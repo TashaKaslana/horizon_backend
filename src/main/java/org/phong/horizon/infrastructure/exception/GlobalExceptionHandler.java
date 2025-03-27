@@ -1,4 +1,4 @@
-package org.phong.horizon.share.exception;
+package org.phong.horizon.infrastructure.exception;
 
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
