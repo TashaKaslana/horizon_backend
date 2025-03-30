@@ -1,4 +1,4 @@
-package org.phong.horizon.user.infrastructure.persistent.entities;
+package org.phong.horizon.user.infrastructure.persistence.entities;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import org.phong.horizon.user.infrastructure.persistent.entities.superclass.BaseEntity;
+import org.phong.horizon.infrastructure.superclass.BaseEntity;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -29,11 +29,6 @@ import java.util.UUID;
         @AttributeOverride(name = "updatedAt", column = @Column(name = "updated_at"))
 })
 public class User extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
-    private UUID id;
-
     @Column(name = "auth0_id", nullable = false)
     private String auth0Id;
 

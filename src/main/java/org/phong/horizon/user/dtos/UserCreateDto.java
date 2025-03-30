@@ -1,6 +1,6 @@
 package org.phong.horizon.user.dtos;
 
-import org.phong.horizon.user.infrastructure.persistent.entities.User;
+import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 import java.io.Serializable;
 

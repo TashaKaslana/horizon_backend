@@ -1,13 +1,14 @@
 package org.phong.horizon.user.services;
 
+import org.phong.horizon.infrastructure.services.AuthService;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserUpdateDto;
 import org.phong.horizon.user.enums.UserErrorEnums;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
-import org.phong.horizon.user.infrastructure.persistent.entities.User;
-import org.phong.horizon.user.infrastructure.persistent.repositories.UserRepository;
+import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -16,10 +17,28 @@ import java.util.UUID;
 public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
-    public UserService(UserMapper userMapper, UserRepository userRepository) {
+    public UserService(UserMapper userMapper, UserRepository userRepository, AuthService authService) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
+        this.authService = authService;
+    }
+
+    public UserRespondDto getCurrentUser() {
+        User user = userRepository.findByAuth0Id(authService.getUserId());
+
+        return getUser(user.getId());
+    }
+
+    public void updateCurrentUser(UserUpdateDto userUpdateDto) {
+        UUID userId = UUID.fromString(authService.getUserId());
+        updateUser(userId, userUpdateDto);
+    }
+
+    public void deleteCurrentUser() {
+        UUID userId = UUID.fromString(authService.getUserId());
+        deleteUser(userId);
     }
 
     public UUID createUser(UserCreateDto userCreateDto) {
