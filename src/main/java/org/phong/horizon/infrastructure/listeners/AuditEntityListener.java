@@ -20,17 +20,17 @@ public class AuditEntityListener {
 
     @PrePersist
     public void prePersist(AuditEntity entity) {
-        String userId = authService.getUserId();
+        UUID userId = authService.getUserId();
         if (userId != null) {
-            entity.setCreatedBy(UUID.fromString(userId));
+            entity.setCreatedBy(userId);
         }
     }
 
     @PreUpdate
     public void preUpdate(AuditEntity entity) {
-        String userId = authService.getUserId();
+        UUID userId = authService.getUserId();
         if (userId != null) {
-            entity.setUpdatedBy(UUID.fromString(userId));
+            entity.setUpdatedBy(userId);
         }
     }
 }

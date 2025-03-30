@@ -43,6 +43,9 @@ public class Post extends BaseEntity {
     @Column(name = "caption", length = Integer.MAX_VALUE)
     private String caption;
 
+    @Column(name = "description", length = Integer.MAX_VALUE)
+    private String description;
+
     @Column(name = "video_url", nullable = false)
     private String videoUrl;
 

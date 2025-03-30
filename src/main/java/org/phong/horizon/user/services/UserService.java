@@ -6,8 +6,8 @@ import org.phong.horizon.user.dtos.UserUpdateDto;
 import org.phong.horizon.user.enums.UserErrorEnums;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
-import org.phong.horizon.user.infrastructure.persistent.entities.User;
-import org.phong.horizon.user.infrastructure.persistent.repositories.UserRepository;
+import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

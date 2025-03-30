@@ -7,6 +7,7 @@ CREATE TABLE posts
     updated_by    UUID,
     user_id       UUID                         NOT NULL,
     caption       TEXT,
+    description   TEXT,
     video_url     VARCHAR(255)                 NOT NULL,
     thumbnail_url VARCHAR(255),
     duration      DOUBLE PRECISION             NOT NULL,

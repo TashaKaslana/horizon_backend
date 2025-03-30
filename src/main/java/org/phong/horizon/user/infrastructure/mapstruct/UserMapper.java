@@ -8,7 +8,7 @@ import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserUpdateDto;
-import org.phong.horizon.user.infrastructure.persistent.entities.User;
+import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface UserMapper {
