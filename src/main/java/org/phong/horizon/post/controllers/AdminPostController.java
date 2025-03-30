@@ -1,13 +1,13 @@
 package org.phong.horizon.post.controllers;
 
 import org.phong.horizon.post.dtos.PostRespond;
-import org.phong.horizon.post.dtos.DeletePostOfUserRequest;
 import org.phong.horizon.post.services.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class AdminPostController {
         this.postService = postService;
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<PostRespond>> getAllPosts() {
         return ResponseEntity.ok(postService.getAll());
     }
@@ -33,10 +33,9 @@ public class AdminPostController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping()
-    public ResponseEntity<Void> deleteAllPosts(DeletePostOfUserRequest request) {
-        postService.deleteAll(request.userId());
-
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllPosts(@RequestParam UUID userId) {
+        postService.deleteAll(userId);
         return ResponseEntity.noContent().build();
     }
 }

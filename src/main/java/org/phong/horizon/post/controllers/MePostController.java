@@ -26,7 +26,7 @@ public class MePostController {
         this.postService = postService;
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<UUID> createPost(@RequestBody CreatePostRequest request) {
         UUID postId = postService.createPost(request);
         return ResponseEntity.ok(postId);
@@ -44,7 +44,7 @@ public class MePostController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<PostRespond>> getMyPosts() {
         return ResponseEntity.ok(postService.getMeAllPost());
     }
