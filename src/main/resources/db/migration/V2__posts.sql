@@ -7,10 +7,11 @@ CREATE TABLE posts
     updated_by    UUID,
     user_id       UUID                         NOT NULL,
     caption       TEXT,
+    description   TEXT,
     video_url     VARCHAR(255)                 NOT NULL,
     thumbnail_url VARCHAR(255),
     duration      DOUBLE PRECISION             NOT NULL,
-    visibility    VARCHAR(10) DEFAULT 'public' NOT NULL,
+    visibility    VARCHAR(10) DEFAULT 'PUBLIC' NOT NULL,
     tags          JSONB,
     CONSTRAINT pk_posts PRIMARY KEY (id)
 );

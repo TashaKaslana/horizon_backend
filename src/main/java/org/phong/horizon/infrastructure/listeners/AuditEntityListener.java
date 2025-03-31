@@ -4,33 +4,32 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import org.phong.horizon.infrastructure.services.AuthService;
 import org.phong.horizon.infrastructure.superclass.AuditEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
 public class AuditEntityListener {
-    private static AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    public void setAuthService(AuthService authService) {
-        AuditEntityListener.authService = authService;
+    public AuditEntityListener(@Lazy AuthService authService) {
+        this.authService = authService;
     }
 
     @PrePersist
     public void prePersist(AuditEntity entity) {
-        String userId = authService.getUserId();
+        UUID userId = authService.getUserId();
         if (userId != null) {
-            entity.setCreatedBy(UUID.fromString(userId));
+            entity.setCreatedBy(userId);
         }
     }
 
     @PreUpdate
     public void preUpdate(AuditEntity entity) {
-        String userId = authService.getUserId();
+        UUID userId = authService.getUserId();
         if (userId != null) {
-            entity.setUpdatedBy(UUID.fromString(userId));
+            entity.setUpdatedBy(userId);
         }
     }
 }

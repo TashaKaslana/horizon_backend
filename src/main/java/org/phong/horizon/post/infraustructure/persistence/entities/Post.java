@@ -4,6 +4,8 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
@@ -16,6 +18,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
+import org.phong.horizon.infrastructure.enums.Visibility;
 import org.phong.horizon.infrastructure.superclass.BaseEntity;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
@@ -43,6 +46,9 @@ public class Post extends BaseEntity {
     @Column(name = "caption", length = Integer.MAX_VALUE)
     private String caption;
 
+    @Column(name = "description", length = Integer.MAX_VALUE)
+    private String description;
+
     @Column(name = "video_url", nullable = false)
     private String videoUrl;
 
@@ -52,9 +58,10 @@ public class Post extends BaseEntity {
     @Column(name = "duration", nullable = false)
     private Double duration;
 
-    @ColumnDefault("'public'")
+    @Enumerated(EnumType.STRING)
     @Column(name = "visibility", nullable = false, length = 10)
-    private String visibility;
+    @ColumnDefault("'PUBLIC'")
+    private Visibility visibility;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "tags", columnDefinition = "jsonb")
