@@ -25,7 +25,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public String handleUserNotFoundException(UserNotFoundException ex) {
-        return "User not found: " + ex.getMessage();
+    public ResponseEntity<ErrorDetails> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        System.out.println("Error: " + ex.getMessage());
+        ex.printStackTrace();
+        return ResponseEntity.status(404).body(errorDetails);
     }
 }

@@ -36,11 +36,17 @@ public class AuthService {
     }
 
     public User getUser() {
-        return userRepository.findByAuth0Id(getAuth0Id()).orElseThrow(() -> new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage()));
+        return userRepository.findByAuth0Id(
+                getAuth0Id()).orElseThrow(() -> new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage())
+        );
     }
 
     public UUID getUserId() {
-        return getUser().getId();
+        try {
+            return getUser().getId();
+        } catch (UserNotFoundException e) {
+            return null;
+        }
     }
 
     public boolean hasRole(String role) {

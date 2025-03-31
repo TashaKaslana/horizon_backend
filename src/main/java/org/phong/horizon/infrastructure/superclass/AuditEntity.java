@@ -26,7 +26,7 @@ public abstract class AuditEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @Column(name = "created_by", updatable = false, nullable = false)
+    @Column(name = "created_by", updatable = false)
     private UUID createdBy;
 
     @Column(name = "updated_by")

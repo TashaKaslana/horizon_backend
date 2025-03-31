@@ -3,12 +3,7 @@ package org.phong.horizon.post.controllers;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.services.PostService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,27 +11,27 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/admin/posts")
 public class AdminPostController {
+
     private final PostService postService;
 
     public AdminPostController(PostService postService) {
         this.postService = postService;
     }
 
-    @GetMapping()
-    public ResponseEntity<List<PostRespond>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAll());
+    @GetMapping
+    public ResponseEntity<List<PostRespond>> getAllPostsForAdmin() {
+        return ResponseEntity.ok(postService.getAllPostsForAdmin());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
-        postService.deletePost(id);
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable UUID postId) {
+        postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAllPosts(@RequestParam UUID userId) {
-        postService.deleteAll(userId);
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<Void> deleteAllPostsByUser(@PathVariable UUID userId) {
+        postService.deleteAllPostsByUser(userId);
         return ResponseEntity.noContent().build();
     }
 }
-

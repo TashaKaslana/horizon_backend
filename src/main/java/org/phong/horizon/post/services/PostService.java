@@ -1,6 +1,7 @@
 package org.phong.horizon.post.services;
 
-import org.phong.horizon.infrastructure.enums.RoleEnums;
+import org.phong.horizon.infrastructure.enums.Role;
+import org.phong.horizon.infrastructure.enums.Visibility;
 import org.phong.horizon.infrastructure.services.AuthService;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostRespond;
@@ -12,7 +13,10 @@ import org.phong.horizon.post.infraustructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infraustructure.persistence.entities.Post;
 import org.phong.horizon.post.infraustructure.persistence.repositories.PostRepository;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,98 +36,93 @@ public class PostService {
         this.postMapper = postMapper;
     }
 
+    @PostAuthorize("hasRole('ADMIN') or " +
+            "returnObject.visibility == T(org.phong.horizon.infrastructure.enums.Visibility).PUBLIC or " +
+//            "(returnObject.visibility != T(org.phong.horizon.infrastructure.enums.Visibility).PRIVATE and @authService.isFriend(returnObject.user.id)) or " +
+            "returnObject.user.id == authentication.principal.id")
+    @Transactional(readOnly = true)
     public PostRespond getPostById(UUID id) {
-        Post post = findById(id);
-
-        if (post.getVisibility().equals("PRIVATE") && isOwnershipOrAdmin(post)) {
-            throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_ACCESS.getMessage());
-        }
-
-        return postMapper.toDto2(findById(id));
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
+        );
+        return postMapper.toDto2(post);
     }
 
-    public List<PostRespond> getMeAllPost() {
-        return findAllPostByUserId(authService.getUserId());
-    }
-
-    public List<PostRespond> getAllPublicPosts() {
-        return postRepository.findAllByVisibility("PUBLIC").stream()
+    @Transactional(readOnly = true)
+    public List<PostRespond> getMeAllPosts() {
+        return postRepository.findAllByUser_Id(authService.getUserId())
+                .stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
     }
 
-    public List<PostRespond> getAll() {
+    @Transactional(readOnly = true)
+    public List<PostRespond> getAllPublicPosts() {
+        return postRepository.findAllByVisibility(Visibility.PUBLIC.getVisibility())
+                .stream()
+                .map(postMapper::toDto2)
+                .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public List<PostRespond> getAllPostsForAdmin() {
         return postRepository.findAll().stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<PostRespond> getAllPublicPostsByUserId(UUID userId) {
-        return postRepository.findAllByUser_IdAndVisibility(userId, "PUBLIC").stream()
+        return postRepository.findAllByUser_IdAndVisibility(userId, Visibility.PUBLIC.getVisibility())
+                .stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
     }
 
-    public List<PostRespond> findAllPostByUserId(UUID userId) {
-        return postRepository.findAllByUser_Id(userId).stream()
-                .map(postMapper::toDto2)
-                .collect(Collectors.toList());
-    }
-
+    @Transactional
     public UUID createPost(CreatePostRequest request) {
-        User user = authService.getUser();
+        User currentUser = authService.getUser();
 
         Post post = postMapper.toEntity(request);
-        post.setUser(user);
-
+        post.setUser(currentUser);
         Post createdPost = postRepository.save(post);
 
         return createdPost.getId();
     }
 
+    @Transactional
     public void updatePost(UUID id, UpdatePostRequest request) {
-        Post post = findById(id);
-        checkPostOwnership(post);
+        User currentUser = authService.getUser();
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
+        );
+
+        if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN.getRole())) {
+            throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_UPDATE.getMessage());
+        }
 
         Post updatedPost = postMapper.partialUpdate(request, post);
         postRepository.save(updatedPost);
     }
 
+    @Transactional
     public void deletePost(UUID id) {
-        Post post = findById(id);
+        User currentUser = authService.getUser();
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
+        );
 
-        postRepository.delete(post);
-    }
-
-    public void deleteMePost(UUID id) {
-        Post post = findById(id);
-
-        if (post.getUser().getId().equals(authService.getUserId())) {
+        if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN.getRole())) {
             throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_DELETE.getMessage());
         }
 
         postRepository.delete(post);
     }
 
-    public void deleteAll(UUID userId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void deleteAllPostsByUser(UUID userId) {
         postRepository.deleteAllByUser_Id(userId);
-    }
-
-    private void checkPostOwnership(Post post) {
-        User user = authService.getUser();
-        if (!post.getUser().getId().equals(user.getId())) {
-            throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_UPDATE.getMessage());
-        }
-    }
-
-    private boolean isOwnershipOrAdmin(Post post) {
-        UUID userId = authService.getUserId();
-        return post.getUser().getId().equals(userId) || authService.hasRole(RoleEnums.ADMIN.getRole());
-    }
-
-    private Post findById(UUID postId) {
-        return postRepository.findById(postId).orElseThrow(
-                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
-        );
     }
 }
