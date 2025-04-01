@@ -6,7 +6,9 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.user.dtos.UserCreateDto;
+import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
+import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateDto;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
@@ -32,4 +34,18 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserCreateDto userCreateDto, @MappingTarget User user);
+
+    User toEntity(UserSummaryRespond userSummaryRespond);
+
+    UserSummaryRespond toDto3(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User partialUpdate(UserSummaryRespond userSummaryRespond, @MappingTarget User user);
+
+    User toEntity(UserCreatedDto userCreatedDto);
+
+    UserCreatedDto toDto4(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User partialUpdate(UserCreatedDto userCreatedDto, @MappingTarget User user);
 }

@@ -1,14 +1,16 @@
 package org.phong.horizon.infrastructure.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 
-@ControllerAdvice
+@RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
@@ -17,9 +19,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
-
-        System.out.println("Error: " + ex.getMessage());
-        ex.printStackTrace();
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
 
         return ResponseEntity.status(500).body(errorDetails);
     }
@@ -31,9 +31,8 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        log.warn("User Not Found: {}", ex.getMessage());
 
-        System.out.println("Error: " + ex.getMessage());
-        ex.printStackTrace();
         return ResponseEntity.status(404).body(errorDetails);
     }
 }

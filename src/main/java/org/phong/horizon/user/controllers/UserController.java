@@ -1,9 +1,12 @@
 package org.phong.horizon.user.controllers;
 
 import org.phong.horizon.user.dtos.UserCreateDto;
+import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
+import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateDto;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,23 +27,30 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{uuid}")
-    public UserRespondDto getUser(@PathVariable UUID uuid) {
-        return userService.getUser(uuid);
+    @GetMapping("/me")
+    public ResponseEntity<UserRespondDto> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUser());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserSummaryRespond> getUserSummary(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getUserSummary(id));
     }
 
     @PostMapping()
-    public UUID createUser(@RequestBody UserCreateDto userCreateDto) {
-        return userService.createUser(userCreateDto);
+    public ResponseEntity<UserCreatedDto> createUser(@RequestBody UserCreateDto userUpdateDto) {
+        return ResponseEntity.ok(userService.createUser(userUpdateDto));
     }
 
-    @PutMapping("/{uuid}")
-    public void updateUser(@PathVariable UUID uuid, @RequestBody UserUpdateDto userUpdateDto) {
-        userService.updateUser(uuid, userUpdateDto);
+    @PutMapping("/me")
+    public ResponseEntity<Void> updateCurrentUser(@RequestBody UserUpdateDto userUpdateDto) {
+        userService.updateCurrentUser(userUpdateDto);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{uuid}")
-    public void deleteUser(@PathVariable UUID uuid) {
-        userService.deleteUser(uuid);
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteCurrentUser() {
+        userService.deleteCurrentUser();
+        return ResponseEntity.noContent().build();
     }
 }

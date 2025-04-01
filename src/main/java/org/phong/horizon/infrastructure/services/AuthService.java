@@ -49,6 +49,10 @@ public class AuthService {
         }
     }
 
+    public boolean isCurrentUserMatch(UUID userId) {
+        return getUserId().equals(userId);
+    }
+
     public boolean hasRole(String role) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
