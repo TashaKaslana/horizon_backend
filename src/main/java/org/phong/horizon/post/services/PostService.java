@@ -4,6 +4,7 @@ import org.phong.horizon.infrastructure.enums.Role;
 import org.phong.horizon.infrastructure.enums.Visibility;
 import org.phong.horizon.infrastructure.services.AuthService;
 import org.phong.horizon.post.dtos.CreatePostRequest;
+import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.enums.PostErrorEnums;
@@ -58,7 +59,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostRespond> getAllPublicPosts() {
-        return postRepository.findAllByVisibility(Visibility.PUBLIC.getVisibility())
+        return postRepository.findAllByVisibility(Visibility.PUBLIC)
                 .stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
@@ -74,21 +75,21 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostRespond> getAllPublicPostsByUserId(UUID userId) {
-        return postRepository.findAllByUser_IdAndVisibility(userId, Visibility.PUBLIC.getVisibility())
+        return postRepository.findAllByUser_IdAndVisibility(userId, Visibility.PUBLIC)
                 .stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public UUID createPost(CreatePostRequest request) {
+    public PostCreatedDto createPost(CreatePostRequest request) {
         User currentUser = authService.getUser();
 
         Post post = postMapper.toEntity(request);
         post.setUser(currentUser);
         Post createdPost = postRepository.save(post);
 
-        return createdPost.getId();
+        return new PostCreatedDto(createdPost.getId());
     }
 
     @Transactional
@@ -98,7 +99,7 @@ public class PostService {
                 () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
         );
 
-        if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN.getRole())) {
+        if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN)) {
             throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_UPDATE.getMessage());
         }
 
@@ -113,7 +114,7 @@ public class PostService {
                 () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
         );
 
-        if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN.getRole())) {
+        if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN)) {
             throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_DELETE.getMessage());
         }
 

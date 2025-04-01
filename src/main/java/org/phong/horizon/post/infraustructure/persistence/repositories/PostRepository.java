@@ -1,5 +1,6 @@
 package org.phong.horizon.post.infraustructure.persistence.repositories;
 
+import org.phong.horizon.infrastructure.enums.Visibility;
 import org.phong.horizon.post.infraustructure.persistence.entities.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,7 +12,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     void deleteAllByUser_Id(UUID userId);
 
-    List<Post> findAllByVisibility(String visibility);
+    List<Post> findAllByVisibility(Visibility visibility);
 
-    List<Post> findAllByUser_IdAndVisibility(UUID userId, String visibility);
+    List<Post> findAllByUser_IdAndVisibility(UUID userId, Visibility visibility);
 }

@@ -1,5 +1,6 @@
 package org.phong.horizon.infrastructure.services;
 
+import org.phong.horizon.infrastructure.enums.Role;
 import org.phong.horizon.user.enums.UserErrorEnums;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
@@ -49,7 +50,7 @@ public class AuthService {
         return getUserId().equals(userId);
     }
 
-    public boolean hasRole(String role) {
+    public boolean hasRole(Role role) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
@@ -58,6 +59,6 @@ public class AuthService {
 
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(authority -> authority.equals("ROLE_" + role));
+                .anyMatch(authority -> authority.equals("ROLE_" + role.getRole()));
     }
 }

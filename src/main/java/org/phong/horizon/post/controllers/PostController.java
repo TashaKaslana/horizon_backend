@@ -1,6 +1,7 @@
 package org.phong.horizon.post.controllers;
 
 import org.phong.horizon.post.dtos.CreatePostRequest;
+import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.services.PostService;
@@ -41,9 +42,8 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createPost(@RequestBody CreatePostRequest request) {
-        UUID postId = postService.createPost(request);
-        return ResponseEntity.ok(postId);
+    public ResponseEntity<PostCreatedDto> createPost(@RequestBody CreatePostRequest request) {
+        return ResponseEntity.ok(postService.createPost(request));
     }
 
     @PutMapping("/{postId}")
