@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -26,9 +28,11 @@ public abstract class AuditEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @CreatedBy
     @Column(name = "created_by", updatable = false)
     private UUID createdBy;
 
+    @LastModifiedBy
     @Column(name = "updated_by")
     private UUID updatedBy;
 }
