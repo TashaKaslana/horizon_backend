@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.phong.horizon.infrastructure.listeners.AuditEntityListener;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @MappedSuperclass
-@EntityListeners(AuditEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public abstract class AuditEntity {
 
     @CreationTimestamp

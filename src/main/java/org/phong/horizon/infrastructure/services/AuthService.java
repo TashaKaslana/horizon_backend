@@ -36,20 +36,16 @@ public class AuthService {
     }
 
     public User getUser() {
-        return userRepository.findByAuth0Id(
-                getAuth0Id()).orElseThrow(() -> new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage())
+        return userRepository.findByAuth0Id(getAuth0Id())
+                .orElseThrow(() -> new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage())
         );
     }
 
     public UUID getUserId() {
-        try {
-            return getUser().getId();
-        } catch (UserNotFoundException e) {
-            return null;
-        }
+        return userRepository.getUserIdByAuth0Id(getAuth0Id());
     }
 
-    public boolean isCurrentUserMatch(UUID userId) {
+    public boolean isPrincipal(UUID userId) {
         return getUserId().equals(userId);
     }
 

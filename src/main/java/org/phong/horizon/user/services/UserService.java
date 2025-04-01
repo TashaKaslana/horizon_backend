@@ -52,7 +52,7 @@ public class UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or @authService.isCurrentUserMatch(#authentication.principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#authentication.principal.id)")
     public void updateCurrentUser(UserUpdateDto userUpdateDto) {
         UUID userId = authService.getUserId();
 
@@ -60,7 +60,7 @@ public class UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or @authService.isCurrentUserMatch(#authentication.principal.id)")
+    @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#authentication.principal.id)")
     public void deleteCurrentUser() {
         UUID userId = authService.getUserId();
 
@@ -78,26 +78,25 @@ public class UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or @authService.isCurrentUserMatch(#uuid)")
+    @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#uuid)")
     public UserRespondDto getUser(UUID uuid) {
         User user = findById(uuid);
         return userMapper.toDto(user);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or @authService.isCurrentUserMatch(#userID)")
-    public void updateUser(UUID userID, UserUpdateDto userUpdateDto) {
-        User user = findById(userID);
+    @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#userId)")
+    public void updateUser(UUID userId, UserUpdateDto userUpdateDto) {
+        log.info("Attempting to update user with ID: {}", userId);
 
+        User user = findById(userId);
         User updatedUser = userMapper.partialUpdate(userUpdateDto, user);
-
-        userRepository.save(updatedUser);
-
-        log.info("Updated user: {}", updatedUser);
+        User savedUser = userRepository.save(updatedUser);
+        log.info("Successfully updated user with ID: {}", savedUser.getId());
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or @authService.isCurrentUserMatch(#uuid)")
+    @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#uuid)")
     public void deleteUser(UUID uuid) {
         userRepository.deleteById(uuid);
 
