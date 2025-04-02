@@ -126,4 +126,11 @@ public class PostService {
     public void deleteAllPostsByUser(UUID userId) {
         postRepository.deleteAllByUser_Id(userId);
     }
+
+    @Transactional
+    public Post findPostById(UUID postId) {
+        return postRepository.findById(postId).orElseThrow(
+                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
+        );
+    }
 }
