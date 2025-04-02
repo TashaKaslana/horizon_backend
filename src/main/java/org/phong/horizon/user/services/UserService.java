@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,6 +45,20 @@ public class UserService {
         User user = findById(uuid);
 
         return userMapper.toDto3(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, User> getUsersByUsernames(List<String> usernameList) {
+        List<User> users = userRepository.findAllByListUserName(usernameList);
+
+        if (users.isEmpty()) {
+            log.warn("No users found with usernames: {}", usernameList);
+            throw new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage());
+        }
+
+        return users.stream()
+                .map(user -> Map.entry(user.getUsername(), user))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public List<UserSummaryRespond> getListUserSummary() {
