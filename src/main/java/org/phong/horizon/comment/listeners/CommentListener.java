@@ -4,7 +4,6 @@ import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.services.CommentMentionService;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -17,17 +16,15 @@ public class CommentListener {
         this.commentMentionService = commentMentionService;
     }
 
-    @Async
     @EventListener
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onCommentCreated(CommentCreated event) {
-        commentMentionService.createMentions(event.comment());
+        commentMentionService.createMentions(event.id());
     }
 
-    @Async
     @EventListener
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onCommentUpdated(CommentUpdated event) {
-        commentMentionService.renewMentions(event.comment());
+        commentMentionService.renewMentions(event.comment().getId());
     }
 }

@@ -1,9 +1,10 @@
 package org.phong.horizon.comment.events;
 
-import lombok.Builder;
-import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
-import org.phong.horizon.infrastructure.events.Event;
+import java.io.Serializable;
+import java.util.UUID;
 
-@Builder
-public record CommentCreated(Comment comment) implements Event {
+/**
+ * DTO for {@link org.phong.horizon.comment.infrastructure.persistence.entities.Comment}
+ */
+public record CommentCreated(UUID id, UUID postId, UUID userId, String content) implements Serializable {
 }

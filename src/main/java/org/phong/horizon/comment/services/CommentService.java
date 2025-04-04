@@ -1,12 +1,12 @@
 package org.phong.horizon.comment.services;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.comment.dtos.CommentCreatedDto;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.enums.CommentErrorEnums;
-import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.events.CommentDeleted;
 import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.exceptions.CommentNotFoundException;
@@ -15,6 +15,9 @@ import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentRepository;
 import org.phong.horizon.infrastructure.enums.Role;
 import org.phong.horizon.infrastructure.services.AuthService;
+import org.phong.horizon.post.infraustructure.persistence.entities.Post;
+import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -26,31 +29,36 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final AuthService authService;
+    private final PostService postService;
     private final ApplicationEventPublisher eventPublisher;
 
-    public CommentService(CommentRepository commentRepository,
-                          CommentMapper commentMapper,
-                          AuthService authService,
-                          ApplicationEventPublisher eventPublisher) {
-        this.commentRepository = commentRepository;
-        this.commentMapper = commentMapper;
-        this.authService = authService;
-        this.eventPublisher = eventPublisher;
-    }
-
     @Transactional
-    public CommentCreatedDto createComment(CreateCommentDto createCommentDto) {
-        Comment comment = commentMapper.toEntity(createCommentDto);
-        comment.setUser(authService.getUser());
+    public CommentCreatedDto createComment(CreateCommentDto request) {
+        Comment comment = commentMapper.toEntity(request);
+
+        Post post = postService.findPostById(request.postId());
+        comment.setPost(post);
+
+        User user = authService.getUser();
+        comment.setUser(user);
+
+        if (request.parentCommentId() != null) {
+            Comment parentComment = commentRepository.findById(request.parentCommentId())
+                    .orElseThrow(() -> new CommentNotFoundException(CommentErrorEnums.COMMENT_NOT_FOUND.getMessage()));
+            comment.setParentComment(parentComment);
+        } else {
+            comment.setParentComment(null);
+        }
 
         Comment createdComment = commentRepository.save(comment);
+        log.info("Comment created successfully, ID: {}", createdComment.getId());
 
-        log.info("Comment created: {}", comment);
-        eventPublisher.publishEvent(new CommentCreated(createdComment));
+        eventPublisher.publishEvent(commentMapper.toDto3(createdComment));
 
         return new CommentCreatedDto(createdComment.getId());
     }

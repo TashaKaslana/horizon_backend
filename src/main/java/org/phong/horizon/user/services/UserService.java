@@ -53,7 +53,7 @@ public class UserService {
 
         if (users.isEmpty()) {
             log.warn("No users found with usernames: {}", usernameList);
-            throw new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage());
+            return null;
         }
 
         return users.stream()
@@ -70,7 +70,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#authentication.principal.id)")
     public void updateCurrentUser(UserUpdateDto userUpdateDto) {
-        UUID userId = authService.getUserId();
+        UUID userId = authService.getUserIdFromContext();
 
         updateUser(userId, userUpdateDto);
     }
@@ -78,7 +78,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#authentication.principal.id)")
     public void deleteCurrentUser() {
-        UUID userId = authService.getUserId();
+        UUID userId = authService.getUserIdFromContext();
 
         deleteUser(userId);
     }
@@ -128,7 +128,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    protected User findById(UUID uuid) {
+    public User findById(UUID uuid) {
         return userRepository.findById(uuid)
                 .orElseThrow(() -> {
                     log.error("User not found with uuid: {}", uuid);

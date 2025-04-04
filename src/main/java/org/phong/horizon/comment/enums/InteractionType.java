@@ -13,12 +13,12 @@ public enum InteractionType {
         this.type = type;
     }
 
-//    public static InteractionType fromString(String type) {
-//        for (InteractionType interactionType : InteractionType.values()) {
-//            if (interactionType.type.equalsIgnoreCase(type)) {
-//                return interactionType;
-//            }
-//        }
-//        throw new IllegalArgumentException("No enum constant for type: " + type);
-//    }
+    public static InteractionType fromString(String type) {
+        for (InteractionType interactionType : InteractionType.values()) {
+            if (interactionType.type.equalsIgnoreCase(type)) {
+                return interactionType;
+            }
+        }
+        throw new IllegalArgumentException("No enum constant for type: " + type);
+    }
 }

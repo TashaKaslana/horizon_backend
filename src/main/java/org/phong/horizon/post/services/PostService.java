@@ -51,7 +51,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostRespond> getMeAllPosts() {
-        return postRepository.findAllByUser_Id(authService.getUserId())
+        return postRepository.findAllByUser_Id(authService.getUserIdFromContext())
                 .stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());

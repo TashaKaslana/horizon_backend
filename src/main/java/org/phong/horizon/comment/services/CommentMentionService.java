@@ -7,11 +7,14 @@ import org.phong.horizon.comment.infrastructure.persistence.repositories.Comment
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -20,47 +23,77 @@ public class CommentMentionService {
     private static final Pattern pattern = Pattern.compile("@[\\w-]+");
     private final CommentMentionRepository commentMentionRepository;
     private final UserService userService;
+    private final CommentService commentService;
 
     public CommentMentionService(CommentMentionRepository commentMentionRepository,
-                                 UserService userService) {
+                                 UserService userService,
+                                 CommentService commentService) {
         this.commentMentionRepository = commentMentionRepository;
         this.userService = userService;
+        this.commentService = commentService;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createMentions(UUID commentId) {
+        Comment comment = commentService.findById(commentId);
+        if (comment != null) {
+            createMentionsInternal(comment);
+        } else {
+            log.warn("Comment not found in createMentionsForListener: {}", commentId);
+        }
     }
 
     @Transactional
-    public void createMentions(Comment comment) {
-        List<String> mentionUser = extractMentions(comment.getContent());
-        Map<String, User> userMap = userService.getUsersByUsernames(mentionUser);
+    public void renewMentions(UUID commentId) {
+        deleteMentions(commentId);
+        Comment comment = commentService.findById(commentId);
 
-        if (userMap.isEmpty()) {
-            log.warn("No users found with usernames: {}", mentionUser);
+        if (comment != null) {
+            createMentionsInternal(comment);
+        } else {
+            log.warn("Comment with ID: {} not found for renewing mentions", commentId);
+        }
+    }
+
+    private void createMentionsInternal(Comment comment) {
+        List<String> mentionUsernames = extractMentions(comment.getContent());
+        if (mentionUsernames.isEmpty()) {
+            log.debug("No mentions found in content for comment: {}", comment.getId());
             return;
         }
 
-        List<CommentMention> mentions = mentionUser.stream()
-                .filter(userMap::containsKey)
-                .map(username -> {
+        Map<String, User> userMap = userService.getUsersByUsernames(mentionUsernames);
+
+        if (userMap == null || userMap.isEmpty()) {
+            log.warn("No users found matching mentioned usernames: {} for comment: {}", mentionUsernames, comment.getId());
+            return;
+        }
+
+        List<CommentMention> mentionsToSave = mentionUsernames.stream()
+                .map(userMap::get)
+                .filter(Objects::nonNull)
+                .map(user -> {
                     CommentMention commentMention = new CommentMention();
                     commentMention.setComment(comment);
-                    commentMention.setMentionedUser(userMap.get(username));
+                    commentMention.setMentionedUser(user);
+
                     return commentMention;
                 })
                 .toList();
 
-        commentMentionRepository.saveAll(mentions);
+        if (!mentionsToSave.isEmpty()) {
+            commentMentionRepository.saveAll(mentionsToSave);
+            log.info("Saved {} new mentions for comment: {}", mentionsToSave.size(), comment.getId());
+        } else {
+            log.debug("No valid users found for mentions, nothing saved for comment: {}", comment.getId());
+        }
     }
 
-    @Transactional
-    public void renewMentions(Comment comment) {
-        deleteMentions(comment);
-        createMentions(comment);
-    }
-
-    protected void deleteMentions(Comment comment) {
-        List<CommentMention> mentions = commentMentionRepository.findAllByComment(comment);
+    protected void deleteMentions(UUID commentId) {
+        List<CommentMention> mentions = commentMentionRepository.findAllByComment_Id(commentId);
 
         if (mentions.isEmpty()) {
-            log.info("No mentions found for comment: {}", comment.getId());
+            log.info("No mentions found for comment: {}", commentId);
             return;
         }
 

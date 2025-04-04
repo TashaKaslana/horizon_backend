@@ -42,8 +42,8 @@ public class CommentInteractionController {
 
     @DeleteMapping("/{interactionType}")
     public ResponseEntity<Void> removeInteraction(@PathVariable UUID commentId,
-                                                  @PathVariable InteractionType interactionType) {
-        interactionService.deleteInteraction(commentId, interactionType);
+                                                  @PathVariable String interactionType) {
+        interactionService.deleteInteraction(commentId, InteractionType.fromString(interactionType));
         return ResponseEntity.noContent().build();
     }
 }

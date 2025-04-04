@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
@@ -42,4 +43,15 @@ public interface CommentMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Comment partialUpdate(UpdateCommentContentDto updateCommentContentDto, @MappingTarget Comment comment);
+
+    @Mapping(source = "userId", target = "user.id")
+    @Mapping(source = "postId", target = "post.id")
+    Comment toEntity(CommentCreated commentCreated);
+
+    @InheritInverseConfiguration(name = "toEntity")
+    CommentCreated toDto3(Comment comment);
+
+    @InheritConfiguration(name = "toEntity")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Comment partialUpdate(CommentCreated commentCreated, @MappingTarget Comment comment);
 }
