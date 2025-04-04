@@ -56,6 +56,14 @@ public class StorageService {
         return assetRepository.findByPublicId(publicId);
     }
 
+    public String generateVideoPlaybackUrl(String publicId) {
+        return cloudinaryClientService.generateVideoPlaybackUrl(publicId);
+    }
+
+    public String generateVideoThumbnailUrl(String publicId) {
+        return cloudinaryClientService.generateVideoThumbnailUrl(publicId);
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN') or @authService.isPrincipal(assetRepository.getCreatedByIdByPublicId(id))")
     @Transactional
     public void deleteAsset(UUID id) {

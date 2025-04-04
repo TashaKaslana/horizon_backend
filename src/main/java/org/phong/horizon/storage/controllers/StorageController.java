@@ -36,6 +36,18 @@ public class StorageController {
         return asset.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/playback-url/{publicId}")
+    public ResponseEntity<String> getVideoPlaybackUrl(@PathVariable String publicId) {
+        String playbackUrl = storageService.generateVideoPlaybackUrl(publicId);
+        return ResponseEntity.ok(playbackUrl);
+    }
+
+    @GetMapping("/thumbnail-url/{publicId}")
+    public ResponseEntity<String> getVideoThumbnailUrl(@PathVariable String publicId) {
+        String thumbnailUrl = storageService.generateVideoThumbnailUrl(publicId);
+        return ResponseEntity.ok(thumbnailUrl);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAsset(@PathVariable UUID id) {
         storageService.deleteAsset(id);
