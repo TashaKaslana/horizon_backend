@@ -1,5 +1,6 @@
 package org.phong.horizon.post.services;
 
+import lombok.AllArgsConstructor;
 import org.phong.horizon.infrastructure.enums.Role;
 import org.phong.horizon.infrastructure.enums.Visibility;
 import org.phong.horizon.infrastructure.services.AuthService;
@@ -13,6 +14,8 @@ import org.phong.horizon.post.exceptions.PostPermissionDenialException;
 import org.phong.horizon.post.infraustructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infraustructure.persistence.entities.Post;
 import org.phong.horizon.post.infraustructure.persistence.repositories.PostRepository;
+import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
+import org.phong.horizon.storage.service.StorageService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,18 +27,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final AuthService authService;
     private final PostMapper postMapper;
-
-    public PostService(PostRepository postRepository,
-                       PostMapper postMapper,
-                       AuthService authService) {
-        this.postRepository = postRepository;
-        this.authService = authService;
-        this.postMapper = postMapper;
-    }
+    private final StorageService storageService;
 
     @PostAuthorize("hasRole('ADMIN') or " +
             "returnObject.visibility == T(org.phong.horizon.infrastructure.enums.Visibility).PUBLIC or " +
@@ -84,9 +81,12 @@ public class PostService {
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
         User currentUser = authService.getUser();
+        Asset asset = storageService.findAssetById(request.videoAssetId());
 
         Post post = postMapper.toEntity(request);
+
         post.setUser(currentUser);
+        post.setVideoAsset(asset);
         Post createdPost = postRepository.save(post);
 
         return new PostCreatedDto(createdPost.getId());

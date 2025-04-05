@@ -1,6 +1,6 @@
 package org.phong.horizon.comment.infrastructure.persistence.repositories;
 
-import org.phong.horizon.comment.enums.InteractionType;
+import org.phong.horizon.infrastructure.enums.InteractionType;
 import org.phong.horizon.comment.infrastructure.persistence.entities.CommentInteraction;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -7,12 +7,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.phong.horizon.infrastructure.superclass.BaseEntity;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "assets", indexes = {
         @Index(name = "idx_assets_public_id", columnList = "public_id"),
@@ -24,6 +28,8 @@ import org.phong.horizon.infrastructure.superclass.BaseEntity;
         @AttributeOverride(name = "createdAt", column = @Column(name = "created_at")),
         @AttributeOverride(name = "updatedAt", column = @Column(name = "updated_at"))
 })
+@NoArgsConstructor
+@AllArgsConstructor
 public class Asset extends BaseEntity {
     @Column(name = "public_id", nullable = false)
     private String publicId;

@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,6 +27,7 @@ import java.util.UUID;
 public class StorageService {
     private final AssetRepository assetRepository;
     private final CloudinaryClientService cloudinaryClientService;
+    private final CloudinaryUrlGenerator cloudinaryUrlGenerator;
     private final AssetMapper assetMapper;
 
     @Transactional
@@ -48,20 +48,36 @@ public class StorageService {
         return assetMapper.toDto1(savedAsset);
     }
 
-    public Optional<Asset> getAssetById(UUID id) {
-        return assetRepository.findById(id);
+    public AssetRespond getAssetById(UUID id) {
+        return assetMapper.toDto1(findAssetById(id));
     }
 
-    public Optional<Asset> getAssetByPublicId(String publicId) {
-        return assetRepository.findByPublicId(publicId);
+    public AssetRespond getAssetByPublicId(String publicId) {
+        return assetMapper.toDto1(findAssetByPublicId(publicId));
+    }
+
+    public Asset findAssetById(UUID id) {
+        return assetRepository.findById(id).orElseThrow(
+                () -> new AssetNotFoundException(StorageErrorEnums.ASSET_NOT_FOUND.getMessage() + id)
+        );
+    }
+
+    public Asset findAssetByPublicId(String publicId) {
+        return assetRepository.findByPublicId(publicId).orElseThrow(
+                () -> new AssetNotFoundException(StorageErrorEnums.ASSET_NOT_FOUND.getMessage() + publicId)
+        );
     }
 
     public String generateVideoPlaybackUrl(String publicId) {
-        return cloudinaryClientService.generateVideoPlaybackUrl(publicId);
+        return cloudinaryUrlGenerator.generateVideoPlaybackUrl(
+                Asset.builder().publicId(publicId).build()
+        );
     }
 
     public String generateVideoThumbnailUrl(String publicId) {
-        return cloudinaryClientService.generateVideoThumbnailUrl(publicId);
+        return cloudinaryUrlGenerator.generateVideoThumbnailUrl(
+                Asset.builder().publicId(publicId).build()
+        );
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or @authService.isPrincipal(assetRepository.getCreatedByIdByPublicId(id))")

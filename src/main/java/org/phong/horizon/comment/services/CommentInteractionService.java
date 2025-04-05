@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.comment.dtos.CommentInteractionRespond;
 import org.phong.horizon.comment.dtos.CreateCommentInteraction;
 import org.phong.horizon.comment.enums.CommentInteractionError;
-import org.phong.horizon.comment.enums.InteractionType;
+import org.phong.horizon.infrastructure.enums.InteractionType;
 import org.phong.horizon.comment.exceptions.CommentInteractionExistException;
 import org.phong.horizon.comment.exceptions.CommentInteractionNotFoundException;
 import org.phong.horizon.comment.infrastructure.mapstruct.CommentInteractionMapper;
@@ -30,11 +30,11 @@ public class CommentInteractionService {
 
     public CommentInteractionService(CommentService commentService,
                                      CommentInteractionRepository repository,
-                                     AuthService authService, CommentInteractionMapper mapper) {
+                                     AuthService authService, CommentInteractionMapper commentInteractionMapper) {
         this.commentService = commentService;
         this.repository = repository;
         this.authService = authService;
-        this.mapper = mapper;
+        this.mapper = commentInteractionMapper;
     }
 
     @Transactional

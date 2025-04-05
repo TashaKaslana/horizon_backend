@@ -2,7 +2,7 @@ package org.phong.horizon.comment.controllers;
 
 import org.phong.horizon.comment.dtos.CommentInteractionRespond;
 import org.phong.horizon.comment.dtos.CreateCommentInteraction;
-import org.phong.horizon.comment.enums.InteractionType;
+import org.phong.horizon.infrastructure.enums.InteractionType;
 import org.phong.horizon.comment.services.CommentInteractionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

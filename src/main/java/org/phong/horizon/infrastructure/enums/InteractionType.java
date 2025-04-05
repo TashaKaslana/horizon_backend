@@ -1,4 +1,4 @@
-package org.phong.horizon.comment.enums;
+package org.phong.horizon.infrastructure.enums;
 
 import lombok.Getter;
 

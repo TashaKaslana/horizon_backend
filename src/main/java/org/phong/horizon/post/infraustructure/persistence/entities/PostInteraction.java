@@ -1,4 +1,4 @@
-package org.phong.horizon.comment.infrastructure.persistence.entities;
+package org.phong.horizon.post.infraustructure.persistence.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,13 +28,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "comment_interactions", indexes = {
-        @Index(name = "idx_comment_interactions_comment_type", columnList = "comment_id, interaction_type"),
-        @Index(name = "idx_comment_interactions_user_type", columnList = "user_id, interaction_type")
+@Table(name = "post_interactions", indexes = {
+        @Index(name = "idx_post_interactions_user", columnList = "user_id, interaction"),
+        @Index(name = "idx_post_interactions_post", columnList = "post_id, interaction")
 }, uniqueConstraints = {
-        @UniqueConstraint(name = "uq_comment_user_interaction", columnNames = {"comment_id", "user_id", "interaction_type"})
+        @UniqueConstraint(name = "uq_post_user_interaction", columnNames = {"post_id", "user_id", "interaction"})
 })
-public class CommentInteraction {
+public class PostInteraction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
@@ -42,17 +42,18 @@ public class CommentInteraction {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "comment_id", nullable = false)
-    private Comment comment;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "interaction_type", nullable = false, length = 32)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ColumnDefault("'LIKE'")
     @Enumerated(EnumType.STRING)
-    private InteractionType interactionType;
+    @Column(name = "interaction", nullable = false, length = 32)
+    private InteractionType interaction;
 
     @ColumnDefault("now()")
     @Column(name = "created_at")

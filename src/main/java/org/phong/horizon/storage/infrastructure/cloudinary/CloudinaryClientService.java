@@ -1,7 +1,6 @@
 package org.phong.horizon.storage.infrastructure.cloudinary;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.storage.enums.StorageErrorEnums;
@@ -85,37 +84,6 @@ public class CloudinaryClientService {
             log.error("Unexpected error calling Cloudinary deletion API for public ID '{}': {}", publicId, e.getMessage(), e);
             throw new CloudinaryException(StorageErrorEnums.UNEXPECTED_CLOUDINARY_ERROR.getMessage(), e);
         }
-    }
-
-    public String generateVideoPlaybackUrl(String publicId) {
-        // Basic playback URL with auto format/quality optimization
-        return cloudinary.url()
-                .resourceType("video")
-                .transformation(new Transformation<>()
-                        .quality("auto")
-                )// Ensure correct resource type
-                .format("auto")// Let Cloudinary choose the best video format (mp4, webm etc.)
-                // Let Cloudinary optimize quality/size
-                .secure(true)
-                .generate(publicId); // Use public_id from the asset entity
-    }
-
-    public String generateVideoThumbnailUrl(String publicId) {
-        // Generate a specific thumbnail (e.g., 300px wide, cropped, as auto-format image)
-        // Extracting a frame often defaults to the middle or first few seconds.
-        // Use 'startOffset' ('so_') in transformation for specific frame.
-        return cloudinary.url()
-                .resourceType("video") // Still video resource type...
-                // ...but generating an image! Cloudinary handles this.
-                .transformation(new Transformation<>()
-                        .width(300)        // Desired thumbnail width
-                        .crop("limit")     // Limit width, auto height (or use 'fill', 'thumb')
-                        // .startOffset("auto") // Or "2" for second 2, "50p" for 50%
-                        .quality("auto")
-                )
-                .format("auto") // Generate best IMAGE format (jpg, png, webp)
-                .secure(true)
-                .generate(publicId); // Base on the video's public_id
     }
 
     private void processClientParams(Map<String, Object> paramsFromClient, Map<String, Object> paramsToSign) {

@@ -3,13 +3,11 @@ package org.phong.horizon.storage.controllers;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.dtos.UploadCompleteRequest;
-import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
 import org.phong.horizon.storage.service.StorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -25,15 +23,15 @@ public class StorageController {
     }
 
     @GetMapping("/asset/{id}")
-    public ResponseEntity<Asset> getAssetById(@PathVariable UUID id) {
-        Optional<Asset> asset = storageService.getAssetById(id);
-        return asset.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<AssetRespond> getAssetById(@PathVariable UUID id) {
+        AssetRespond asset = storageService.getAssetById(id);
+        return ResponseEntity.ok(asset);
     }
 
     @GetMapping("/asset/public/{publicId}")
-    public ResponseEntity<Asset> getAssetByPublicId(@PathVariable String publicId) {
-        Optional<Asset> asset = storageService.getAssetByPublicId(publicId);
-        return asset.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<AssetRespond> getAssetByPublicId(@PathVariable String publicId) {
+        AssetRespond asset = storageService.getAssetByPublicId(publicId);
+        return ResponseEntity.ok(asset);
     }
 
     @GetMapping("/playback-url/{publicId}")

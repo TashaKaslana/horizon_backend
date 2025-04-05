@@ -20,6 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 import org.phong.horizon.infrastructure.enums.Visibility;
 import org.phong.horizon.infrastructure.superclass.BaseEntity;
+import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 import java.util.List;
@@ -49,11 +50,9 @@ public class Post extends BaseEntity {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @Column(name = "video_url", nullable = false)
-    private String videoUrl;
-
-    @Column(name = "thumbnail_url")
-    private String thumbnailUrl;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "video_asset_id", nullable = false)
+    private Asset videoAsset;
 
     @Column(name = "duration", nullable = false)
     private Double duration;
