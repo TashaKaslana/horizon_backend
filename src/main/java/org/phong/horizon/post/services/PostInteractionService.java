@@ -13,6 +13,7 @@ import org.phong.horizon.post.infraustructure.persistence.entities.Post;
 import org.phong.horizon.post.infraustructure.persistence.entities.PostInteraction;
 import org.phong.horizon.post.infraustructure.persistence.repositories.PostInteractionRepository;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.services.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,23 +24,25 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class PostInteractionService {
-    private AuthService authService;
-    private PostService postService;
-    private PostInteractionRepository postInteractionRepository;
-    private PostInteractionMapper postInteractionMapper;
+    private final AuthService authService;
+    private final PostService postService;
+    private final UserService userService;
+    private final PostInteractionRepository postInteractionRepository;
+    private final PostInteractionMapper postInteractionMapper;
 
     @Transactional
     public void createInteraction(UUID postId, CreatePostInteraction postInteraction) {
-        Post post = postService.findPostById(postId);
-        User user = authService.getUser();
+        Post post = postService.getRefById(postId);
+        UUID currentUserId = authService.getUserIdFromContext();
+        User currentUser = userService.getRefById(currentUserId);
 
-        if (postInteractionRepository.existsByUser_IdAndPost_IdAndInteraction(user.getId(), post.getId(), postInteraction.interactionType())) {
+        if (postInteractionRepository.existsByUser_IdAndPost_IdAndInteraction(currentUserId, post.getId(), postInteraction.interactionType())) {
             throw new PostInteractionAlreadyExistException(PostInteractionError.POST_INTERACTION_EXISTS.getMessage());
         }
 
         PostInteraction interaction = new PostInteraction();
         interaction.setPost(post);
-        interaction.setUser(user);
+        interaction.setUser(currentUser);
         interaction.setInteraction(postInteraction.interactionType());
 
         postInteractionRepository.save(interaction);
@@ -47,10 +50,9 @@ public class PostInteractionService {
 
     @Transactional
     public void deleteInteraction(UUID postId, InteractionType interactionType) {
-        Post post = postService.findPostById(postId);
-        User user = authService.getUser();
+        UUID currentUserId = authService.getUserIdFromContext();
 
-        PostInteraction interaction = postInteractionRepository.findByPost_IdAndUser_IdAndInteraction(post.getId(), user.getId(), interactionType).orElseThrow(
+        PostInteraction interaction = postInteractionRepository.findByPost_IdAndUser_IdAndInteraction(postId, currentUserId, interactionType).orElseThrow(
                 () -> new PostInteractionNotFoundException(PostInteractionError.POST_INTERACTION_NOT_FOUND.getMessage())
         );
 

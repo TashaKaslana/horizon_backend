@@ -16,6 +16,7 @@ import org.phong.horizon.notification.infrastructure.persistence.entities.Notifi
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,16 +41,12 @@ public class NotificationService {
     private final CommentService commentService;
     private final AuthService authService;
 
-    //TODO: modify using getByReference when add relationship to others entities
-
     @Transactional(readOnly = true)
     public Page<NotificationRespond> getMyNotifications(
             Pageable pageable,
             NotificationFilterCriteria filters
     ) {
         UUID currentUserId = authService.getUserIdFromContext();
-        //remember to add filter for isDeleted in controller
-//        boolean isDeletedFilter = filters.isDeleted() != null ? filters.isDeleted() : false;
 
         Specification<Notification> specification = NotificationSpecifications.buildSpecification(
                 currentUserId,
@@ -95,7 +92,7 @@ public class NotificationService {
         processToAddNotificationsRelationship(request, notification);
 
         if (senderUserId != null) {
-            notification.setSenderUser(userService.findById(senderUserId));
+            notification.setSenderUser(userService.getRefById(senderUserId));
         } else {
             log.warn("Creating notification of type {} without a sender user.", request.type());
             notification.setSenderUser(null);
@@ -110,20 +107,23 @@ public class NotificationService {
         Notification notification = notificationMapper.toEntity(request);
 
         processToAddNotificationsRelationship(request, notification);
-        notification.setSenderUser(authService.getUser());
+
+        UUID currentUserId = authService.getUserIdFromContext();
+        User currentUser = userService.getRefById(currentUserId);
+        notification.setSenderUser(currentUser);
 
         notificationRepository.save(notification);
     }
 
     private void processToAddNotificationsRelationship(CreateNotificationRequest request, Notification notification) {
-        notification.setRecipientUser(userService.findById(request.recipientUserId()));
+        notification.setRecipientUser(userService.getRefById(request.recipientUserId()));
 
         if (request.postId() != null) {
-            notification.setPost(postService.findPostById(request.postId()));
+            notification.setPost(postService.getRefById(request.postId()));
         }
 
         if (request.commentId() != null) {
-            notification.setComment(commentService.findById(request.commentId()));
+            notification.setComment(commentService.getRefById(request.commentId()));
         }
     }
 

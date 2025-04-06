@@ -17,6 +17,7 @@ import org.phong.horizon.post.infraustructure.persistence.repositories.PostRepos
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
 import org.phong.horizon.storage.service.StorageService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.services.UserService;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class PostService {
     private final AuthService authService;
     private final PostMapper postMapper;
     private final StorageService storageService;
+    private final UserService userService;
 
     @PostAuthorize("hasRole('ADMIN') or " +
             "returnObject.visibility == T(org.phong.horizon.infrastructure.enums.Visibility).PUBLIC or " +
@@ -80,9 +82,10 @@ public class PostService {
 
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
-        User currentUser = authService.getUser();
-        Asset asset = storageService.findAssetById(request.videoAssetId());
+        UUID currentUserId = authService.getUserIdFromContext();
+        User currentUser = userService.getRefById(currentUserId);
 
+        Asset asset = storageService.findAssetById(request.videoAssetId());
         Post post = postMapper.toEntity(request);
 
         post.setUser(currentUser);
@@ -95,9 +98,10 @@ public class PostService {
     @Transactional
     public void updatePost(UUID id, UpdatePostRequest request) {
         User currentUser = authService.getUser();
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
-        );
+        Post post = findPostById(id);
+        if (post == null) {
+            throw new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage());
+        }
 
         if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN)) {
             throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_UPDATE.getMessage());
@@ -110,9 +114,10 @@ public class PostService {
     @Transactional
     public void deletePost(UUID id) {
         User currentUser = authService.getUser();
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
-        );
+        Post post = findPostById(id);
+        if (post == null) {
+            throw new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage());
+        }
 
         if (!post.getUser().getId().equals(currentUser.getId()) && !authService.hasRole(Role.ADMIN)) {
             throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_DELETE.getMessage());
@@ -127,10 +132,15 @@ public class PostService {
         postRepository.deleteAllByUser_Id(userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Post findPostById(UUID postId) {
         return postRepository.findById(postId).orElseThrow(
                 () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Post getRefById(UUID postId) {
+        return postRepository.getReferenceById(postId);
     }
 }

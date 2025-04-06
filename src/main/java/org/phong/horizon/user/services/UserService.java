@@ -135,4 +135,9 @@ public class UserService {
                     return new UserNotFoundException(UserErrorEnums.USER_NOT_FOUND.getMessage());
                 });
     }
+
+    @Transactional(readOnly = true)
+    public User getRefById(UUID uuid) {
+        return userRepository.getReferenceById(uuid);
+    }
 }

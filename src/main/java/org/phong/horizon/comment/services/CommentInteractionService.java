@@ -13,6 +13,7 @@ import org.phong.horizon.comment.infrastructure.persistence.entities.CommentInte
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentInteractionRepository;
 import org.phong.horizon.infrastructure.services.AuthService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.services.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,26 +28,31 @@ public class CommentInteractionService {
     private final CommentInteractionRepository repository;
     private final AuthService authService;
     private final CommentInteractionMapper mapper;
+    private final UserService userService;
 
     public CommentInteractionService(CommentService commentService,
                                      CommentInteractionRepository repository,
-                                     AuthService authService, CommentInteractionMapper commentInteractionMapper) {
+                                     AuthService authService,
+                                     CommentInteractionMapper commentInteractionMapper,
+                                     UserService userService) {
         this.commentService = commentService;
         this.repository = repository;
         this.authService = authService;
         this.mapper = commentInteractionMapper;
+        this.userService = userService;
     }
 
     @Transactional
     public void createInteraction(UUID commentId, CreateCommentInteraction request) {
-        User currentUser = authService.getUser();
-        Comment comment = commentService.findById(commentId);
+        UUID currentUserId = authService.getUserIdFromContext();
+        User currentUser = userService.getRefById(currentUserId);
+        Comment comment = commentService.getRefById(commentId);
 
         boolean exists = repository.existsByComment_IdAndUser_IdAndInteractionType(
-                commentId, currentUser.getId(), request.interactionType());
+                commentId, currentUserId, request.interactionType());
         if (exists) {
             log.warn("Interaction already exists for comment {}, user {}, type {}. Skipping creation.",
-                    commentId, currentUser.getId(), request.interactionType());
+                    commentId, currentUserId, request.interactionType());
 
             throw new CommentInteractionExistException(CommentInteractionError.COMMENT_INTERACTION_EXISTS.getMessage());
         }
@@ -63,24 +69,24 @@ public class CommentInteractionService {
 
     @Transactional
     public void deleteInteraction(UUID commentId, InteractionType interactionType) {
-        User currentUser = authService.getUser();
+        UUID currentUserId = authService.getUserIdFromContext();
 
         int deletedCount = repository.deleteByComment_IdAndUser_IdAndInteractionType(
                 commentId,
-                currentUser.getId(),
+                currentUserId,
                 interactionType
         );
 
         if (deletedCount == 0) {
             log.warn("No interaction found to delete for comment {}, user {}, type {}",
-                    commentId, currentUser.getId(), interactionType);
+                    commentId, currentUserId, interactionType);
 
             throw new CommentInteractionNotFoundException(
                     CommentInteractionError.COMMENT_INTERACTION_NOT_FOUND.getMessage()
             );
         } else {
             log.info("Deleted interaction for comment {}, user {}, type {}",
-                    commentId, currentUser.getId(), interactionType);
+                    commentId, currentUserId, interactionType);
         }
     }
 

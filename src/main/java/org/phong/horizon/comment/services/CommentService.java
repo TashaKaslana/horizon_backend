@@ -18,6 +18,7 @@ import org.phong.horizon.infrastructure.services.AuthService;
 import org.phong.horizon.post.infraustructure.persistence.entities.Post;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.services.UserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final UserService userService;
     private final AuthService authService;
     private final PostService postService;
     private final ApplicationEventPublisher eventPublisher;
@@ -41,15 +43,15 @@ public class CommentService {
     public CommentCreatedDto createComment(CreateCommentDto request) {
         Comment comment = commentMapper.toEntity(request);
 
-        Post post = postService.findPostById(request.postId());
+        Post post = postService.getRefById(request.postId());
         comment.setPost(post);
 
-        User user = authService.getUser();
-        comment.setUser(user);
+        UUID currentUserId = authService.getUserIdFromContext();
+        User currentUser = userService.getRefById(currentUserId);
+        comment.setUser(currentUser);
 
         if (request.parentCommentId() != null) {
-            Comment parentComment = commentRepository.findById(request.parentCommentId())
-                    .orElseThrow(() -> new CommentNotFoundException(CommentErrorEnums.COMMENT_NOT_FOUND.getMessage()));
+            Comment parentComment = commentRepository.getReferenceById(request.parentCommentId());
             comment.setParentComment(parentComment);
         } else {
             comment.setParentComment(null);
@@ -124,5 +126,10 @@ public class CommentService {
                     log.info("Comment not found: {}", commentId);
                     return new CommentNotFoundException(CommentErrorEnums.COMMENT_NOT_FOUND.getMessage());
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public Comment getRefById(UUID commentId) {
+        return commentRepository.getReferenceById(commentId);
     }
 }
