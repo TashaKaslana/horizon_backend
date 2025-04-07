@@ -1,5 +1,6 @@
 package org.phong.horizon.post.controllers;
 
+import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostRespond;
@@ -41,6 +42,12 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPublicPostsByUserId(userId));
     }
 
+    @LogActivity(
+            activityCode = "post_create",
+            description = "Create a new post",
+            targetType = "POST",
+            targetIdExpression = "#result.body.id"
+    )
     @PostMapping
     public ResponseEntity<PostCreatedDto> createPost(@RequestBody CreatePostRequest request) {
         return ResponseEntity.ok(postService.createPost(request));

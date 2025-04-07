@@ -82,7 +82,6 @@ public class Notification {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
-    @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private OffsetDateTime createdAt;
