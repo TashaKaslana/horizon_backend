@@ -1,5 +1,6 @@
 package org.phong.horizon.user.controllers;
 
+import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
@@ -38,6 +39,12 @@ public class UserController {
     }
 
     @PostMapping()
+    @LogActivity(
+            activityCode = "user_create",
+            description = "Create a new user",
+            targetType = "USER",
+            targetIdExpression = "#result.body.id"
+    )
     public ResponseEntity<UserCreatedDto> createUser(@RequestBody UserCreateDto userUpdateDto) {
         return ResponseEntity.ok(userService.createUser(userUpdateDto));
     }
@@ -49,6 +56,12 @@ public class UserController {
     }
 
     @DeleteMapping("/me")
+    @LogActivity(
+            activityCode = "user_delete",
+            description = "Delete current user",
+            targetType = "USER",
+            targetIdExpression = "#currentUserId"
+    )
     public ResponseEntity<Void> deleteCurrentUser() {
         userService.deleteCurrentUser();
         return ResponseEntity.noContent().build();

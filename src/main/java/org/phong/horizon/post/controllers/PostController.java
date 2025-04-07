@@ -42,13 +42,14 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPublicPostsByUserId(userId));
     }
 
+
+    @PostMapping
     @LogActivity(
             activityCode = "post_create",
             description = "Create a new post",
             targetType = "POST",
             targetIdExpression = "#result.body.id"
     )
-    @PostMapping
     public ResponseEntity<PostCreatedDto> createPost(@RequestBody CreatePostRequest request) {
         return ResponseEntity.ok(postService.createPost(request));
     }
@@ -59,7 +60,14 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+
     @DeleteMapping("/{postId}")
+    @LogActivity(
+            activityCode = "post_delete",
+            description = "Post entity deleted",
+            targetType = "POST",
+            targetIdExpression = "#postId"
+    )
     public ResponseEntity<Void> deletePost(@PathVariable UUID postId) {
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();

@@ -1,6 +1,7 @@
 package org.phong.horizon.storage.controllers;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.dtos.UploadCompleteRequest;
 import org.phong.horizon.storage.service.StorageService;
@@ -17,6 +18,12 @@ public class StorageController {
     private final StorageService storageService;
 
     @PostMapping("/create")
+    @LogActivity(
+            activityCode = "asset_create",
+            description = "Create a new asset",
+            targetType = "ASSET",
+            targetIdExpression = "#result.body.id"
+    )
     public ResponseEntity<AssetRespond> createAsset(@RequestBody UploadCompleteRequest uploadData) {
         AssetRespond asset = storageService.createAsset(uploadData);
         return ResponseEntity.ok(asset);
@@ -47,12 +54,24 @@ public class StorageController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @LogActivity(
+            activityCode = "asset_delete",
+            description = "Delete an asset",
+            targetType = "ASSET",
+            targetIdExpression = "#id"
+    )
     public ResponseEntity<Void> deleteAsset(@PathVariable UUID id) {
         storageService.deleteAsset(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/signature")
+    @LogActivity(
+            activityCode = "asset_signature",
+            description = "Generate upload signature",
+            targetType = "ASSET"
+//            targetIdExpression = "#result.body.id"
+    )
     public ResponseEntity<Map<String, Object>> generateUploadSignature(@RequestBody Map<String, Object> paramsFromClient) {
         Map<String, Object> signature = storageService.generateUploadSignature(paramsFromClient);
         return ResponseEntity.ok(signature);

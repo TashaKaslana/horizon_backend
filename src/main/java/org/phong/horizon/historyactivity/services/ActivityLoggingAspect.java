@@ -79,11 +79,13 @@ public class ActivityLoggingAspect {
                 }
             }
 
+            Map<String, Object> activityDetail = null;
             //I have no idea about this, this is for update reference which could hold old value
-            Map<String, Object> activityDetail = Map.of(
-                    "args", Arrays.toString(joinPoint.getArgs()),
-                    "result", result
-            );
+            //change later, typical for updating or metadata
+//          activityDetail = Map.of(
+//                    "args", Arrays.toString(joinPoint.getArgs()),
+//                    "result", result
+//            );
 
             activityLoggingService.logActivity(
                     new CreateHistoryActivity(
@@ -121,6 +123,7 @@ public class ActivityLoggingAspect {
         context.setVariable("result", result); // Make return value available as #result
         context.setVariable("target", joinPoint.getTarget()); // Make controller instance available as #target
         context.setVariable("args", joinPoint.getArgs()); // Make arguments array available as #args
+        context.setVariable("currentUserId", authService.getUserIdFromContext()); // Make current user available as #currentUserId
 
         // Make individual method parameters available by name (requires -parameters javac flag or ParameterNameDiscoverer)
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
