@@ -140,4 +140,9 @@ public class UserService {
     public User getRefById(UUID uuid) {
         return userRepository.getReferenceById(uuid);
     }
+
+    @Transactional
+    public boolean existsById(UUID uuid) {
+        return userRepository.existsById(uuid);
+    }
 }
