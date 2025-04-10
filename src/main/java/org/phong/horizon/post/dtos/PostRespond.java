@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * DTO for {@link org.phong.horizon.post.infraustructure.persistence.entities.Post}
+ * DTO for {@link org.phong.horizon.post.infrastructure.persistence.entities.Post}
  */
 public record PostRespond(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id, UserSummaryRespond user,
                           String caption, String description, Double duration, String visibility,

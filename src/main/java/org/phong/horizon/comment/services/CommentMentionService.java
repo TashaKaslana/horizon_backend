@@ -1,11 +1,16 @@
 package org.phong.horizon.comment.services;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.comment.events.CommentMentionCreatedEvent;
+import org.phong.horizon.comment.events.CommentMentionDeletedEvent;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.infrastructure.persistence.entities.CommentMention;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentMentionRepository;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,22 +21,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class CommentMentionService {
     private static final Pattern pattern = Pattern.compile("@[\\w-]+");
     private final CommentMentionRepository commentMentionRepository;
     private final UserService userService;
+    private final AuthService authService;
     private final CommentService commentService;
-
-    public CommentMentionService(CommentMentionRepository commentMentionRepository,
-                                 UserService userService,
-                                 CommentService commentService) {
-        this.commentMentionRepository = commentMentionRepository;
-        this.userService = userService;
-        this.commentService = commentService;
-    }
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createMentions(UUID commentId) {
@@ -84,6 +85,19 @@ public class CommentMentionService {
         if (!mentionsToSave.isEmpty()) {
             commentMentionRepository.saveAll(mentionsToSave);
             log.info("Saved {} new mentions for comment: {}", mentionsToSave.size(), comment.getId());
+
+            Map<String, UUID> mapUsernameToUserId = userMap.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getId()));
+
+            eventPublisher.publishEvent(new CommentMentionCreatedEvent(
+                    this,
+                    comment.getId(),
+                    comment.getPost().getId(),
+                    comment.getUser().getUsername(),
+                    comment.getUser().getId(),
+                    comment.getContent(),
+                    mapUsernameToUserId
+            ));
         } else {
             log.debug("No valid users found for mentions, nothing saved for comment: {}", comment.getId());
         }
@@ -98,9 +112,16 @@ public class CommentMentionService {
         }
 
         commentMentionRepository.deleteAll(mentions);
+
+        eventPublisher.publishEvent(new CommentMentionDeletedEvent(
+                this,
+                commentId,
+                mentions.stream().map(mention -> mention.getMentionedUser().getId()).toList()
+        ));
     }
 
     private List<String> extractMentions(String content) {
+        String currentUserName = userService.findById(authService.getUserIdFromContext()).getUsername();
         if (content == null || content.isEmpty()) {
             return Collections.emptyList();
         }
@@ -109,6 +130,7 @@ public class CommentMentionService {
                 .results()
                 .map(match -> match.group().substring(1))
                 .distinct()
+                .filter(username -> !username.equals(currentUserName))
                 .toList();
     }
 }

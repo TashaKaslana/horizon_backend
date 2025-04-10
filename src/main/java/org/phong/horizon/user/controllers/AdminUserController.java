@@ -1,6 +1,8 @@
 package org.phong.horizon.user.controllers;
 
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.services.UserService;
@@ -37,9 +39,9 @@ public class AdminUserController {
 
     @DeleteMapping("/{id}")
     @LogActivity(
-            activityCode = "user_delete",
+            activityCode = ActivityTypeCode.USER_DELETE,
             description = "Admin delete a user",
-            targetType = "USER",
+            targetType = SystemCategory.USER,
             targetIdExpression = "#id"
     )
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
@@ -49,9 +51,9 @@ public class AdminUserController {
 
     @DeleteMapping("/all")
     @LogActivity(
-            activityCode = "user_delete_all",
+            activityCode = ActivityTypeCode.USER_DELETE,
             description = "Admin delete all users",
-            targetType = "USER"
+            targetType = SystemCategory.USER
     )
     public ResponseEntity<Void> deleteAllUsers() {
         userService.deleteAllUsers();

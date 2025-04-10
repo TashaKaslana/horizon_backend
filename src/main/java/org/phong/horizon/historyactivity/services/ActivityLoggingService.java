@@ -30,10 +30,10 @@ public class ActivityLoggingService {
         try {
             HistoryActivity historyActivity = historyActivityMapper.toEntity(request);
 
-            ActivityType activityType = activityTypeRepository.findByCode(request.activityTypeCode())
+            ActivityType activityType = activityTypeRepository.findByCode(request.activityTypeCode().getCode())
                     .orElseThrow(() -> new ActivityTypeNotFoundException(
                             HistoryActivityBusinessError.ACTIVITY_TYPE_CODE_NOT_FOUND,
-                            request.activityTypeCode()
+                            request.activityTypeCode().getCode()
                     ));
             historyActivity.setActivityType(activityType);
             historyActivity.setUser(userService.getRefById(request.userId()));

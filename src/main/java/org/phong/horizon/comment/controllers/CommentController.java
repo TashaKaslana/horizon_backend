@@ -5,7 +5,9 @@ import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.services.CommentService;
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +25,9 @@ public class CommentController {
 
     @PostMapping
     @LogActivity(
-            activityCode = "comment_create",
+            activityCode = ActivityTypeCode.COMMENT_CREATE,
             description = "Create a new comment",
-            targetType = "POST",
+            targetType = SystemCategory.POST,
             targetIdExpression = "#result.body.id"
     )
     public ResponseEntity<CommentCreatedDto> createComment(@RequestBody CreateCommentDto createCommentDto) {
@@ -51,9 +53,9 @@ public class CommentController {
 
     @DeleteMapping("/{commentId}")
     @LogActivity(
-            activityCode = "comment_delete",
+            activityCode = ActivityTypeCode.COMMENT_DELETE,
             description = "Delete a comment",
-            targetType = "COMMENT",
+            targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
     public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId) {

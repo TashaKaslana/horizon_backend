@@ -1,9 +1,11 @@
 package org.phong.horizon.follow.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.follow.dtos.FollowOneSideRespond;
 import org.phong.horizon.follow.services.FollowService;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +41,9 @@ public class FollowController {
 
     @PostMapping("/{followingId}")
     @LogActivity(
-            activityCode = "user_follow",
+            activityCode = ActivityTypeCode.USER_FOLLOW,
             description = "Follow user",
-            targetType = "USER",
+            targetType = SystemCategory.USER,
             targetIdExpression = "#followingId"
     )
     public ResponseEntity<Void> follow(@PathVariable UUID followingId) {
@@ -51,9 +53,9 @@ public class FollowController {
 
     @DeleteMapping("/{followingId}")
     @LogActivity(
-            activityCode = "user_unfollow",
+            activityCode = ActivityTypeCode.USER_UNFOLLOW,
             description = "Unfollow user",
-            targetType = "USER",
+            targetType = SystemCategory.USER,
             targetIdExpression = "#followingId"
     )
     public ResponseEntity<Void> unfollow(@PathVariable UUID followingId) {

@@ -3,7 +3,7 @@ package org.phong.horizon.notification.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.comment.services.CommentService;
-import org.phong.horizon.infrastructure.services.AuthService;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
 import org.phong.horizon.notification.dtos.NotificationRespond;
@@ -87,18 +87,22 @@ public class NotificationService {
     //internal service, do not expose to controller
     @Transactional
     public void createEventNotification(UUID senderUserId, CreateNotificationRequest request) {
-        Notification notification = notificationMapper.toEntity(request);
+        try {
+            Notification notification = notificationMapper.toEntity(request);
 
-        processToAddNotificationsRelationship(request, notification);
+            processToAddNotificationsRelationship(request, notification);
 
-        if (senderUserId != null) {
-            notification.setSenderUser(userService.getRefById(senderUserId));
-        } else {
-            log.warn("Creating notification of type {} without a sender user.", request.type());
-            notification.setSenderUser(null);
+            if (senderUserId != null) {
+                notification.setSenderUser(userService.getRefById(senderUserId));
+            } else {
+                log.warn("Creating notification of type {} without a sender user.", request.getType());
+                notification.setSenderUser(null);
+            }
+
+            notificationRepository.save(notification);
+        } catch (Exception e) {
+            log.error("Error while creating notification of type {}", request.getType(), e);
         }
-
-        notificationRepository.save(notification);
     }
 
     @Transactional
@@ -116,14 +120,14 @@ public class NotificationService {
     }
 
     private void processToAddNotificationsRelationship(CreateNotificationRequest request, Notification notification) {
-        notification.setRecipientUser(userService.getRefById(request.recipientUserId()));
+        notification.setRecipientUser(userService.getRefById(request.getRecipientUserId()));
 
-        if (request.postId() != null) {
-            notification.setPost(postService.getRefById(request.postId()));
+        if (request.getPostId() != null) {
+            notification.setPost(postService.getRefById(request.getPostId()));
         }
 
-        if (request.commentId() != null) {
-            notification.setComment(commentService.getRefById(request.commentId()));
+        if (request.getCommentId() != null) {
+            notification.setComment(commentService.getRefById(request.getCommentId()));
         }
     }
 

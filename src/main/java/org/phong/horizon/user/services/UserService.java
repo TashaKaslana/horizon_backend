@@ -1,21 +1,28 @@
 package org.phong.horizon.user.services;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.phong.horizon.infrastructure.services.AuthService;
+import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateDto;
 import org.phong.horizon.user.enums.UserErrorEnums;
+import org.phong.horizon.user.events.UserCreatedEvent;
+import org.phong.horizon.user.events.UserDeletedEvent;
+import org.phong.horizon.user.events.UserUpdatedEvent;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,18 +30,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final AuthService authService;
-
-    public UserService(UserMapper userMapper,
-                       UserRepository userRepository,
-                       AuthService authService) {
-        this.userMapper = userMapper;
-        this.userRepository = userRepository;
-        this.authService = authService;
-    }
+    private final ApplicationEventPublisher publisher;
 
     public UserRespondDto getCurrentUser() {
         return userMapper.toDto(authService.getUser());
@@ -90,6 +91,10 @@ public class UserService {
 
         log.info("Created user: {}", createdUser);
 
+        publisher.publishEvent(new UserCreatedEvent(
+                this, createdUser.getId(), createdUser.getUsername(), createdUser.getEmail()
+        ));
+
         return userMapper.toDto4(createdUser);
     }
 
@@ -105,20 +110,58 @@ public class UserService {
     public void updateUser(UUID userId, UserUpdateDto userUpdateDto) {
         log.info("Attempting to update user with ID: {}", userId);
 
-        User user = findById(userId);
-        User updatedUser = userMapper.partialUpdate(userUpdateDto, user);
-        User savedUser = userRepository.save(updatedUser);
-        log.info("Successfully updated user with ID: {}", savedUser.getId());
+        User oldUser = findById(userId);
+
+        if (userUpdateDto.username() != null) {
+            updateUsername(oldUser, userUpdateDto.username());
+        }
+
+        if (userUpdateDto.email() != null) {
+            updateEmail(oldUser, userUpdateDto.email());
+        }
+
+//        if (userUpdateDto.getRoles() != null) {
+//            updateRoles(user, userUpdateDto.getRoles());
+//        }
+
+        User newUser = userRepository.save(oldUser);
+
+        publisher.publishEvent(new UserUpdatedEvent(
+                this, newUser.getId(), newUser.getUsername(), newUser.getEmail(),
+                ObjectHelper.extractChangesWithCommonsLang(oldUser, newUser)
+        ));
+        log.info("Successfully updated user with ID: {}", newUser.getId());
     }
+
+
+    private void updateUsername(User user, String username) {
+        log.info("Updating username for user ID: {}", user.getId());
+        user.setUsername(username);
+    }
+
+    private void updateEmail(User user, String email) {
+        log.info("Updating email for user ID: {}", user.getId());
+        user.setEmail(email);
+    }
+
+//    private void updateRoles(User user, List<String> roles) {
+//        log.info("Updating roles for user ID: {}", user.getId());
+//        user.setRoles(roles);
+//    }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#uuid)")
     public void deleteUser(UUID uuid) {
+        User userTemp = findById(uuid);
         userRepository.deleteById(uuid);
 
         log.warn("Deleted user with id: {}", uuid);
+        publisher.publishEvent(new UserDeletedEvent(
+                this, uuid, userTemp.getUsername(), userTemp.getEmail()
+        ));
     }
 
+    //test only or admin demonstration bruh!
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteAllUsers() {

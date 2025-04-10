@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import org.phong.horizon.infrastructure.superclass.BaseEntity;
+import org.phong.horizon.core.superclass.BaseEntity;
 
 import java.time.LocalDate;
 

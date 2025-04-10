@@ -62,6 +62,10 @@ public class StorageService {
         );
     }
 
+    public Asset getRefById(UUID id) {
+        return assetRepository.getReferenceById(id);
+    }
+
     public Asset findAssetByPublicId(String publicId) {
         return assetRepository.findByPublicId(publicId).orElseThrow(
                 () -> new AssetNotFoundException(StorageErrorEnums.ASSET_NOT_FOUND.getMessage() + publicId)

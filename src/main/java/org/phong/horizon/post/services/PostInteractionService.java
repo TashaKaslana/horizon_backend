@@ -1,17 +1,18 @@
 package org.phong.horizon.post.services;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.infrastructure.enums.InteractionType;
-import org.phong.horizon.infrastructure.services.AuthService;
+import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.core.enums.InteractionType;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.post.dtos.CreatePostInteraction;
 import org.phong.horizon.post.dtos.PostInteractionRespond;
 import org.phong.horizon.post.enums.PostInteractionError;
 import org.phong.horizon.post.exceptions.PostInteractionAlreadyExistException;
 import org.phong.horizon.post.exceptions.PostInteractionNotFoundException;
-import org.phong.horizon.post.infraustructure.mapstruct.PostInteractionMapper;
-import org.phong.horizon.post.infraustructure.persistence.entities.Post;
-import org.phong.horizon.post.infraustructure.persistence.entities.PostInteraction;
-import org.phong.horizon.post.infraustructure.persistence.repositories.PostInteractionRepository;
+import org.phong.horizon.post.infrastructure.mapstruct.PostInteractionMapper;
+import org.phong.horizon.post.infrastructure.persistence.entities.Post;
+import org.phong.horizon.post.infrastructure.persistence.entities.PostInteraction;
+import org.phong.horizon.post.infrastructure.persistence.repositories.PostInteractionRepository;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PostInteractionService {
     private final AuthService authService;
     private final PostService postService;
@@ -49,7 +51,7 @@ public class PostInteractionService {
     }
 
     @Transactional
-    public void deleteInteraction(UUID postId, InteractionType interactionType) {
+    public void removeInteraction(UUID postId, InteractionType interactionType) {
         UUID currentUserId = authService.getUserIdFromContext();
 
         PostInteraction interaction = postInteractionRepository.findByPost_IdAndUser_IdAndInteraction(postId, currentUserId, interactionType).orElseThrow(

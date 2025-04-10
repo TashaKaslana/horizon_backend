@@ -1,6 +1,8 @@
 package org.phong.horizon.post.controllers;
 
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostRespond;
@@ -45,9 +47,9 @@ public class PostController {
 
     @PostMapping
     @LogActivity(
-            activityCode = "post_create",
+            activityCode = ActivityTypeCode.POST_CREATE,
             description = "Create a new post",
-            targetType = "POST",
+            targetType = SystemCategory.POST,
             targetIdExpression = "#result.body.id"
     )
     public ResponseEntity<PostCreatedDto> createPost(@RequestBody CreatePostRequest request) {
@@ -63,9 +65,9 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @LogActivity(
-            activityCode = "post_delete",
+            activityCode = ActivityTypeCode.POST_DELETE,
             description = "Post entity deleted",
-            targetType = "POST",
+            targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
     public ResponseEntity<Void> deletePost(@PathVariable UUID postId) {

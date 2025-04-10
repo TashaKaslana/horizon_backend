@@ -10,7 +10,7 @@ import org.phong.horizon.follow.infrastructure.mapstruct.FollowMapper;
 import org.phong.horizon.follow.infrastructure.persistence.entities.Follow;
 import org.phong.horizon.follow.infrastructure.persistence.entities.FollowId;
 import org.phong.horizon.follow.infrastructure.persistence.repositories.FollowRepository;
-import org.phong.horizon.infrastructure.services.AuthService;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

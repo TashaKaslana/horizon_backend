@@ -19,7 +19,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.phong.horizon.infrastructure.enums.InteractionType;
+import org.phong.horizon.core.enums.InteractionType;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 import java.time.Instant;

@@ -1,7 +1,9 @@
 package org.phong.horizon.comment.controllers;
 
 import org.phong.horizon.comment.services.CommentService;
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +20,9 @@ public class AdminCommentController {
 
     @DeleteMapping("/all")
     @LogActivity(
-            activityCode = "comment_delete_all",
+            activityCode = ActivityTypeCode.COMMENT_DELETE,
             description = "Admin delete all comments",
-            targetType = "COMMENT"
+            targetType = SystemCategory.COMMENT
     )
     public ResponseEntity<Void> deleteAllComments() {
         commentService.deleteAllComments();

@@ -30,9 +30,6 @@ public interface CommentMapper {
     @Mapping(source = "postId", target = "post.id")
     Comment toEntity(CreateCommentDto createCommentDto);
 
-    @InheritInverseConfiguration(name = "toEntity")
-    CreateCommentDto toDto1(Comment comment);
-
     @InheritConfiguration(name = "toEntity")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Comment partialUpdate(CreateCommentDto createCommentDto, @MappingTarget Comment comment);
@@ -54,4 +51,6 @@ public interface CommentMapper {
     @InheritConfiguration(name = "toEntity")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Comment partialUpdate(CommentCreated commentCreated, @MappingTarget Comment comment);
+
+    CommentCreated toDto4(Comment comment);
 }

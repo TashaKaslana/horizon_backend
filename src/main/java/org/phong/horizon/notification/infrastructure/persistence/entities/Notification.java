@@ -20,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.notification.enums.NotificationType;
-import org.phong.horizon.post.infraustructure.persistence.entities.Post;
+import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 import java.time.OffsetDateTime;

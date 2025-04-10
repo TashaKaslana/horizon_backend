@@ -8,7 +8,7 @@ import java.time.LocalDate;
 /**
  * DTO for {@link User}
  */
-public record UserUpdateDto(String firstName, String lastName, String username, String phoneNumber,
-                            LocalDate dateOfBirth, String gender, String bio, String profileImage, String coverImage,
-                            String country, String city) implements Serializable {
+public record UserUpdateDto(String email, String firstName, String lastName, String username, String phoneNumber,
+                              LocalDate dateOfBirth, String gender, String bio, String profileImage, String coverImage,
+                              String country, String city) implements Serializable {
 }

@@ -1,9 +1,21 @@
 package org.phong.horizon.comment.events;
 
-import lombok.Builder;
-import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
-import org.phong.horizon.infrastructure.events.Event;
+import lombok.Getter;
+import org.springframework.context.ApplicationEvent;
 
-@Builder
-public record CommentDeleted(Comment comment) implements Event {
+import java.io.Serializable;
+import java.util.UUID;
+
+@Getter
+public final class CommentDeleted extends ApplicationEvent implements Serializable {
+    private final UUID commentId;
+    private final UUID postId;
+    private final UUID userId;
+
+    public CommentDeleted(Object source, UUID commentId, UUID postId, UUID userId) {
+        super(source);
+        this.commentId = commentId;
+        this.postId = postId;
+        this.userId = userId;
+    }
 }

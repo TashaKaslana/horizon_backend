@@ -13,9 +13,10 @@ import org.phong.horizon.comment.exceptions.CommentNotFoundException;
 import org.phong.horizon.comment.infrastructure.mapstruct.CommentMapper;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentRepository;
-import org.phong.horizon.infrastructure.enums.Role;
-import org.phong.horizon.infrastructure.services.AuthService;
-import org.phong.horizon.post.infraustructure.persistence.entities.Post;
+import org.phong.horizon.core.enums.Role;
+import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.core.utils.ObjectHelper;
+import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
@@ -81,18 +82,26 @@ public class CommentService {
 
     @Transactional
     public void updateCommentContent(UUID commentId, UpdateCommentContentDto updateCommentContentDto) {
-        Comment comment = findById(commentId);
+        Comment oldComment = findById(commentId);
 
-        if (isNotAllowToWrite(comment)) {
+        if (isNotAllowToWrite(oldComment)) {
             log.info("Not allow to update comment");
             throw new CommentNotFoundException(CommentErrorEnums.UNAUTHORIZED_ACCESS.getMessage());
         }
 
-        Comment newComment = commentMapper.partialUpdate(updateCommentContentDto, comment);
-
-        eventPublisher.publishEvent(new CommentUpdated(newComment));
+        Comment newComment = commentMapper.partialUpdate(updateCommentContentDto, oldComment);
 
         commentRepository.save(newComment);
+        log.info("Comment updated for commentId: {}", newComment.getId());
+
+        eventPublisher.publishEvent(new CommentUpdated(
+                this,
+                newComment.getId(),
+                newComment.getPost().getId(),
+                newComment.getUser().getId(),
+                newComment.getContent(),
+                ObjectHelper.extractChangesWithCommonsLang(oldComment, newComment)
+        ));
     }
 
     @Transactional
@@ -103,16 +112,22 @@ public class CommentService {
             throw new CommentNotFoundException(CommentErrorEnums.UNAUTHORIZED_ACCESS.getMessage());
         }
 
-        log.info("Comment deleted: {}", comment);
-        eventPublisher.publishEvent(new CommentDeleted(comment));
-
         commentRepository.deleteById(commentId);
+        log.info("Comment deleted: {}", comment.getId());
+
+        eventPublisher.publishEvent(new CommentDeleted(
+                this,
+                comment.getId(),
+                comment.getPost().getId(),
+                comment.getUser().getId()
+        ));
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteAllComments() {
         commentRepository.deleteAll();
+        log.warn("All comments deleted by admin");
     }
 
     protected boolean isNotAllowToWrite(Comment comment) {

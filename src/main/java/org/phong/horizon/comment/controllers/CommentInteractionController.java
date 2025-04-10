@@ -2,9 +2,11 @@ package org.phong.horizon.comment.controllers;
 
 import org.phong.horizon.comment.dtos.CommentInteractionRespond;
 import org.phong.horizon.comment.dtos.CreateCommentInteraction;
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
-import org.phong.horizon.infrastructure.enums.InteractionType;
+import org.phong.horizon.core.enums.InteractionType;
 import org.phong.horizon.comment.services.CommentInteractionService;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +37,9 @@ public class CommentInteractionController {
 
     @PostMapping
     @LogActivity(
-            activityCode = "comment_interaction_create",
+            activityCode = ActivityTypeCode.COMMENT_INTERACTION_CREATE,
             description = "Create a new comment interaction",
-            targetType = "COMMENT",
+            targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
     public ResponseEntity<Void> createInteraction(@PathVariable UUID commentId,
@@ -49,9 +51,9 @@ public class CommentInteractionController {
 
     @DeleteMapping("/{interactionType}")
     @LogActivity(
-            activityCode = "comment_interaction_delete",
+            activityCode = ActivityTypeCode.COMMENT_INTERACTION_DELETE,
             description = "Delete a comment interaction",
-            targetType = "COMMENT",
+            targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
     public ResponseEntity<Void> removeInteraction(@PathVariable UUID commentId,

@@ -10,8 +10,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
-import org.phong.horizon.historyactivity.utils.HttpRequestUtils;
-import org.phong.horizon.infrastructure.services.AuthService;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.core.utils.HttpRequestUtils;
+import org.phong.horizon.core.services.AuthService;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
@@ -63,10 +64,10 @@ public class ActivityLoggingAspect {
                 );
             }
 
-            String activityCode = logActivityAnnotation.activityCode();
+            ActivityTypeCode activityCode = logActivityAnnotation.activityCode();
             String description = logActivityAnnotation.description().isBlank() ?
-                    generateDescription(joinPoint, activityCode) : logActivityAnnotation.description();
-            String targetType = logActivityAnnotation.targetType();
+                    generateDescription(joinPoint, activityCode.getCode()) : logActivityAnnotation.description();
+            String targetType = logActivityAnnotation.targetType().getName();
 
             UUID targetId = null;
             String spelExpression = logActivityAnnotation.targetIdExpression();

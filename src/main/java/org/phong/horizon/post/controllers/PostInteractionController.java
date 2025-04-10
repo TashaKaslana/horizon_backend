@@ -1,8 +1,10 @@
 package org.phong.horizon.post.controllers;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
-import org.phong.horizon.infrastructure.enums.InteractionType;
+import org.phong.horizon.core.enums.InteractionType;
+import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.CreatePostInteraction;
 import org.phong.horizon.post.dtos.PostInteractionRespond;
 import org.phong.horizon.post.services.PostInteractionService;
@@ -27,9 +29,9 @@ public class PostInteractionController {
 
     @PostMapping
     @LogActivity(
-            activityCode = "post_interaction_create",
+            activityCode = ActivityTypeCode.POST_LIKE,
             description = "Create a new post interaction",
-            targetType = "POST",
+            targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
     public ResponseEntity<Void> createInteraction(@PathVariable UUID postId,
@@ -41,13 +43,13 @@ public class PostInteractionController {
 
     @DeleteMapping("/{interactionType}")
     @LogActivity(
-            activityCode = "post_interaction_delete",
+            activityCode = ActivityTypeCode.POST_UNLIKE,
             description = "Delete a post interaction",
-            targetType = "POST",
+            targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
     public ResponseEntity<Void> deleteInteraction(@PathVariable UUID postId, @PathVariable String interactionType) {
-        postInteractionService.deleteInteraction(postId, InteractionType.fromString(interactionType));
+        postInteractionService.removeInteraction(postId, InteractionType.fromString(interactionType));
         return ResponseEntity.noContent().build();
     }
 
