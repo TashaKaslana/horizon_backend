@@ -9,8 +9,8 @@ import org.phong.horizon.post.services.PostService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @AllArgsConstructor
@@ -19,15 +19,14 @@ public class CommentMentionListener {
     private final ApplicationEventPublisher eventPublisher;
 
     @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onCommentMentionCreated(CommentMentionCreatedEvent event) {
         String postCaption = postService.getPostById(event.getPostId()).caption();
 
         for (var entry : event.getMapUsernameToUserId().entrySet()) {
-            UUID userId = UUID.fromString(entry.getKey());
-
             CreateNotificationEvent notificationEvent = new CreateNotificationEvent(
                     this,
-                    userId,
+                    entry.getValue(),
                     CreateNotificationRequest.builder()
                             .recipientUserId(entry.getValue())
                             .postId(event.getPostId())

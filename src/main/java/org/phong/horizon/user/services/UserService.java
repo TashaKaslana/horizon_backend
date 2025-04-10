@@ -22,7 +22,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -105,26 +104,31 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+
+    //TODO: update this again
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#userId)")
     public void updateUser(UUID userId, UserUpdateDto userUpdateDto) {
         log.info("Attempting to update user with ID: {}", userId);
 
         User oldUser = findById(userId);
+        User temp = userMapper.partialUpdate( userUpdateDto, oldUser);
 
-        if (userUpdateDto.username() != null) {
-            updateUsername(oldUser, userUpdateDto.username());
-        }
-
-        if (userUpdateDto.email() != null) {
-            updateEmail(oldUser, userUpdateDto.email());
-        }
+//        if (userUpdateDto.username() != null) {
+//            updateUsername(temp, userUpdateDto.username());
+//        }
+//
+//        if (userUpdateDto.email() != null) {
+//            updateEmail(temp, userUpdateDto.email());
+//        }
 
 //        if (userUpdateDto.getRoles() != null) {
 //            updateRoles(user, userUpdateDto.getRoles());
 //        }
 
-        User newUser = userRepository.save(oldUser);
+
+
+        User newUser = userRepository.save(temp);
 
         publisher.publishEvent(new UserUpdatedEvent(
                 this, newUser.getId(), newUser.getUsername(), newUser.getEmail(),

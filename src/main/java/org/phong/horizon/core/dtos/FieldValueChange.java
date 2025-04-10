@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @ToString
-public class FieldValueChange extends Object {
+public class FieldValueChange {
     private final Object oldValue;
     private final Object newValue;
 }

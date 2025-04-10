@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.follow.dtos.FollowOneSideRespond;
 import org.phong.horizon.follow.dtos.FollowRespond;
 import org.phong.horizon.follow.enums.FollowErrorEnums;
+import org.phong.horizon.follow.events.UserFollowedEvent;
 import org.phong.horizon.follow.exceptions.FollowException;
 import org.phong.horizon.follow.infrastructure.mapstruct.FollowMapper;
 import org.phong.horizon.follow.infrastructure.persistence.entities.Follow;
@@ -12,6 +13,7 @@ import org.phong.horizon.follow.infrastructure.persistence.entities.FollowId;
 import org.phong.horizon.follow.infrastructure.persistence.repositories.FollowRepository;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +30,7 @@ public class FollowService {
     private final UserService userService;
     private final AuthService authService;
     private final FollowMapper followMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Page<FollowOneSideRespond> getMyFollowers(Pageable pageable) {
         UUID userId = authService.getUserIdFromContext();
@@ -91,6 +94,14 @@ public class FollowService {
                         .following(userService.getRefById(followingId))
                         .build()
         );
+
+        eventPublisher.publishEvent(new UserFollowedEvent(
+                this,
+                userService.findById(followerId).getUsername(),
+                userService.findById(followingId).getUsername(),
+                followerId,
+                followingId
+        ));
     }
 
 

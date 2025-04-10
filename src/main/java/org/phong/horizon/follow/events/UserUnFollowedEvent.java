@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEvent;
 
 import java.util.UUID;
 
+//websocket later
 @Getter
 public class UserUnFollowedEvent extends ApplicationEvent {
     private final UUID followerUserId;

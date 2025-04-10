@@ -7,6 +7,7 @@ import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.enums.CommentErrorEnums;
+import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.events.CommentDeleted;
 import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.exceptions.CommentNotFoundException;
@@ -61,7 +62,12 @@ public class CommentService {
         Comment createdComment = commentRepository.save(comment);
         log.info("Comment created successfully, ID: {}", createdComment.getId());
 
-        eventPublisher.publishEvent(commentMapper.toDto3(createdComment));
+        eventPublisher.publishEvent(new CommentCreated(this,
+                createdComment.getId(),
+                createdComment.getPost().getId(),
+                createdComment.getUser().getId(),
+                createdComment.getContent()
+        ));
 
         return new CommentCreatedDto(createdComment.getId());
     }

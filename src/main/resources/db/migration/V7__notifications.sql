@@ -1,6 +1,7 @@
 CREATE TYPE notification_type AS ENUM (
     'LIKE_POST',
     'NEW_FOLLOWER',
+    'UN_FOLLOWER',
     'COMMENT_POST',
     'LIKE_COMMENT',
     'MENTION_COMMENT',

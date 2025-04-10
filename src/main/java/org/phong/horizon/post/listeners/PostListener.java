@@ -58,8 +58,8 @@ public class PostListener {
                         event.getUserId(),
                         SystemCategory.USER.getName(),
                         event.getUserId(),
-                        HttpRequestUtils.getClientIpAddress(Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest())),
-                        HttpRequestUtils.getCurrentHttpRequest().getHeader("User-Agent")
+                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
+                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
                 )
         ));
     }

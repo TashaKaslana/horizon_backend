@@ -10,6 +10,7 @@ import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.enums.NotificationType;
 import org.phong.horizon.notification.events.CreateNotificationEvent;
 import org.phong.horizon.user.events.UserCreatedEvent;
+import org.phong.horizon.user.events.UserDeletedEvent;
 import org.phong.horizon.user.events.UserUpdatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -39,7 +40,7 @@ public class UserListener {
 
     //why I send event to notification the user has been deleted account? This is nonsense but just keep it
     @EventListener
-    public void onUserDeleted(UserCreatedEvent event) {
+    public void onUserDeleted(UserDeletedEvent event) {
         eventPublisher.publishEvent(new CreateNotificationEvent(
                 this,
                 event.getUserId(),
@@ -72,8 +73,8 @@ public class UserListener {
                         event.getUserId(),
                         SystemCategory.USER.getName(),
                         event.getUserId(),
-                        HttpRequestUtils.getClientIpAddress(Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest())),
-                        HttpRequestUtils.getCurrentHttpRequest().getHeader("User-Agent")
+                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
+                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
                 )
         ));
     }

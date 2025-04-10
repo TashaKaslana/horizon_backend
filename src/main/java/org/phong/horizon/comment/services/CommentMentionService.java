@@ -44,7 +44,7 @@ public class CommentMentionService {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void renewMentions(UUID commentId) {
         deleteMentions(commentId);
         Comment comment = commentService.findById(commentId);
@@ -111,7 +111,13 @@ public class CommentMentionService {
             return;
         }
 
-        commentMentionRepository.deleteAll(mentions);
+        try {
+            commentMentionRepository.deleteAllInBatch(mentions);
+        } catch (Exception e) {
+            log.error("Error deleting mentions for comment: {}", commentId, e);
+            throw new RuntimeException("Failed to delete mentions", e);
+        }
+//        commentMentionRepository.deleteAll(mentions);
 
         eventPublisher.publishEvent(new CommentMentionDeletedEvent(
                 this,

@@ -2,6 +2,7 @@ package org.phong.horizon.follow.listeners;
 
 import lombok.AllArgsConstructor;
 import org.phong.horizon.follow.events.UserFollowedEvent;
+import org.phong.horizon.follow.events.UserUnFollowedEvent;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.enums.NotificationType;
 import org.phong.horizon.notification.events.CreateNotificationEvent;
