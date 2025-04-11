@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.phong.horizon.user.dtos.UserCloneDto;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
@@ -48,4 +49,8 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserCreatedDto userCreatedDto, @MappingTarget User user);
+
+    UserCloneDto toCloneDto(User user);
+
+    User cloneUser(User user);
 }

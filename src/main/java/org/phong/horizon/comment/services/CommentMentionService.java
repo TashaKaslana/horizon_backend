@@ -117,7 +117,6 @@ public class CommentMentionService {
             log.error("Error deleting mentions for comment: {}", commentId, e);
             throw new RuntimeException("Failed to delete mentions", e);
         }
-//        commentMentionRepository.deleteAll(mentions);
 
         eventPublisher.publishEvent(new CommentMentionDeletedEvent(
                 this,

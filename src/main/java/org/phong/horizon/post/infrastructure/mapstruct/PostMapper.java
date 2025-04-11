@@ -9,6 +9,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.post.dtos.CreatePostRequest;
+import org.phong.horizon.post.dtos.PostCloneDto;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
@@ -45,4 +46,10 @@ public interface PostMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(PostRespond postRespond, @MappingTarget Post post);
+
+    Post clonePost(Post post);
+
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "videoAsset.id", target = "videoAssetId")
+    PostCloneDto toDto1(Post post);
 }

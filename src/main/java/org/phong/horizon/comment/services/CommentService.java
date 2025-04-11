@@ -88,14 +88,15 @@ public class CommentService {
 
     @Transactional
     public void updateCommentContent(UUID commentId, UpdateCommentContentDto updateCommentContentDto) {
-        Comment oldComment = findById(commentId);
+        Comment original = findById(commentId);
+        Comment oldComment = commentMapper.cloneComment(original);
 
-        if (isNotAllowToWrite(oldComment)) {
+        if (isNotAllowToWrite(original)) {
             log.info("Not allow to update comment");
             throw new CommentNotFoundException(CommentErrorEnums.UNAUTHORIZED_ACCESS.getMessage());
         }
 
-        Comment newComment = commentMapper.partialUpdate(updateCommentContentDto, oldComment);
+        Comment newComment = commentMapper.partialUpdate(updateCommentContentDto, original);
 
         commentRepository.save(newComment);
         log.info("Comment updated for commentId: {}", newComment.getId());
@@ -106,7 +107,10 @@ public class CommentService {
                 newComment.getPost().getId(),
                 newComment.getUser().getId(),
                 newComment.getContent(),
-                ObjectHelper.extractChangesWithCommonsLang(oldComment, newComment)
+                ObjectHelper.extractChangesWithCommonsLang(
+                        commentMapper.toDto1(oldComment),
+                        commentMapper.toDto1(newComment)
+                )
         ));
     }
 

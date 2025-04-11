@@ -104,15 +104,14 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-
-    //TODO: update this again
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#userId)")
     public void updateUser(UUID userId, UserUpdateDto userUpdateDto) {
         log.info("Attempting to update user with ID: {}", userId);
 
-        User oldUser = findById(userId);
-        User temp = userMapper.partialUpdate( userUpdateDto, oldUser);
+        User original = findById(userId);
+        User oldUser = userMapper.cloneUser(original);
+        User temp = userMapper.partialUpdate( userUpdateDto, original);
 
 //        if (userUpdateDto.username() != null) {
 //            updateUsername(temp, userUpdateDto.username());
@@ -126,27 +125,27 @@ public class UserService {
 //            updateRoles(user, userUpdateDto.getRoles());
 //        }
 
-
-
         User newUser = userRepository.save(temp);
 
         publisher.publishEvent(new UserUpdatedEvent(
                 this, newUser.getId(), newUser.getUsername(), newUser.getEmail(),
-                ObjectHelper.extractChangesWithCommonsLang(oldUser, newUser)
+                ObjectHelper.extractChangesWithCommonsLang(
+                        userMapper.toCloneDto(oldUser),
+                        userMapper.toCloneDto(newUser)
+                )
         ));
         log.info("Successfully updated user with ID: {}", newUser.getId());
     }
 
-
-    private void updateUsername(User user, String username) {
-        log.info("Updating username for user ID: {}", user.getId());
-        user.setUsername(username);
-    }
-
-    private void updateEmail(User user, String email) {
-        log.info("Updating email for user ID: {}", user.getId());
-        user.setEmail(email);
-    }
+//    private void updateUsername(User user, String username) {
+//        log.info("Updating username for user ID: {}", user.getId());
+//        user.setUsername(username);
+//    }
+//
+//    private void updateEmail(User user, String email) {
+//        log.info("Updating email for user ID: {}", user.getId());
+//        user.setEmail(email);
+//    }
 
 //    private void updateRoles(User user, List<String> roles) {
 //        log.info("Updating roles for user ID: {}", user.getId());
@@ -168,7 +167,7 @@ public class UserService {
     //test only or admin demonstration bruh!
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteAllUsers() {
+    public void     deleteAllUsers() {
         userRepository.deleteAll();
 
         log.warn("All users have been deleted!");

@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.phong.horizon.comment.dtos.CommentCloneDto;
 import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
@@ -53,4 +54,11 @@ public interface CommentMapper {
     Comment partialUpdate(CommentCreated commentCreated, @MappingTarget Comment comment);
 
     CommentCreated toDto4(Comment comment);
+
+    @Mapping(source = "parentComment.id", target = "parentCommentId")
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "post.id", target = "postId")
+    CommentCloneDto toDto1(Comment comment);
+
+    Comment cloneComment(Comment comment);
 }

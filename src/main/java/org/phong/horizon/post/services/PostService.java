@@ -111,28 +111,29 @@ public class PostService {
     @Transactional
     public void updatePost(UUID id, UpdatePostRequest request) {
         UUID currentUserId = authService.getUserIdFromContext();
-        Post oldPost = findPostById(id);
-        if (oldPost == null) {
+        Post originalPost = findPostById(id);
+        Post oldPost = postMapper.clonePost(originalPost);
+        if (originalPost == null) {
             throw new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage());
         }
 
-        if (!oldPost.getUser().getId().equals(currentUserId) && !authService.hasRole(Role.ADMIN)) {
+        if (!originalPost.getUser().getId().equals(currentUserId) && !authService.hasRole(Role.ADMIN)) {
             throw new PostPermissionDenialException(PostErrorEnums.UNAUTHORIZED_POST_UPDATE.getMessage());
         }
 
-        Post updatedPost = postMapper.partialUpdate(request, oldPost);
+        Post updatedPost = postMapper.partialUpdate(request, originalPost);
 
         if (request.videoAssetId() != null) {
             Asset asset = storageService.findAssetById(request.videoAssetId());
             updatedPost.setVideoAsset(asset);
         }
 
-        postRepository.save(updatedPost);
-        log.info("Updated post: {}", updatedPost);
+        Post savedPost = postRepository.save(updatedPost);
+        log.info("Updated post: {}", savedPost);
 
         eventPublisher.publishEvent(new PostUpdatedEvent(
-                this, updatedPost.getId(), currentUserId, updatedPost.getCaption(), updatedPost.getDescription(),
-                ObjectHelper.extractChangesWithCommonsLang(oldPost, updatedPost)
+                this, savedPost.getId(), currentUserId, savedPost.getCaption(), savedPost.getDescription(),
+                ObjectHelper.extractChangesWithCommonsLang(postMapper.toDto1(oldPost), postMapper.toDto1(savedPost))
         ));
     }
 

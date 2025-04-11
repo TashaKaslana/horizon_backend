@@ -37,10 +37,11 @@ public abstract class BaseEntity extends AuditEntity {
 
     @Override
     public final int hashCode() {
-        // Use a fixed value for transient instances (before ID assignment),
-        // and the ID's hashcode for persistent instances.
-        // Using getClass().hashCode() ensures consistency with the equals check across proxies/classes.
-        return Objects.hash(getClass());
+        Class<?> effectiveClass = this instanceof HibernateProxy
+                ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                : this.getClass();
+
+        return Objects.hash(effectiveClass, id);
     }
 
     // Consider adding a toString based on ID for logging if needed

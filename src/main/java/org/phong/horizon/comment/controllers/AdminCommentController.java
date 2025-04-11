@@ -1,5 +1,6 @@
 package org.phong.horizon.comment.controllers;
 
+import lombok.AllArgsConstructor;
 import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
@@ -11,12 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/admin/comments")
+@AllArgsConstructor
 public class AdminCommentController {
     private final CommentService commentService;
-
-    public AdminCommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
 
     @DeleteMapping("/all")
     @LogActivity(
