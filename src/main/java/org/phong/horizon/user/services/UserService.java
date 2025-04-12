@@ -156,7 +156,7 @@ public class UserService {
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#uuid)")
     public void deleteUser(UUID uuid) {
         User userTemp = findById(uuid);
-        userRepository.deleteById(uuid);
+        userRepository.softDeleteById(uuid);
 
         log.warn("Deleted user with id: {}", uuid);
         publisher.publishEvent(new UserDeletedEvent(
@@ -164,10 +164,18 @@ public class UserService {
         ));
     }
 
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#uuid)")
+    public void restoreUserById(UUID uuid) {
+        userRepository.restoreById(uuid);
+
+        log.info("Restored user with id: {}", uuid);
+    }
+
     //test only or admin demonstration bruh!
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void     deleteAllUsers() {
+    public void deleteAllUsers() {
         userRepository.deleteAll();
 
         log.warn("All users have been deleted!");

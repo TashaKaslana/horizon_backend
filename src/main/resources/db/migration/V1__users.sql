@@ -18,6 +18,7 @@ CREATE TABLE users
     cover_image   VARCHAR(255),
     country       VARCHAR(100),
     city          VARCHAR(100),
+    deleted_at     TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 

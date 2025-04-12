@@ -2,7 +2,9 @@ package org.phong.horizon.user.infrastructure.persistence.repositories;
 
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.username IN :usernameList")
     List<User> findAllByListUserName(List<String> usernameList);
 
+    @Modifying
+    @Query("UPDATE User u SET u.deletedAt = CURRENT_TIMESTAMP WHERE u.id = :id")
+    void softDeleteById(UUID id);
+
+    @Modifying
+    @Query("UPDATE User u SET u.deletedAt = null WHERE u.id = :id")
+    void restoreById(@Param("id") UUID id);
 }

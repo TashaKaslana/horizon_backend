@@ -13,6 +13,7 @@ public enum ActivityTypeCode {
     USER_LOGOUT("user_logout"),
     USER_UPDATE("user_update"),
     USER_DELETE("user_delete"),
+    USER_RESTORE("user_restore"),
     PASSWORD_CHANGE("password_change"),
     PROFILE_UPDATE("profile_update"),
     EMAIL_CHANGE("email_change"),

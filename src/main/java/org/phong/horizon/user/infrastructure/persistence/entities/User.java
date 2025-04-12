@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.phong.horizon.core.superclass.BaseEntity;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Getter
@@ -63,4 +64,7 @@ public class User extends BaseEntity {
 
     @Column(name = "city", length = 100)
     private String city;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 }

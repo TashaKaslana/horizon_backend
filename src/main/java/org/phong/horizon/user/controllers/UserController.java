@@ -68,4 +68,16 @@ public class UserController {
         userService.deleteCurrentUser();
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/restore")
+    @LogActivity(
+            activityCode = ActivityTypeCode.USER_RESTORE,
+            description = "Restore user",
+            targetType = SystemCategory.USER,
+            targetIdExpression = "#id"
+    )
+    public ResponseEntity<Void> restoreUser(@PathVariable UUID id) {
+        userService.restoreUserById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
