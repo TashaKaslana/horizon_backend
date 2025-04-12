@@ -2,6 +2,8 @@ package org.phong.horizon.post.infrastructure.persistence.repositories;
 
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,4 +27,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     @Modifying
     @Query("UPDATE Post p SET p.isAuthorDeleted = false WHERE p.user.id = :id")
     void restoreAllPostByUserId(UUID id);
+
+    Page<Post> findAllByVisibility(Visibility visibility, Pageable pageable);
 }

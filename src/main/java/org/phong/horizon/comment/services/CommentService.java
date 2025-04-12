@@ -87,6 +87,11 @@ public class CommentService {
     }
 
     @Transactional
+    public long getCountCommentsByPostId(UUID postId) {
+        return commentRepository.countAllByPost_Id(postId);
+    }
+
+    @Transactional
     public void updateCommentContent(UUID commentId, UpdateCommentContentDto updateCommentContentDto) {
         Comment original = findById(commentId);
         Comment oldComment = commentMapper.cloneComment(original);

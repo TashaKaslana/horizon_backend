@@ -24,6 +24,8 @@ import org.phong.horizon.storage.service.StorageService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -70,6 +72,12 @@ public class PostService {
                 .stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Page<PostRespond> getAllPublicPosts(Pageable pageable) {
+        return postRepository.findAllByVisibility(Visibility.PUBLIC, pageable)
+                .map(postMapper::toDto2);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

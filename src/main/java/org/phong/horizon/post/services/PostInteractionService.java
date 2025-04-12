@@ -50,6 +50,11 @@ public class PostInteractionService {
         postInteractionRepository.save(interaction);
     }
 
+    @Transactional(readOnly = true)
+    public long getCountInteractionByPostId(UUID postId) {
+        return postInteractionRepository.countAllByPost_Id(postId);
+    }
+
     @Transactional
     public void removeInteraction(UUID postId, InteractionType interactionType) {
         UUID currentUserId = authService.getUserIdFromContext();
@@ -66,6 +71,11 @@ public class PostInteractionService {
         List<PostInteraction> interactions = postInteractionRepository.findAllByPost_Id(postId);
 
         return interactions.stream().map(postInteractionMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public long getCountCommentsByPostId(UUID postId) {
+        return postInteractionRepository.countAllByPost_Id(postId);
     }
 
     @Transactional
