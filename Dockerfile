@@ -7,6 +7,8 @@ COPY settings.gradle settings.gradle
 COPY gradle gradle
 COPY build.gradle build.gradle
 
+RUN chmod +x ./gradlew
+
 RUN ./gradlew dependencies --no-daemon
 
 COPY src src
