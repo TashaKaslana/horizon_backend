@@ -138,6 +138,16 @@ public class PostService {
     }
 
     @Transactional
+    public void softDeletePostByUserId(UUID id) {
+        postRepository.softDeleteAllPostByUserId(id);
+    }
+
+    @Transactional
+    public void restorePostByUserId(UUID id) {
+        postRepository.restoreAllPostByUserId(id);
+    }
+
+    @Transactional
     public void deletePost(UUID id) {
         UUID currentUserId = authService.getUserIdFromContext();
         Post post = findPostById(id);

@@ -54,4 +54,7 @@ public class Comment extends BaseEntity {
 
     @OneToMany(mappedBy = "parentComment")
     private Set<Comment> comments = new LinkedHashSet<>();
+
+    @Column(name = "is_author_deleted")
+    private Boolean isAuthorDeleted;
 }

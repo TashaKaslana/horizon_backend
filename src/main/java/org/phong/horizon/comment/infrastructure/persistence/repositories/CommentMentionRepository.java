@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface CommentMentionRepository extends JpaRepository<CommentMention, UUID> {
     List<CommentMention> findAllByComment_Id(UUID commentId);
+
+    void deleteAllByMentionedUser_Id(UUID mentionedUserId);
 }

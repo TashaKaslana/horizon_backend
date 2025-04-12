@@ -14,4 +14,6 @@ public interface PostInteractionRepository extends JpaRepository<PostInteraction
     Optional<PostInteraction> findByPost_IdAndUser_IdAndInteraction(UUID postId, UUID userId, InteractionType interaction);
 
     List<PostInteraction> findAllByPost_Id(UUID postId);
+
+    void deleteAllByUser_Id(UUID userId);
 }

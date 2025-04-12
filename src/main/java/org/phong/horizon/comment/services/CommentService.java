@@ -157,4 +157,14 @@ public class CommentService {
     public Comment getRefById(UUID commentId) {
         return commentRepository.getReferenceById(commentId);
     }
+
+    @Transactional
+    public void softDeleteCommentsByUserId(UUID userId) {
+        commentRepository.softDeleteAllByUser_Id(userId);
+    }
+
+    @Transactional
+    public void restoreCommentsByPostId(UUID postId) {
+        commentRepository.restoreAllByUser_Id(postId);
+    }
 }

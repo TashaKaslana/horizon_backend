@@ -132,4 +132,10 @@ public class FollowService {
     public boolean isFriend(UUID followerId, UUID followingId) {
         return followRepository.checkIfFriend(followerId, followingId);
     }
+
+    @Transactional
+    public void deleteAllByUserID(UUID userId) {
+        followRepository.deleteAllByFollower_Id(userId);
+        followRepository.deleteAllByFollowing_Id(userId);
+    }
 }

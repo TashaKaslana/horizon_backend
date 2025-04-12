@@ -11,10 +11,13 @@ import org.phong.horizon.notification.enums.NotificationType;
 import org.phong.horizon.notification.events.CreateNotificationEvent;
 import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
+import org.phong.horizon.user.events.UserRestoreEvent;
 import org.phong.horizon.user.events.UserUpdatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Map;
 import java.util.Objects;
@@ -40,6 +43,8 @@ public class UserListener {
 
     //why I send event to notification the user has been deleted account? This is nonsense but just keep it
     @EventListener
+    @TransactionalEventListener
+    @Async
     public void onUserDeleted(UserDeletedEvent event) {
         eventPublisher.publishEvent(new CreateNotificationEvent(
                 this,
@@ -76,6 +81,21 @@ public class UserListener {
                         Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
                         HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
                 )
+        ));
+    }
+
+    @EventListener
+    @Async
+    @TransactionalEventListener
+    public void onUserRestoreEvent(UserRestoreEvent event) {
+        eventPublisher.publishEvent(new CreateNotificationEvent(
+                this,
+                event.getUserId(),
+                CreateNotificationRequest.builder()
+                        .recipientUserId(event.getUserId())
+                        .content("Your account has been successfully restore.")
+                        .type(NotificationType.SYSTEM_MESSAGE)
+                        .build()
         ));
     }
 }

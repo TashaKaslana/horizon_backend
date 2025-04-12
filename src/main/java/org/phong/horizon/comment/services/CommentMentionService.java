@@ -138,4 +138,9 @@ public class CommentMentionService {
                 .filter(username -> !username.equals(currentUserName))
                 .toList();
     }
+
+    @Transactional
+    public void deleteMentionsByUserId(UUID userId) {
+        commentMentionRepository.deleteAllByMentionedUser_Id(userId);
+    }
 }

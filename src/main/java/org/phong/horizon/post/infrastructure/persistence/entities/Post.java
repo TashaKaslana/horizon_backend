@@ -65,4 +65,7 @@ public class Post extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "tags", columnDefinition = "jsonb")
     private List<String> tags;
+
+    @Column(name = "is_author_deleted")
+    private Boolean isAuthorDeleted;
 }

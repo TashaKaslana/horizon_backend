@@ -13,5 +13,6 @@ import java.util.UUID;
  */
 public record PostRespond(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id, UserSummaryRespond user,
                           String caption, String description, Double duration, String visibility,
-                          List<String> tags, String videoPlaybackUrl, String videoThumbnailUrl, AssetRespond videoAsset) implements Serializable {
+                          List<String> tags, String videoPlaybackUrl, String videoThumbnailUrl, AssetRespond videoAsset,
+                          Boolean isAuthorDeleted) implements Serializable {
 }

@@ -10,5 +10,5 @@ import java.util.UUID;
  */
 public record CommentCloneDto(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id,
                               UUID postId, UUID userId, String content, UUID parentCommentId,
-                              Set<UUID> commentIds) implements Serializable {
+                              Set<UUID> commentIds, Boolean isAuthorDeleted) implements Serializable {
 }

@@ -13,4 +13,6 @@ public interface CommentInteractionRepository extends JpaRepository<CommentInter
     boolean existsByComment_IdAndUser_IdAndInteractionType(UUID commentId, UUID userId, InteractionType interactionType);
 
     int deleteByComment_IdAndUser_IdAndInteractionType(UUID commentId, UUID userId, InteractionType interactionType);
+
+    void deleteAllByUser_Id(UUID userId);
 }

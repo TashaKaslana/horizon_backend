@@ -3,6 +3,8 @@ package org.phong.horizon.post.infrastructure.persistence.repositories;
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,4 +17,12 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     List<Post> findAllByVisibility(Visibility visibility);
 
     List<Post> findAllByUser_IdAndVisibility(UUID userId, Visibility visibility);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.isAuthorDeleted = true WHERE p.user.id = :id")
+    void softDeleteAllPostByUserId(UUID id);
+
+    @Modifying
+    @Query("UPDATE Post p SET p.isAuthorDeleted = false WHERE p.user.id = :id")
+    void restoreAllPostByUserId(UUID id);
 }

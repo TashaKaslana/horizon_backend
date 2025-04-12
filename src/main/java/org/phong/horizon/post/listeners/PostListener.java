@@ -12,9 +12,14 @@ import org.phong.horizon.notification.events.CreateNotificationEvent;
 import org.phong.horizon.post.events.PostCreatedEvent;
 import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
+import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.user.events.UserDeletedEvent;
+import org.phong.horizon.user.events.UserRestoreEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Map;
 import java.util.Objects;
@@ -23,6 +28,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class PostListener {
     private final ApplicationEventPublisher eventPublisher;
+    private final PostService postService;
 
     @EventListener
     public void onPostCreated(PostCreatedEvent event) {
@@ -76,4 +82,19 @@ public class PostListener {
                         .build()
         ));
     }
+
+    @EventListener
+    @TransactionalEventListener
+    @Async
+    public void onUserDeleted(UserDeletedEvent event) {
+        postService.softDeletePostByUserId(event.getUserId());
+    }
+
+    @EventListener
+    @TransactionalEventListener
+    @Async
+    public void onUserRestore(UserRestoreEvent event) {
+        postService.restorePostByUserId(event.getUserId());
+    }
+
 }

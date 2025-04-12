@@ -12,6 +12,7 @@ import org.phong.horizon.user.dtos.UserUpdateDto;
 import org.phong.horizon.user.enums.UserErrorEnums;
 import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
+import org.phong.horizon.user.events.UserRestoreEvent;
 import org.phong.horizon.user.events.UserUpdatedEvent;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
@@ -170,6 +171,9 @@ public class UserService {
         userRepository.restoreById(uuid);
 
         log.info("Restored user with id: {}", uuid);
+        publisher.publishEvent(new UserRestoreEvent(
+                this, uuid
+        ));
     }
 
     //test only or admin demonstration bruh!

@@ -67,4 +67,9 @@ public class PostInteractionService {
 
         return interactions.stream().map(postInteractionMapper::toDto).collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteInteractionsByUserId(UUID userId) {
+        postInteractionRepository.deleteAllByUser_Id(userId);
+    }
 }
