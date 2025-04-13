@@ -99,6 +99,7 @@ public class PostService {
 
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
+        Asset asset = storageService.getRefById(request.videoAssetId());
         if (postRepository.isExistByAssetId(request.videoAssetId())) {
             throw new PostWithAssetAlreadyExistException(PostErrorEnums.POST_ASSET_ALREADY_EXISTS.getMessage());
         }
@@ -106,7 +107,6 @@ public class PostService {
         UUID currentUserId = authService.getUserIdFromContext();
         User currentUser = userService.getRefById(currentUserId);
 
-        Asset asset = storageService.getRefById(request.videoAssetId());
         Post post = postMapper.toEntity(request);
 
         post.setUser(currentUser);

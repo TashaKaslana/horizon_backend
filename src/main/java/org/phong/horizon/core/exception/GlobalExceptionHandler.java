@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.enums.SystemError;
 import org.phong.horizon.core.utils.HttpRequestUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -124,6 +125,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 null
         );
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, WebRequest request) {
+
+        log.warn("Data Integrity Violation: {}", ex.getMessage());
+
+        ApiErrorResponse apiError = new ApiErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                SystemError.DATA_INTEGRITY_VIOLATION,
+                HttpRequestUtils.getRequestPath(request),
+                HttpStatus.CONFLICT.getReasonPhrase()
+        );
+
+        if (ex.getRootCause() != null) {
+            log.warn("Root cause: {}", ex.getRootCause().getMessage());
+        }
+
+
+        return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
     }
 
     // --- Generic Fallback Handler (Catches anything else) ---
