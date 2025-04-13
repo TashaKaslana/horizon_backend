@@ -1,5 +1,6 @@
 package org.phong.horizon.post.controllers;
 
+import jakarta.validation.Valid;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
@@ -52,12 +53,13 @@ public class PostController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#result.body.id"
     )
-    public ResponseEntity<PostCreatedDto> createPost(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<PostCreatedDto> createPost(@Valid @RequestBody CreatePostRequest request) {
         return ResponseEntity.ok(postService.createPost(request));
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable UUID postId, @RequestBody UpdatePostRequest request) {
+    public ResponseEntity<Void> updatePost(@PathVariable UUID postId,
+                                           @Valid @RequestBody UpdatePostRequest request) {
         postService.updatePost(postId, request);
         return ResponseEntity.noContent().build();
     }

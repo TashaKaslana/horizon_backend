@@ -1,5 +1,6 @@
 package org.phong.horizon.comment.controllers;
 
+import jakarta.validation.Valid;
 import org.phong.horizon.comment.dtos.CommentInteractionRespond;
 import org.phong.horizon.comment.dtos.CreateCommentInteraction;
 import org.phong.horizon.core.enums.SystemCategory;
@@ -43,8 +44,8 @@ public class CommentInteractionController {
             targetIdExpression = "#commentId"
     )
     public ResponseEntity<Void> createInteraction(@PathVariable UUID commentId,
-                                                  @RequestBody CreateCommentInteraction createCommentInteraction) {
-        interactionService.createInteraction(commentId, createCommentInteraction);
+                                                  @Valid @RequestBody CreateCommentInteraction request) {
+        interactionService.createInteraction(commentId, request);
 
         return ResponseEntity.ok().build();
     }

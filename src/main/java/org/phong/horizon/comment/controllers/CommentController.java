@@ -1,5 +1,6 @@
 package org.phong.horizon.comment.controllers;
 
+import jakarta.validation.Valid;
 import org.phong.horizon.comment.dtos.CommentCreatedDto;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
@@ -30,8 +31,8 @@ public class CommentController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#result.body.id"
     )
-    public ResponseEntity<CommentCreatedDto> createComment(@RequestBody CreateCommentDto createCommentDto) {
-        return ResponseEntity.ok(commentService.createComment(createCommentDto));
+    public ResponseEntity<CommentCreatedDto> createComment(@Valid @RequestBody CreateCommentDto request) {
+        return ResponseEntity.ok(commentService.createComment(request));
     }
 
     @GetMapping("/{commentId}")
@@ -46,8 +47,8 @@ public class CommentController {
 
     @PutMapping("/{commentId}")
     public ResponseEntity<Void> updateComment(@PathVariable UUID commentId, 
-                                              @RequestBody UpdateCommentContentDto updateCommentContentDto) {
-        commentService.updateCommentContent(commentId, updateCommentContentDto);
+                                              @Valid @RequestBody UpdateCommentContentDto request) {
+        commentService.updateCommentContent(commentId, request);
         return ResponseEntity.noContent().build();
     }
 

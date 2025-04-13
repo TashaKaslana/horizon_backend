@@ -1,5 +1,6 @@
 package org.phong.horizon.user.controllers;
 
+import jakarta.validation.Valid;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
@@ -47,12 +48,12 @@ public class UserController {
             targetType = SystemCategory.USER,
             targetIdExpression = "#result.body.id"
     )
-    public ResponseEntity<UserCreatedDto> createUser(@RequestBody UserCreateDto userUpdateDto) {
+    public ResponseEntity<UserCreatedDto> createUser(@Valid @RequestBody UserCreateDto userUpdateDto) {
         return ResponseEntity.ok(userService.createUser(userUpdateDto));
     }
 
     @PutMapping("/me")
-    public ResponseEntity<Void> updateCurrentUser(@RequestBody UserUpdateDto userUpdateDto) {
+    public ResponseEntity<Void> updateCurrentUser(@Valid @RequestBody UserUpdateDto userUpdateDto) {
         userService.updateCurrentUser(userUpdateDto);
         return ResponseEntity.noContent().build();
     }

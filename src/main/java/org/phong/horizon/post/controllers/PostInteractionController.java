@@ -1,5 +1,6 @@
 package org.phong.horizon.post.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
@@ -35,7 +36,7 @@ public class PostInteractionController {
             targetIdExpression = "#postId"
     )
     public ResponseEntity<Void> createInteraction(@PathVariable UUID postId,
-                                                  @RequestBody CreatePostInteraction postInteraction) {
+                                                  @Valid @RequestBody CreatePostInteraction postInteraction) {
         postInteractionService.createInteraction(postId, postInteraction);
         return ResponseEntity.noContent().build();
     }
@@ -48,7 +49,8 @@ public class PostInteractionController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
-    public ResponseEntity<Void> deleteInteraction(@PathVariable UUID postId, @PathVariable String interactionType) {
+    public ResponseEntity<Void> deleteInteraction(@PathVariable UUID postId,
+                                                  @PathVariable String interactionType) {
         postInteractionService.removeInteraction(postId, InteractionType.fromString(interactionType));
         return ResponseEntity.noContent().build();
     }

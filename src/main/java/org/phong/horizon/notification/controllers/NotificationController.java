@@ -3,7 +3,6 @@ package org.phong.horizon.notification.controllers;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
 import org.phong.horizon.notification.dtos.NotificationRespond;
-import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.services.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,13 +32,6 @@ public class NotificationController {
     public ResponseEntity<NotificationRespond> getNotificationById(@PathVariable UUID notificationId) {
         NotificationRespond notification = notificationService.getNotificationById(notificationId);
         return ResponseEntity.ok(notification);
-    }
-
-    @PutMapping("/{notificationId}")
-    public ResponseEntity<Void> updateNotificationById(@PathVariable UUID notificationId,
-                                                       @RequestBody UpdateNotificationDto request) {
-        notificationService.updateNotificationById(notificationId, request);
-        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{notificationId}/soft")

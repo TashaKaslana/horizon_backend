@@ -1,5 +1,6 @@
 package org.phong.horizon.notification.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
@@ -29,20 +30,20 @@ public class AdminNotificationController {
     @GetMapping("/recipient/{recipientId}")
     public ResponseEntity<Page<NotificationRespond>> getAllNotificationByRecipientId(Pageable pageable,
                                                                                      @PathVariable UUID recipientId,
-                                                                                     NotificationFilterCriteria filters) {
+                                                                                     @Valid NotificationFilterCriteria filters) {
         Page<NotificationRespond> notifications = notificationService.getAllNotificationByRecipientId(pageable, recipientId, filters);
         return ResponseEntity.ok(notifications);
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<Void> createAdminNotifications(@RequestBody CreateNotificationRequest request) {
+    public ResponseEntity<Void> createAdminNotifications(@Valid @RequestBody CreateNotificationRequest request) {
         notificationService.createAdminNotifications(request);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{notificationId}")
     public ResponseEntity<Void> updateNotificationById(@PathVariable UUID notificationId,
-                                                       @RequestBody UpdateNotificationDto request) {
+                                                       @Valid @RequestBody UpdateNotificationDto request) {
         notificationService.updateNotificationById(notificationId, request);
         return ResponseEntity.noContent().build();
     }

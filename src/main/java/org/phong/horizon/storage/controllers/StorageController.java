@@ -1,5 +1,6 @@
 package org.phong.horizon.storage.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
@@ -26,7 +27,7 @@ public class StorageController {
             targetType = SystemCategory.ASSET,
             targetIdExpression = "#result.body.id"
     )
-    public ResponseEntity<AssetRespond> createAsset(@RequestBody UploadCompleteRequest uploadData) {
+    public ResponseEntity<AssetRespond> createAsset(@Valid @RequestBody UploadCompleteRequest uploadData) {
         AssetRespond asset = storageService.createAsset(uploadData);
         return ResponseEntity.ok(asset);
     }
