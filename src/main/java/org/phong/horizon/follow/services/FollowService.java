@@ -6,7 +6,8 @@ import org.phong.horizon.follow.dtos.FollowOneSideRespond;
 import org.phong.horizon.follow.dtos.FollowRespond;
 import org.phong.horizon.follow.enums.FollowErrorEnums;
 import org.phong.horizon.follow.events.UserFollowedEvent;
-import org.phong.horizon.follow.exceptions.FollowException;
+import org.phong.horizon.follow.exceptions.FollowNotFoundException;
+import org.phong.horizon.follow.exceptions.FollowSelfException;
 import org.phong.horizon.follow.infrastructure.mapstruct.FollowMapper;
 import org.phong.horizon.follow.infrastructure.persistence.entities.Follow;
 import org.phong.horizon.follow.infrastructure.persistence.entities.FollowId;
@@ -63,7 +64,7 @@ public class FollowService {
     public void follow(UUID followingId) {
         UUID followerId = authService.getUserIdFromContext();
         if (followerId.equals(followingId)) {
-            throw new FollowException(FollowErrorEnums.UNABLE_TO_FOLLOW_SELF);
+            throw new FollowSelfException(FollowErrorEnums.UNABLE_TO_FOLLOW_SELF);
         }
 
         followBetween(followerId, followingId);
@@ -73,7 +74,7 @@ public class FollowService {
     public void unfollow(UUID followingId) {
         UUID followerId = authService.getUserIdFromContext();
         if (followerId.equals(followingId)) {
-            throw new FollowException(FollowErrorEnums.UNABLE_TO_UNFOLLOW_SELF);
+            throw new FollowSelfException(FollowErrorEnums.UNABLE_TO_UNFOLLOW_SELF);
         }
 
         unfollowBetween(followerId, followingId);
@@ -122,10 +123,10 @@ public class FollowService {
     protected void checkUsersExist(UUID followerId, UUID followingId) {
         if (!userService.existsById(followerId)) {
             log.warn("Follower not found: {}", followerId);
-            throw new FollowException(FollowErrorEnums.FOLLOWER_NOT_FOUND);
+            throw new FollowNotFoundException(FollowErrorEnums.FOLLOWER_NOT_FOUND);
         } else if (!userService.existsById(followingId)) {
             log.warn("Following not found: {}", followingId);
-            throw new FollowException(FollowErrorEnums.FOLLOWING_NOT_FOUND);
+            throw new FollowNotFoundException(FollowErrorEnums.FOLLOWING_NOT_FOUND);
         }
     }
 

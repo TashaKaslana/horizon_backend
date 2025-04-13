@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.Objects;
 
@@ -48,5 +50,13 @@ public class HttpRequestUtils {
             log.error("Failed to get current HTTP request: {}", e.getMessage());
             return null;
         }
+    }
+
+    public static String getRequestPath(WebRequest request) {
+        if (request instanceof ServletWebRequest) {
+            return ((ServletWebRequest) request).getRequest().getRequestURI();
+        }
+        // Fallback for non-servlet requests
+        return request.getDescription(false).replace("uri=", "");
     }
 }

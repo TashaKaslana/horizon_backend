@@ -29,4 +29,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     void restoreAllPostByUserId(UUID id);
 
     Page<Post> findAllByVisibility(Visibility visibility, Pageable pageable);
+
+    @Query("SELECT CASE WHEN EXISTS(SELECT 1 FROM Post p WHERE p.videoAsset.id = :assetId) THEN true ELSE false END")
+    boolean isExistByAssetId(UUID assetId);
 }

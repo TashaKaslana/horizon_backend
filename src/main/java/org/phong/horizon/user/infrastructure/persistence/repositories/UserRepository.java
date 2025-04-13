@@ -26,4 +26,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Modifying
     @Query("UPDATE User u SET u.deletedAt = null WHERE u.id = :id")
     void restoreById(@Param("id") UUID id);
+
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END " +
+            "FROM User u WHERE u.auth0Id = :auth0 OR u.username = :username OR u.email = :email")
+    boolean isAlreadyExist(@Param("auth0") String auth0,
+                           @Param("username") String username,
+                           @Param("email") String email);
 }

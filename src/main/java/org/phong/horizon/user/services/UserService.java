@@ -14,6 +14,7 @@ import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
 import org.phong.horizon.user.events.UserRestoreEvent;
 import org.phong.horizon.user.events.UserUpdatedEvent;
+import org.phong.horizon.user.exceptions.UserAlreadyExistsException;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
@@ -86,6 +87,16 @@ public class UserService {
 
     @Transactional
     public UserCreatedDto createUser(UserCreateDto userCreateDto) {
+        boolean isAlreadyExist = userRepository.isAlreadyExist(
+                userCreateDto.auth0Id(), userCreateDto.username(), userCreateDto.email()
+        );
+
+        if (isAlreadyExist) {
+            throw new UserAlreadyExistsException(
+                    UserErrorEnums.USER_ALREADY_EXISTS.getMessage()
+            );
+        }
+
         User user = userMapper.toEntity(userCreateDto);
         User createdUser = userRepository.save(user);
 

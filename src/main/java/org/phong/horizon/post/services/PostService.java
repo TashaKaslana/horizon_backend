@@ -16,6 +16,7 @@ import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
 import org.phong.horizon.post.exceptions.PostNotFoundException;
 import org.phong.horizon.post.exceptions.PostPermissionDenialException;
+import org.phong.horizon.post.exceptions.PostWithAssetAlreadyExistException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
@@ -98,6 +99,10 @@ public class PostService {
 
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
+        if (postRepository.isExistByAssetId(request.videoAssetId())) {
+            throw new PostWithAssetAlreadyExistException(PostErrorEnums.POST_ASSET_ALREADY_EXISTS.getMessage());
+        }
+
         UUID currentUserId = authService.getUserIdFromContext();
         User currentUser = userService.getRefById(currentUserId);
 
