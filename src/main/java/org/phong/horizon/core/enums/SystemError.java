@@ -12,6 +12,8 @@ public enum SystemError {
     MISSING_PARAMETER_MSG("Required parameter is missing"),
     DATA_INTEGRITY_VIOLATION("Operation cannot be completed due to a data conflict (e.g., duplicate entry or invalid reference)."),
     INVALID_ARGUMENT_TYPE_MSG("Invalid argument type"),
+    AUTHENTICATION_FAILED("Authentication failed"),
+    ACCESS_DENIED("Access denied"),
     ;
 
     private final String errorMessage;

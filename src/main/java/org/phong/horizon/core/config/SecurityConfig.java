@@ -1,6 +1,8 @@
 package org.phong.horizon.core.config;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.core.exception.CustomAccessDeniedHandler;
+import org.phong.horizon.core.exception.CustomAuthenticationEntryPoint;
 import org.phong.horizon.core.services.InternalUserIdEnhancerFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +34,8 @@ public class SecurityConfig {
     private static final String ROLES_CLAIM = "https://phong-corp/roles";
     //    private static final String ROLE_PREFIX = "ROLE_";
     private final InternalUserIdEnhancerFilter internalUserIdEnhancerFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,7 +60,11 @@ public class SecurityConfig {
                         )
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterAfter(internalUserIdEnhancerFilter, BearerTokenAuthenticationFilter.class);
+                .addFilterAfter(internalUserIdEnhancerFilter, BearerTokenAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(customAuthenticationEntryPoint) // Use custom 401 handler
+                        .accessDeniedHandler(customAccessDeniedHandler)      // Use custom 403 handler
+                );
 
         return http.build();
     }

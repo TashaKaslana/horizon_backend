@@ -1,4 +1,4 @@
-package org.phong.horizon.core.exception;
+package org.phong.horizon.core.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

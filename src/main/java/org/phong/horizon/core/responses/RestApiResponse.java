@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
-import org.phong.horizon.core.exception.ApiErrorResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -197,6 +196,16 @@ public class RestApiResponse<T> {
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
         );
         return buildErrorResponse(details, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public static ResponseEntity<RestApiResponse<Void>> unauthorized(String path, String message) {
+        ApiErrorResponse details = new ApiErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                message,
+                path,
+                HttpStatus.UNAUTHORIZED.getReasonPhrase()
+        );
+        return buildErrorResponse(details, HttpStatus.UNAUTHORIZED);
     }
 
     // Special case: Validation errors need fieldErrors/globalErrors

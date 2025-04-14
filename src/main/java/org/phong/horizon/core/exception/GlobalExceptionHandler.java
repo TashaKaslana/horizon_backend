@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.enums.SystemError;
+import org.phong.horizon.core.responses.ApiErrorResponse;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -160,6 +164,22 @@ public class GlobalExceptionHandler {
         );
 
         return RestApiResponse.badRequest(apiError, SystemError.INVALID_ARGUMENT_TYPE_MSG.getErrorMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<RestApiResponse<Void>> handleAccessDeniedException(
+            AccessDeniedException ex, WebRequest request) {
+        log.warn("Access Denied: {}", ex.getMessage());
+
+        return RestApiResponse.forbidden(HttpRequestUtils.getRequestPath(request), SystemError.ACCESS_DENIED.getErrorMessage());
+    }
+
+    @ExceptionHandler({ AuthenticationException.class, InsufficientAuthenticationException.class })
+    public ResponseEntity<RestApiResponse<Void>> handleAuthenticationException(
+            AuthenticationException ex, WebRequest request) {
+        log.warn("Authentication Failed: {}", ex.getMessage());
+
+        return RestApiResponse.unauthorized(HttpRequestUtils.getRequestPath(request), SystemError.AUTHENTICATION_FAILED.getErrorMessage());
     }
 
     // --- Generic Fallback Handler (Catches anything else) ---

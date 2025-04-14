@@ -6,6 +6,7 @@ import org.phong.horizon.user.enums.UserErrorEnums;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,7 +30,7 @@ public class AuthService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
-            throw new IllegalStateException("JWT Token not found in security context");
+            throw new InsufficientAuthenticationException("JWT Token not found in security context");
         }
 
         return jwt.getClaims();
