@@ -3,6 +3,7 @@ package org.phong.horizon.comment.controllers;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.core.enums.SystemCategory;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,9 @@ public class AdminCommentController {
             description = "Admin delete all comments",
             targetType = SystemCategory.COMMENT
     )
-    public ResponseEntity<Void> deleteAllComments() {
+    public ResponseEntity<RestApiResponse<Void>> deleteAllComments() {
         commentService.deleteAllComments();
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }
+

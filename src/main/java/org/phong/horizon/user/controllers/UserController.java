@@ -2,6 +2,7 @@ package org.phong.horizon.user.controllers;
 
 import jakarta.validation.Valid;
 import org.phong.horizon.core.enums.SystemCategory;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserCreateDto;
@@ -32,13 +33,13 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserRespondDto> getCurrentUser() {
-        return ResponseEntity.ok(userService.getCurrentUser());
+    public ResponseEntity<RestApiResponse<UserRespondDto>> getCurrentUser() {
+        return RestApiResponse.success(userService.getCurrentUser());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserSummaryRespond> getUserSummary(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUserSummary(id));
+    public ResponseEntity<RestApiResponse<UserSummaryRespond>> getUserSummary(@PathVariable UUID id) {
+        return RestApiResponse.success(userService.getUserSummary(id));
     }
 
     @PostMapping()
@@ -46,16 +47,16 @@ public class UserController {
             activityCode = ActivityTypeCode.USER_CREATE,
             description = "Create a new user",
             targetType = SystemCategory.USER,
-            targetIdExpression = "#result.body.id"
+            targetIdExpression = "#result.body.data.id"
     )
-    public ResponseEntity<UserCreatedDto> createUser(@Valid @RequestBody UserCreateDto userUpdateDto) {
-        return ResponseEntity.ok(userService.createUser(userUpdateDto));
+    public ResponseEntity<RestApiResponse<UserCreatedDto>> createUser(@Valid @RequestBody UserCreateDto userUpdateDto) {
+        return RestApiResponse.created(userService.createUser(userUpdateDto));
     }
 
     @PutMapping("/me")
-    public ResponseEntity<Void> updateCurrentUser(@Valid @RequestBody UserUpdateDto userUpdateDto) {
+    public ResponseEntity<RestApiResponse<Void>> updateCurrentUser(@Valid @RequestBody UserUpdateDto userUpdateDto) {
         userService.updateCurrentUser(userUpdateDto);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @DeleteMapping("/me")
@@ -65,9 +66,9 @@ public class UserController {
             targetType = SystemCategory.USER,
             targetIdExpression = "#currentUserId"
     )
-    public ResponseEntity<Void> deleteCurrentUser() {
+    public ResponseEntity<RestApiResponse<Void>> deleteCurrentUser() {
         userService.deleteCurrentUser();
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @PutMapping("/{id}/restore")
@@ -77,8 +78,8 @@ public class UserController {
             targetType = SystemCategory.USER,
             targetIdExpression = "#id"
     )
-    public ResponseEntity<Void> restoreUser(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<Void>> restoreUser(@PathVariable UUID id) {
         userService.restoreUserById(id);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }

@@ -9,6 +9,7 @@ import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,27 +30,27 @@ public class CommentController {
             activityCode = ActivityTypeCode.COMMENT_CREATE,
             description = "Create a new comment",
             targetType = SystemCategory.POST,
-            targetIdExpression = "#result.body.id"
+            targetIdExpression = "#result.body.data.id"
     )
-    public ResponseEntity<CommentCreatedDto> createComment(@Valid @RequestBody CreateCommentDto request) {
-        return ResponseEntity.ok(commentService.createComment(request));
+    public ResponseEntity<RestApiResponse<CommentCreatedDto>> createComment(@Valid @RequestBody CreateCommentDto request) {
+        return RestApiResponse.created(commentService.createComment(request));
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentRespond> getCommentById(@PathVariable UUID commentId) {
-        return ResponseEntity.ok(commentService.getCommentById(commentId));
+    public ResponseEntity<RestApiResponse<CommentRespond>> getCommentById(@PathVariable UUID commentId) {
+        return RestApiResponse.success(commentService.getCommentById(commentId));
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<CommentRespond>> getAllCommentsByPostId(@PathVariable UUID postId) {
-        return ResponseEntity.ok(commentService.getAllCommentsByPostId(postId));
+    public ResponseEntity<RestApiResponse<List<CommentRespond>>> getAllCommentsByPostId(@PathVariable UUID postId) {
+        return RestApiResponse.success(commentService.getAllCommentsByPostId(postId));
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<Void> updateComment(@PathVariable UUID commentId, 
+    public ResponseEntity<RestApiResponse<Void>> updateComment(@PathVariable UUID commentId, 
                                               @Valid @RequestBody UpdateCommentContentDto request) {
         commentService.updateCommentContent(commentId, request);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @DeleteMapping("/{commentId}")
@@ -59,8 +60,8 @@ public class CommentController {
             targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
-    public ResponseEntity<Void> deleteComment(@PathVariable UUID commentId) {
+    public ResponseEntity<RestApiResponse<Void>> deleteComment(@PathVariable UUID commentId) {
         commentService.deleteCommentById(commentId);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }

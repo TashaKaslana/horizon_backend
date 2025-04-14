@@ -9,6 +9,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.CreatePostInteraction;
 import org.phong.horizon.post.dtos.PostInteractionRespond;
 import org.phong.horizon.post.services.PostInteractionService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,6 @@ import java.util.UUID;
 public class PostInteractionController {
     private final PostInteractionService postInteractionService;
 
-
     @PostMapping
     @LogActivity(
             activityCode = ActivityTypeCode.POST_LIKE,
@@ -35,12 +35,11 @@ public class PostInteractionController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
-    public ResponseEntity<Void> createInteraction(@PathVariable UUID postId,
+    public ResponseEntity<RestApiResponse<Void>> createInteraction(@PathVariable UUID postId,
                                                   @Valid @RequestBody CreatePostInteraction postInteraction) {
         postInteractionService.createInteraction(postId, postInteraction);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
-
 
     @DeleteMapping("/{interactionType}")
     @LogActivity(
@@ -49,15 +48,15 @@ public class PostInteractionController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
-    public ResponseEntity<Void> deleteInteraction(@PathVariable UUID postId,
+    public ResponseEntity<RestApiResponse<Void>> deleteInteraction(@PathVariable UUID postId,
                                                   @PathVariable String interactionType) {
         postInteractionService.removeInteraction(postId, InteractionType.fromString(interactionType));
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @GetMapping()
-    public ResponseEntity<List<PostInteractionRespond>> getInteractionsByPostId(@PathVariable UUID postId) {
+    public ResponseEntity<RestApiResponse<List<PostInteractionRespond>>> getInteractionsByPostId(@PathVariable UUID postId) {
         List<PostInteractionRespond> interactions = postInteractionService.getInteractionsByPostId(postId);
-        return ResponseEntity.ok(interactions);
+        return RestApiResponse.success(interactions);
     }
 }

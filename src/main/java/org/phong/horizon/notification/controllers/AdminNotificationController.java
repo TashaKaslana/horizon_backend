@@ -7,6 +7,7 @@ import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
 import org.phong.horizon.notification.dtos.NotificationRespond;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.services.NotificationService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,29 +30,29 @@ public class AdminNotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<Page<NotificationRespond>> getAllNotificationByRecipientId(Pageable pageable,
-                                                                                     @PathVariable UUID recipientId,
-                                                                                     @Valid NotificationFilterCriteria filters) {
+    public ResponseEntity<RestApiResponse<List<NotificationRespond>>> getAllNotificationByRecipientId(Pageable pageable,
+                                                                                                      @PathVariable UUID recipientId,
+                                                                                                      @Valid NotificationFilterCriteria filters) {
         Page<NotificationRespond> notifications = notificationService.getAllNotificationByRecipientId(pageable, recipientId, filters);
-        return ResponseEntity.ok(notifications);
+        return RestApiResponse.success(notifications);
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<Void> createAdminNotifications(@Valid @RequestBody CreateNotificationRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> createAdminNotifications(@Valid @RequestBody CreateNotificationRequest request) {
         notificationService.createAdminNotifications(request);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.created();
     }
 
     @PutMapping("/{notificationId}")
-    public ResponseEntity<Void> updateNotificationById(@PathVariable UUID notificationId,
-                                                       @Valid @RequestBody UpdateNotificationDto request) {
+    public ResponseEntity<RestApiResponse<Void>> updateNotificationById(@PathVariable UUID notificationId,
+                                                                         @Valid @RequestBody UpdateNotificationDto request) {
         notificationService.updateNotificationById(notificationId, request);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @DeleteMapping("/{notificationId}/force")
-    public ResponseEntity<Void> forceDeleteNotificationById(@PathVariable UUID notificationId) {
+    public ResponseEntity<RestApiResponse<Void>> forceDeleteNotificationById(@PathVariable UUID notificationId) {
         notificationService.forceDeleteNotificationById(notificationId);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }

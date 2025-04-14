@@ -8,6 +8,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.dtos.UploadCompleteRequest;
 import org.phong.horizon.storage.service.StorageService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,35 +26,35 @@ public class StorageController {
             activityCode = ActivityTypeCode.ASSET_CREATE,
             description = "Create a new asset",
             targetType = SystemCategory.ASSET,
-            targetIdExpression = "#result.body.id"
+            targetIdExpression = "#result.body.data.id"
     )
-    public ResponseEntity<AssetRespond> createAsset(@Valid @RequestBody UploadCompleteRequest uploadData) {
+    public ResponseEntity<RestApiResponse<AssetRespond>> createAsset(@Valid @RequestBody UploadCompleteRequest uploadData) {
         AssetRespond asset = storageService.createAsset(uploadData);
-        return ResponseEntity.ok(asset);
+        return RestApiResponse.created(asset);
     }
 
     @GetMapping("/asset/{id}")
-    public ResponseEntity<AssetRespond> getAssetById(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<AssetRespond>> getAssetById(@PathVariable UUID id) {
         AssetRespond asset = storageService.getAssetById(id);
-        return ResponseEntity.ok(asset);
+        return RestApiResponse.success(asset);
     }
 
     @GetMapping("/asset/public/{publicId}")
-    public ResponseEntity<AssetRespond> getAssetByPublicId(@PathVariable String publicId) {
+    public ResponseEntity<RestApiResponse<AssetRespond>> getAssetByPublicId(@PathVariable String publicId) {
         AssetRespond asset = storageService.getAssetByPublicId(publicId);
-        return ResponseEntity.ok(asset);
+        return RestApiResponse.success(asset);
     }
 
     @GetMapping("/playback-url/{publicId}")
-    public ResponseEntity<String> getVideoPlaybackUrl(@PathVariable String publicId) {
+    public ResponseEntity<RestApiResponse<String>> getVideoPlaybackUrl(@PathVariable String publicId) {
         String playbackUrl = storageService.generateVideoPlaybackUrl(publicId);
-        return ResponseEntity.ok(playbackUrl);
+        return RestApiResponse.success(playbackUrl);
     }
 
     @GetMapping("/thumbnail-url/{publicId}")
-    public ResponseEntity<String> getVideoThumbnailUrl(@PathVariable String publicId) {
+    public ResponseEntity<RestApiResponse<String>> getVideoThumbnailUrl(@PathVariable String publicId) {
         String thumbnailUrl = storageService.generateVideoThumbnailUrl(publicId);
-        return ResponseEntity.ok(thumbnailUrl);
+        return RestApiResponse.success(thumbnailUrl);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -63,9 +64,9 @@ public class StorageController {
             targetType = SystemCategory.ASSET,
             targetIdExpression = "#id"
     )
-    public ResponseEntity<Void> deleteAsset(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<Void>> deleteAsset(@PathVariable UUID id) {
         storageService.deleteAsset(id);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @PostMapping("/signature")
@@ -73,10 +74,10 @@ public class StorageController {
             activityCode = ActivityTypeCode.ASSET_SIGNATURE,
             description = "Generate upload signature",
             targetType = SystemCategory.ASSET
-//            targetIdExpression = "#result.body.id"
+//            targetIdExpression = "#result.body.data.id"
     )
-    public ResponseEntity<Map<String, Object>> generateUploadSignature(@RequestBody Map<String, Object> paramsFromClient) {
+    public ResponseEntity<RestApiResponse<Map<String, Object>>> generateUploadSignature(@RequestBody Map<String, Object> paramsFromClient) {
         Map<String, Object> signature = storageService.generateUploadSignature(paramsFromClient);
-        return ResponseEntity.ok(signature);
+        return RestApiResponse.success(signature);
     }
 }

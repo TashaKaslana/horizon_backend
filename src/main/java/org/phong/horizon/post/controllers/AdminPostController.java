@@ -5,6 +5,7 @@ import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,8 @@ public class AdminPostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostRespond>> getAllPostsForAdmin() {
-        return ResponseEntity.ok(postService.getAllPostsForAdmin());
+    public ResponseEntity<RestApiResponse<List<PostRespond>>> getAllPostsForAdmin() {
+        return RestApiResponse.success(postService.getAllPostsForAdmin());
     }
 
     @DeleteMapping("/{postId}")
@@ -33,9 +34,9 @@ public class AdminPostController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
-    public ResponseEntity<Void> deletePost(@PathVariable UUID postId) {
+    public ResponseEntity<RestApiResponse<Void>> deletePost(@PathVariable UUID postId) {
         postService.deletePost(postId);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @DeleteMapping("/user/{userId}")
@@ -45,8 +46,8 @@ public class AdminPostController {
             targetType = SystemCategory.USER,
             targetIdExpression = "#userId"
     )
-    public ResponseEntity<Void> deleteAllPostsByUser(@PathVariable UUID userId) {
+    public ResponseEntity<RestApiResponse<Void>> deleteAllPostsByUser(@PathVariable UUID userId) {
         postService.deleteAllPostsByUser(userId);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }

@@ -48,7 +48,7 @@ public class ActivityLoggingService {
 
     private static void logToConsole(CreateHistoryActivity request) {
         //UA is user agent
-        log.info("ACTIVITY LOGGING : UserId {}, Code: {}, Desc: '{}', Target: [Type :{}, ID :{}], IP: {}, UA: {}, Detail: {}",
+        log.debug("ACTIVITY LOGGING : UserId {}, Code: {}, Desc: '{}', Target: [Type :{}, ID :{}], IP: {}, UA: {}, Detail: {}",
                 request.userId(),
                 request.activityTypeCode(),
                 request.activityDescription(),

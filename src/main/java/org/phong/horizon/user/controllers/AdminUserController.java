@@ -6,6 +6,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.services.UserService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,13 +29,13 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserSummaryRespond>> getAllUsers() {
-        return ResponseEntity.ok(userService.getListUserSummary());
+    public ResponseEntity<RestApiResponse<List<UserSummaryRespond>>> getAllUsers() {
+        return RestApiResponse.success(userService.getListUserSummary());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserRespondDto> getUser(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUser(id));
+    public ResponseEntity<RestApiResponse<UserRespondDto>> getUser(@PathVariable UUID id) {
+        return RestApiResponse.success(userService.getUser(id));
     }
 
     @DeleteMapping("/{id}")
@@ -44,9 +45,9 @@ public class AdminUserController {
             targetType = SystemCategory.USER,
             targetIdExpression = "#id"
     )
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<Void>> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 
     @DeleteMapping("/all")
@@ -55,8 +56,8 @@ public class AdminUserController {
             description = "Admin delete all users",
             targetType = SystemCategory.USER
     )
-    public ResponseEntity<Void> deleteAllUsers() {
+    public ResponseEntity<RestApiResponse<Void>> deleteAllUsers() {
         userService.deleteAllUsers();
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }

@@ -9,6 +9,7 @@ import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,44 +27,42 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostRespond> getPostById(@PathVariable UUID postId) {
-        return ResponseEntity.ok(postService.getPostById(postId));
+    public ResponseEntity<RestApiResponse<PostRespond>> getPostById(@PathVariable UUID postId) {
+        return RestApiResponse.success(postService.getPostById(postId));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<PostRespond>> getMeAllPosts() {
-        return ResponseEntity.ok(postService.getMeAllPosts());
+    public ResponseEntity<RestApiResponse<List<PostRespond>>> getMeAllPosts() {
+        return RestApiResponse.success(postService.getMeAllPosts());
     }
 
     @GetMapping("/public")
-    public ResponseEntity<List<PostRespond>> getAllPublicPosts() {
-        return ResponseEntity.ok(postService.getAllPublicPosts());
+    public ResponseEntity<RestApiResponse<List<PostRespond>>> getAllPublicPosts() {
+        return RestApiResponse.success(postService.getAllPublicPosts());
     }
 
     @GetMapping("/user/{userId}/public")
-    public ResponseEntity<List<PostRespond>> getAllPublicPostsByUserId(@PathVariable UUID userId) {
-        return ResponseEntity.ok(postService.getAllPublicPostsByUserId(userId));
+    public ResponseEntity<RestApiResponse<List<PostRespond>>> getAllPublicPostsByUserId(@PathVariable UUID userId) {
+        return RestApiResponse.success(postService.getAllPublicPostsByUserId(userId));
     }
-
 
     @PostMapping
     @LogActivity(
             activityCode = ActivityTypeCode.POST_CREATE,
             description = "Create a new post",
             targetType = SystemCategory.POST,
-            targetIdExpression = "#result.body.id"
+            targetIdExpression = "#result.body.data.id"
     )
-    public ResponseEntity<PostCreatedDto> createPost(@Valid @RequestBody CreatePostRequest request) {
-        return ResponseEntity.ok(postService.createPost(request));
+    public ResponseEntity<RestApiResponse<PostCreatedDto>> createPost(@Valid @RequestBody CreatePostRequest request) {
+        return RestApiResponse.created(postService.createPost(request));
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable UUID postId,
+    public ResponseEntity<RestApiResponse<Void>> updatePost(@PathVariable UUID postId,
                                            @Valid @RequestBody UpdatePostRequest request) {
         postService.updatePost(postId, request);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
-
 
     @DeleteMapping("/{postId}")
     @LogActivity(
@@ -72,8 +71,8 @@ public class PostController {
             targetType = SystemCategory.POST,
             targetIdExpression = "#postId"
     )
-    public ResponseEntity<Void> deletePost(@PathVariable UUID postId) {
+    public ResponseEntity<RestApiResponse<Void>> deletePost(@PathVariable UUID postId) {
         postService.deletePost(postId);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }

@@ -8,6 +8,7 @@ import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.core.enums.InteractionType;
 import org.phong.horizon.comment.services.CommentInteractionService;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +31,9 @@ public class CommentInteractionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentInteractionRespond>> getInteractions(@PathVariable UUID commentId) {
+    public ResponseEntity<RestApiResponse<List<CommentInteractionRespond>>> getInteractions(@PathVariable UUID commentId) {
         List<CommentInteractionRespond> interactions = interactionService.getInteractionsByCommentId(commentId);
-
-        return ResponseEntity.ok(interactions);
+        return RestApiResponse.success(interactions);
     }
 
     @PostMapping
@@ -43,11 +43,10 @@ public class CommentInteractionController {
             targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
-    public ResponseEntity<Void> createInteraction(@PathVariable UUID commentId,
+    public ResponseEntity<RestApiResponse<Void>> createInteraction(@PathVariable UUID commentId,
                                                   @Valid @RequestBody CreateCommentInteraction request) {
         interactionService.createInteraction(commentId, request);
-
-        return ResponseEntity.ok().build();
+        return RestApiResponse.created();
     }
 
     @DeleteMapping("/{interactionType}")
@@ -57,9 +56,9 @@ public class CommentInteractionController {
             targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
-    public ResponseEntity<Void> removeInteraction(@PathVariable UUID commentId,
+    public ResponseEntity<RestApiResponse<Void>> removeInteraction(@PathVariable UUID commentId,
                                                   @PathVariable String interactionType) {
         interactionService.deleteInteraction(commentId, InteractionType.fromString(interactionType));
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }
