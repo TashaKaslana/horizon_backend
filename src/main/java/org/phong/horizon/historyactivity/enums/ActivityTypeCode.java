@@ -2,6 +2,7 @@ package org.phong.horizon.historyactivity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.phong.horizon.historyactivity.exceptions.ActivityTypeNotFoundException;
 
 @Getter
 @RequiredArgsConstructor
@@ -58,6 +59,7 @@ public enum ActivityTypeCode {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown activity type code: " + code);
+
+        throw new ActivityTypeNotFoundException("Unknown activity type code: " + code);
     }
 }

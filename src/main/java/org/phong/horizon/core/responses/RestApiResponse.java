@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
 import org.phong.horizon.core.exception.ApiErrorResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -118,6 +119,28 @@ public class RestApiResponse<T> {
         return ResponseEntity.status(status).body(body);
     }
 
+    private static <E> ResponseEntity<RestApiResponse<E>> buildErrorResponse(ApiErrorResponse errorDetails, HttpStatus status, String message) {
+        RestApiResponse<E> body = new RestApiResponse<>(errorDetails, message);
+        return ResponseEntity.status(status).body(body);
+    }
+
+    private static <E> ResponseEntity<RestApiResponse<E>> buildErrorResponse(
+            ApiErrorResponse errorDetails,
+            HttpStatus status,
+            HttpHeaders headers,
+            String message) {
+        RestApiResponse<E> body = new RestApiResponse<>(errorDetails, message);
+        return ResponseEntity.status(status).headers(headers).body(body);
+    }
+
+    public static ResponseEntity<RestApiResponse<Void>> badRequest(ApiErrorResponse errorDetails) {
+        return buildErrorResponse(errorDetails, HttpStatus.BAD_REQUEST, null);
+    }
+
+    public static ResponseEntity<RestApiResponse<Void>> badRequest(ApiErrorResponse errorDetails, String message) {
+        return buildErrorResponse(errorDetails, HttpStatus.BAD_REQUEST, message);
+    }
+
     public static ResponseEntity<RestApiResponse<Void>> badRequest(String path, String message) {
         ApiErrorResponse details = new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
@@ -130,14 +153,8 @@ public class RestApiResponse<T> {
         return buildErrorResponse(details, HttpStatus.BAD_REQUEST);
     }
 
-    public static ResponseEntity<RestApiResponse<Void>> badRequest(String path, String message, String errorDescription) {
-        ApiErrorResponse details = new ApiErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                message,
-                path,
-                errorDescription
-        );
-        return buildErrorResponse(details, HttpStatus.BAD_REQUEST);
+    public static ResponseEntity<RestApiResponse<Void>> methodNotAllowed(ApiErrorResponse errorResponse, String message, HttpHeaders headers) {
+        return buildErrorResponse(errorResponse, HttpStatus.METHOD_NOT_ALLOWED, headers, message);
     }
 
     public static ResponseEntity<RestApiResponse<Void>> notFound(String path, String message) {
@@ -162,22 +179,22 @@ public class RestApiResponse<T> {
         return buildErrorResponse(details, HttpStatus.CONFLICT);
     }
 
+    public static ResponseEntity<RestApiResponse<Void>> forbidden(String path, String message) {
+        ApiErrorResponse details = new ApiErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                message,
+                path,
+                HttpStatus.FORBIDDEN.getReasonPhrase()
+        );
+        return buildErrorResponse(details, HttpStatus.FORBIDDEN);
+    }
+
     public static ResponseEntity<RestApiResponse<Void>> internalServerError(String path, String message) {
         ApiErrorResponse details = new ApiErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 message,
                 path,
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()
-        );
-        return buildErrorResponse(details, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    public static ResponseEntity<RestApiResponse<Void>> internalServerError(String path, String message, String errorDescription) {
-        ApiErrorResponse details = new ApiErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                message,
-                path,
-                errorDescription
         );
         return buildErrorResponse(details, HttpStatus.INTERNAL_SERVER_ERROR);
     }

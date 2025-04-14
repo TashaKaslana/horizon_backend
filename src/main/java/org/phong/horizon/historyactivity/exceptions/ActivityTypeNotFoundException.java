@@ -6,4 +6,8 @@ public class ActivityTypeNotFoundException extends RuntimeException {
     public ActivityTypeNotFoundException(HistoryActivityBusinessError error, String activityTypeCode) {
         super(error.getMessage() + '\n' + String.format("Activity type with code %s not found", activityTypeCode));
     }
+
+    public ActivityTypeNotFoundException(String message) {
+        super(message);
+    }
 }

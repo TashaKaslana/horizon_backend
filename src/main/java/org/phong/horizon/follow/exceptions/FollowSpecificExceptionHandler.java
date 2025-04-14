@@ -1,11 +1,10 @@
 package org.phong.horizon.follow.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
-import org.phong.horizon.core.exception.ApiErrorResponse;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,30 +16,16 @@ import org.springframework.web.context.request.WebRequest;
 public class FollowSpecificExceptionHandler {
 
     @ExceptionHandler(FollowNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleFollowNotFoundException(FollowNotFoundException ex,
-                                                                           WebRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> handleFollowNotFoundException(FollowNotFoundException ex,
+                                                                               WebRequest request) {
         log.warn("Follow Not Found: {}", ex.getMessage());
-
-        ApiErrorResponse apiError = new ApiErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                HttpRequestUtils.getRequestPath(request),
-                HttpStatus.NOT_FOUND.getReasonPhrase()
-        );
-        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+        return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), ex.getMessage());
     }
 
     @ExceptionHandler(FollowSelfException.class)
-    public ResponseEntity<ApiErrorResponse> handleFollowSelfException(FollowSelfException ex,
-                                                                       WebRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> handleFollowSelfException(FollowSelfException ex,
+                                                                           WebRequest request) {
         log.warn("Follow Self Error: {}", ex.getMessage());
-
-        ApiErrorResponse apiError = new ApiErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
-                HttpRequestUtils.getRequestPath(request),
-                HttpStatus.BAD_REQUEST.getReasonPhrase()
-        );
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        return RestApiResponse.badRequest(HttpRequestUtils.getRequestPath(request), ex.getMessage());
     }
 }
