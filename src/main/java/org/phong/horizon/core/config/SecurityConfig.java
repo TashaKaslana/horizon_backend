@@ -5,6 +5,7 @@ import org.phong.horizon.core.services.InternalUserIdEnhancerFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private static final String ROLES_CLAIM = "https://phong-corp/roles";
-//    private static final String ROLE_PREFIX = "ROLE_";
+    //    private static final String ROLE_PREFIX = "ROLE_";
     private final InternalUserIdEnhancerFilter internalUserIdEnhancerFilter;
 
     @Bean
@@ -37,6 +38,12 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/{id}",
+                                "/api/posts/users/{userId}/public",
+                                "/api/feed"
+                        ).permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

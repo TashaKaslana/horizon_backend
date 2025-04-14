@@ -41,7 +41,7 @@ public class PostController {
         return RestApiResponse.success(postService.getAllPublicPosts());
     }
 
-    @GetMapping("/user/{userId}/public")
+    @GetMapping("/users/{userId}/public")
     public ResponseEntity<RestApiResponse<List<PostRespond>>> getAllPublicPostsByUserId(@PathVariable UUID userId) {
         return RestApiResponse.success(postService.getAllPublicPostsByUserId(userId));
     }
