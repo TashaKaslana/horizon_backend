@@ -5,11 +5,12 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
-import org.phong.horizon.user.dtos.UserUpdateDto;
+import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,10 +54,14 @@ public class UserController {
         return RestApiResponse.created(userService.createUser(userUpdateDto));
     }
 
-    @PutMapping("/me")
-    public ResponseEntity<RestApiResponse<Void>> updateCurrentUser(@Valid @RequestBody UserUpdateDto userUpdateDto) {
-        userService.updateCurrentUser(userUpdateDto);
-        return RestApiResponse.noContent();
+    @PutMapping("/me/info")
+    public ResponseEntity<RestApiResponse<UserRespondDto>> updateCurrentUserInfo(@Valid @RequestBody UserUpdateInfoDto userUpdateInfoDto) {
+        return RestApiResponse.success(userService.updateCurrentUser(userUpdateInfoDto));
+    }
+
+    @PutMapping("/me/account")
+    public ResponseEntity<RestApiResponse<UserRespondDto>> updateUserAccount(@Valid @RequestBody UserAccountUpdate request) {
+        return RestApiResponse.success(userService.updateMeAccount(request));
     }
 
     @DeleteMapping("/me")

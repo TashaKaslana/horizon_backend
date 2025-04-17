@@ -5,12 +5,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCloneDto;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
-import org.phong.horizon.user.dtos.UserUpdateDto;
+import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
@@ -22,12 +23,12 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserRespondDto userRespondDto, @MappingTarget User user);
 
-    User toEntity(UserUpdateDto userUpdateDto);
+    User toEntity(UserUpdateInfoDto userUpdateInfoDto);
 
-    UserUpdateDto toDto1(User user);
+    UserUpdateInfoDto toDto1(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    User partialUpdate(UserUpdateDto userUpdateDto, @MappingTarget User user);
+    User partialUpdate(UserUpdateInfoDto userUpdateInfoDto, @MappingTarget User user);
 
     User toEntity(UserCreateDto userCreateDto);
 
@@ -53,4 +54,7 @@ public interface UserMapper {
     UserCloneDto toCloneDto(User user);
 
     User cloneUser(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User partialUpdate(UserAccountUpdate userAccountUpdate, @MappingTarget User user);
 }

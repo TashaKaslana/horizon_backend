@@ -3,6 +3,7 @@ package org.phong.horizon.user.controllers;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.services.UserService;
@@ -12,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +39,11 @@ public class AdminUserController {
     @GetMapping("/{id}")
     public ResponseEntity<RestApiResponse<UserRespondDto>> getUser(@PathVariable UUID id) {
         return RestApiResponse.success(userService.getUser(id));
+    }
+
+    @PutMapping("/{id}/account")
+    public ResponseEntity<RestApiResponse<UserRespondDto>> updateUserAccount(@PathVariable UUID id, @RequestBody UserAccountUpdate request) {
+        return RestApiResponse.success(userService.updateUserAccount(request, id));
     }
 
     @DeleteMapping("/{id}")

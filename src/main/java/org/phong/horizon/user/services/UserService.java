@@ -4,16 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.ObjectHelper;
+import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
-import org.phong.horizon.user.dtos.UserUpdateDto;
+import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.enums.UserErrorEnums;
+import org.phong.horizon.user.events.UserAccountUpdatedEvent;
 import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
 import org.phong.horizon.user.events.UserRestoreEvent;
-import org.phong.horizon.user.events.UserUpdatedEvent;
+import org.phong.horizon.user.events.UserInfoUpdatedEvent;
 import org.phong.horizon.user.exceptions.UserAlreadyExistsException;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
@@ -71,10 +73,10 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#authentication.principal.id)")
-    public void updateCurrentUser(UserUpdateDto userUpdateDto) {
+    public UserRespondDto updateCurrentUser(UserUpdateInfoDto userUpdateInfoDto) {
         UUID userId = authService.getUserIdFromContext();
 
-        updateUser(userId, userUpdateDto);
+        return updateUserInfo(userId, userUpdateInfoDto);
     }
 
     @Transactional
@@ -118,12 +120,12 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#userId)")
-    public void updateUser(UUID userId, UserUpdateDto userUpdateDto) {
+    public UserRespondDto updateUserInfo(UUID userId, UserUpdateInfoDto userUpdateInfoDto) {
         log.info("Attempting to update user with ID: {}", userId);
 
         User original = findById(userId);
         User oldUser = userMapper.cloneUser(original);
-        User temp = userMapper.partialUpdate( userUpdateDto, original);
+        User temp = userMapper.partialUpdate(userUpdateInfoDto, original);
 
 //        if (userUpdateDto.username() != null) {
 //            updateUsername(temp, userUpdateDto.username());
@@ -139,7 +141,7 @@ public class UserService {
 
         User newUser = userRepository.save(temp);
 
-        publisher.publishEvent(new UserUpdatedEvent(
+        publisher.publishEvent(new UserInfoUpdatedEvent(
                 this, newUser.getId(), newUser.getUsername(), newUser.getEmail(),
                 ObjectHelper.extractChangesWithCommonsLang(
                         userMapper.toCloneDto(oldUser),
@@ -147,17 +149,34 @@ public class UserService {
                 )
         ));
         log.info("Successfully updated user with ID: {}", newUser.getId());
+
+        return userMapper.toDto(newUser);
     }
 
-//    private void updateUsername(User user, String username) {
-//        log.info("Updating username for user ID: {}", user.getId());
-//        user.setUsername(username);
-//    }
-//
-//    private void updateEmail(User user, String email) {
-//        log.info("Updating email for user ID: {}", user.getId());
-//        user.setEmail(email);
-//    }
+    @Transactional
+    public UserRespondDto updateMeAccount(UserAccountUpdate request) {
+        return updateUserAccount(request, authService.getUserIdFromContext());
+    }
+
+    @Transactional
+    public UserRespondDto updateUserAccount(UserAccountUpdate request, UUID uuid) {
+        User user = findById(uuid);
+        User oldUser = userMapper.cloneUser(user);
+        User updatedUser = userMapper.partialUpdate(request, user);
+
+        log.info("Updated user account with ID: {}", updatedUser.getId());
+
+        publisher.publishEvent(new UserAccountUpdatedEvent(
+                this, updatedUser.getId(), updatedUser.getUsername(), updatedUser.getEmail(),
+                updatedUser.getProfileImage(), updatedUser.getCoverImage(), updatedUser.getBio(),
+                ObjectHelper.extractChangesWithCommonsLang(
+                        userMapper.toCloneDto(oldUser),
+                        userMapper.toCloneDto(updatedUser)
+                ))
+        );
+
+        return userMapper.toDto(updatedUser);
+    }
 
 //    private void updateRoles(User user, List<String> roles) {
 //        log.info("Updating roles for user ID: {}", user.getId());

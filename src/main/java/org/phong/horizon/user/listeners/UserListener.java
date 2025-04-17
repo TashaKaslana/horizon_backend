@@ -9,10 +9,11 @@ import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.enums.NotificationType;
 import org.phong.horizon.notification.events.CreateNotificationEvent;
+import org.phong.horizon.user.events.UserAccountUpdatedEvent;
 import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
 import org.phong.horizon.user.events.UserRestoreEvent;
-import org.phong.horizon.user.events.UserUpdatedEvent;
+import org.phong.horizon.user.events.UserInfoUpdatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -58,13 +59,14 @@ public class UserListener {
     }
 
     @EventListener
-    public void onUserUpdated(UserUpdatedEvent event) {
+    public void onUserInfoUpdated(UserInfoUpdatedEvent event) {
         eventPublisher.publishEvent(new CreateNotificationEvent(
                 this,
                 event.getUserId(),
                 CreateNotificationRequest.builder()
                         .recipientUserId(event.getUserId())
-                        .content("Your account has been successfully updated.")
+                        .content("Your personal information has been successfully updated.")
+                        .extraData(Map.of("diffChange", event.getAdditionalInfo()))
                         .type(NotificationType.SYSTEM_MESSAGE)
                         .build()
         ));
@@ -73,7 +75,35 @@ public class UserListener {
                 this,
                 new CreateHistoryActivity(
                         ActivityTypeCode.USER_UPDATE,
-                        "User updated",
+                        "User personal info updated",
+                        Map.of("diffChange", event.getAdditionalInfo()),
+                        event.getUserId(),
+                        SystemCategory.USER.getName(),
+                        event.getUserId(),
+                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
+                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
+                )
+        ));
+    }
+
+    @EventListener
+    public void onUserAccountUpdated(UserAccountUpdatedEvent event) {
+        eventPublisher.publishEvent(new CreateNotificationEvent(
+                this,
+                event.getUserId(),
+                CreateNotificationRequest.builder()
+                        .recipientUserId(event.getUserId())
+                        .content("Your account information has been successfully updated.")
+                        .type(NotificationType.SYSTEM_MESSAGE)
+                        .extraData(Map.of("diffChange", event.getAdditionalInfo()))
+                        .build()
+        ));
+
+        eventPublisher.publishEvent(new CreateHistoryLogEvent(
+                this,
+                new CreateHistoryActivity(
+                        ActivityTypeCode.USER_UPDATE,
+                        "User account info updated",
                         Map.of("diffChange", event.getAdditionalInfo()),
                         event.getUserId(),
                         SystemCategory.USER.getName(),
