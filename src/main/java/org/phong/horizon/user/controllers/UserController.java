@@ -56,7 +56,7 @@ public class UserController {
 
     @PutMapping("/me/info")
     public ResponseEntity<RestApiResponse<UserRespondDto>> updateCurrentUserInfo(@Valid @RequestBody UserUpdateInfoDto userUpdateInfoDto) {
-        return RestApiResponse.success(userService.updateCurrentUser(userUpdateInfoDto));
+        return RestApiResponse.success(userService.updateCurrentUserInfo(userUpdateInfoDto));
     }
 
     @PutMapping("/me/account")

@@ -73,7 +73,7 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN') or @authService.isPrincipal(#authentication.principal.id)")
-    public UserRespondDto updateCurrentUser(UserUpdateInfoDto userUpdateInfoDto) {
+    public UserRespondDto updateCurrentUserInfo(UserUpdateInfoDto userUpdateInfoDto) {
         UUID userId = authService.getUserIdFromContext();
 
         return updateUserInfo(userId, userUpdateInfoDto);

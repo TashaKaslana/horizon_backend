@@ -10,6 +10,7 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +43,8 @@ public class CommentController {
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<RestApiResponse<List<CommentRespond>>> getAllCommentsByPostId(@PathVariable UUID postId) {
-        return RestApiResponse.success(commentService.getAllCommentsByPostId(postId));
+    public ResponseEntity<RestApiResponse<List<CommentRespond>>> getAllCommentsByPostId(Pageable pageable, @PathVariable UUID postId) {
+        return RestApiResponse.success(commentService.getAllCommentsByPostId(pageable, postId));
     }
 
     @PutMapping("/{commentId}")

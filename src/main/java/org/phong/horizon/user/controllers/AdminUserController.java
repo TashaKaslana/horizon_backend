@@ -6,6 +6,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
+import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.services.UserService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,11 @@ public class AdminUserController {
     @PutMapping("/{id}/account")
     public ResponseEntity<RestApiResponse<UserRespondDto>> updateUserAccount(@PathVariable UUID id, @RequestBody UserAccountUpdate request) {
         return RestApiResponse.success(userService.updateUserAccount(request, id));
+    }
+
+    @PutMapping("/{id}/info")
+    public ResponseEntity<RestApiResponse<UserRespondDto>> updateUserInfo(@PathVariable UUID id, @RequestBody UserUpdateInfoDto request) {
+        return RestApiResponse.success(userService.updateUserInfo(id, request));
     }
 
     @DeleteMapping("/{id}")

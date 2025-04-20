@@ -172,7 +172,7 @@ public class GlobalExceptionHandler {
             NoHandlerFoundException ex, WebRequest request) {
         log.debug("No Handler Found: {}", ex.getMessage());
 
-        return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), SystemError.NOT_FOUND.getErrorMessage());
+        return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), SystemError.NOT_FOUND_ENDPOINT.getErrorMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

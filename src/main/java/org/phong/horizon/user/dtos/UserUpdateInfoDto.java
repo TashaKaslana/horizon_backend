@@ -1,8 +1,5 @@
 package org.phong.horizon.user.dtos;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
 import jakarta.validation.constraints.NotBlank;
@@ -15,8 +12,7 @@ import java.time.LocalDate;
 /**
  * DTO for {@link User}
  */
-@JsonIgnoreProperties
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public record UserUpdateInfoDto(
         @NotBlank(message = "First name cannot be blank") String firstName,
         @NotBlank(message = "Last name cannot be blank") String lastName,
