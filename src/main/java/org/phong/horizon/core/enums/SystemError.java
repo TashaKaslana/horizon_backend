@@ -14,6 +14,7 @@ public enum SystemError {
     INVALID_ARGUMENT_TYPE_MSG("Invalid argument type"),
     AUTHENTICATION_FAILED("Authentication failed"),
     ACCESS_DENIED("Access denied"),
+    NOT_FOUND("Resource not found"),
     ;
 
     private final String errorMessage;

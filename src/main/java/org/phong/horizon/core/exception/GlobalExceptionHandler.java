@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -164,6 +165,14 @@ public class GlobalExceptionHandler {
         );
 
         return RestApiResponse.badRequest(apiError, SystemError.INVALID_ARGUMENT_TYPE_MSG.getErrorMessage());
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<RestApiResponse<Void>> handleNoHandlerFoundException(
+            NoHandlerFoundException ex, WebRequest request) {
+        log.debug("No Handler Found: {}", ex.getMessage());
+
+        return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), SystemError.NOT_FOUND.getErrorMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
