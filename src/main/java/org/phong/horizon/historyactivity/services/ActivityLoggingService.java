@@ -3,6 +3,7 @@ package org.phong.horizon.historyactivity.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
+import org.phong.horizon.historyactivity.dtos.HistoryActivityDto;
 import org.phong.horizon.historyactivity.enums.HistoryActivityBusinessError;
 import org.phong.horizon.historyactivity.exceptions.ActivityTypeNotFoundException;
 import org.phong.horizon.historyactivity.infrstructure.mapstruct.HistoryActivityMapper;
@@ -11,8 +12,13 @@ import org.phong.horizon.historyactivity.infrstructure.persistence.enitities.His
 import org.phong.horizon.historyactivity.infrstructure.persistence.repositories.ActivityTypeRepository;
 import org.phong.horizon.historyactivity.infrstructure.persistence.repositories.HistoryActivityRepository;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -57,5 +63,20 @@ public class ActivityLoggingService {
                 request.ipAddress() != null ? request.ipAddress() : "N/A",
                 request.userAgent() != null ? request.userAgent().substring(0, Math.min(request.userAgent().length(), 30)) + "..." : "N/A",
                 request.activityDetail() != null ? request.activityDetail() : "N/A");
+    }
+
+    @Transactional(readOnly = true)
+    public ActivityType getActivityTypeByCode(String code) {
+        return activityTypeRepository.findByCode(code)
+                .orElseThrow(() -> new ActivityTypeNotFoundException(
+                        HistoryActivityBusinessError.ACTIVITY_TYPE_CODE_NOT_FOUND,
+                        code
+                ));
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @authService.isPrincipal(#userId)")
+    public Page<HistoryActivityDto> getAllActivitiesByUserId(UUID userId, Pageable pageable) {
+        return historyActivityRepository.findAllByUser_Id(userId, pageable).map(historyActivityMapper::toDto1);
     }
 }

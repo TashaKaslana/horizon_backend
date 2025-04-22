@@ -22,6 +22,8 @@ import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,10 +67,10 @@ public class UserService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public List<UserSummaryRespond> getListUserSummary() {
-        List<User> users = userRepository.findAll();
+    public Page<UserSummaryRespond> getListUserSummary(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
 
-        return users.stream().map(userMapper::toDto3).toList();
+        return users.map(userMapper::toDto3);
     }
 
     @Transactional
