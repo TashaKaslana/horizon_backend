@@ -29,7 +29,10 @@ public class CloudinaryClientService {
     ));
     private final Cloudinary cloudinary;
     @Value("${cloudinary.api_key}")
-    private String apiKey;
+    private  String apiKey;
+
+    @Value("${cloudinary.folder}")
+    private String folderName;
 
     public CloudinaryClientService(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
@@ -39,7 +42,7 @@ public class CloudinaryClientService {
         long timestamp = System.currentTimeMillis() / 1000L;
         Map<String, Object> paramsToSign = new TreeMap<>(); // TreeMap for sorted keys
 
-        paramsToSign.put("folder", "secure_uploads"); // Example: Enforce a folder
+        paramsToSign.put("folder", folderName);
         paramsToSign.put("timestamp", timestamp);
 
         processClientParams(paramsFromClient, paramsToSign);

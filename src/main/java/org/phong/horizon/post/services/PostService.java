@@ -20,6 +20,7 @@ import org.phong.horizon.post.exceptions.PostWithAssetAlreadyExistException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
+import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
 import org.phong.horizon.storage.service.StorageService;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
@@ -99,10 +100,8 @@ public class PostService {
 
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
-        Asset asset = storageService.getRefById(request.videoAssetId());
-        if (postRepository.isExistByAssetId(request.videoAssetId())) {
-            throw new PostWithAssetAlreadyExistException(PostErrorEnums.POST_ASSET_ALREADY_EXISTS.getMessage());
-        }
+        AssetRespond assetRespond = storageService.createAsset(request.videoAsset());
+        Asset asset = storageService.getRefById(assetRespond.id());
 
         UUID currentUserId = authService.getUserIdFromContext();
         User currentUser = userService.getRefById(currentUserId);

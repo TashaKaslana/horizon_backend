@@ -13,24 +13,15 @@ import org.phong.horizon.post.dtos.PostCloneDto;
 import org.phong.horizon.post.dtos.PostRespond;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
+import org.phong.horizon.storage.infrastructure.mapper.AssetMapper;
 import org.phong.horizon.storage.service.CloudinaryUrlGenerator;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = {
-                CloudinaryUrlGenerator.class,
-        }
+        uses = {CloudinaryUrlGenerator.class, AssetMapper.class}
 )
 public interface PostMapper {
-    Post toEntity(CreatePostRequest createPostRequest);
-
-    @Mapping(source = "videoAsset.id", target = "videoAssetId")
-    CreatePostRequest toDto(Post post);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Post partialUpdate(CreatePostRequest createPostRequest, @MappingTarget Post post);
-
     Post toEntity(UpdatePostRequest updatePostRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -52,4 +43,14 @@ public interface PostMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "videoAsset.id", target = "videoAssetId")
     PostCloneDto toDto1(Post post);
+
+    @Mapping(source = "userId", target = "user.id")
+    Post toEntity(CreatePostRequest createPostRequest);
+
+    @Mapping(source = "user.id", target = "userId")
+    CreatePostRequest toDto3(Post post);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "userId", target = "user.id")
+    Post partialUpdate(CreatePostRequest createPostRequest, @MappingTarget Post post);
 }
