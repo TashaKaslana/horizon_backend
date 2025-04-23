@@ -27,7 +27,7 @@ public class CloudinaryUrlGenerator {
                 .transformation(new Transformation<>()
                         .quality("auto")
                 )// Ensure correct resource type
-                .format("auto")// Let Cloudinary choose the best video format (mp4, webm etc.)
+//                .format("auto")// Let Cloudinary choose the best video format (mp4, webm etc.)
                 // Let Cloudinary optimize quality/size
                 .secure(true)
                 .generate(videoAsset.getPublicId()); // Use public_id from the asset entity
@@ -44,12 +44,12 @@ public class CloudinaryUrlGenerator {
                 .resourceType("video") // Still video resource type...
                 // ...but generating an image! Cloudinary handles this.
                 .transformation(new Transformation<>()
-                        .width(300)        // Desired thumbnail width
+                        .width(640)        // Desired thumbnail width
                         .crop("limit")     // Limit width, auto height (or use 'fill', 'thumb')
-                        // .startOffset("auto") // Or "2" for second 2, "50p" for 50%
-                        .quality("auto")
+                        .startOffset("2") //start at 2 seconds after the video starts
+                        .quality("auto:best")
                 )
-                .format("auto") // Generate best IMAGE format (jpg, png, webp)
+                .format("webp") // Generate best IMAGE format (jpg, png, webp)
                 .secure(true)
                 .generate(videoAsset.getPublicId()); // Base on the video's public_id
     }

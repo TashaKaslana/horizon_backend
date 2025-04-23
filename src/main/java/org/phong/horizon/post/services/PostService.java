@@ -16,7 +16,6 @@ import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
 import org.phong.horizon.post.exceptions.PostNotFoundException;
 import org.phong.horizon.post.exceptions.PostPermissionDenialException;
-import org.phong.horizon.post.exceptions.PostWithAssetAlreadyExistException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
