@@ -18,4 +18,6 @@ public interface PostInteractionRepository extends JpaRepository<PostInteraction
     void deleteAllByUser_Id(UUID userId);
 
     long countAllByPost_Id(UUID postId);
+
+    boolean existsByPost_IdAndUser_IdAndInteraction(UUID postId, UUID currentUserId, InteractionType interactionType);
 }

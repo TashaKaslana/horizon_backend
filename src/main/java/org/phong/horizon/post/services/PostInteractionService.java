@@ -73,9 +73,9 @@ public class PostInteractionService {
         return interactions.stream().map(postInteractionMapper::toDto).collect(Collectors.toList());
     }
 
-    @Transactional
-    public long getCountCommentsByPostId(UUID postId) {
-        return postInteractionRepository.countAllByPost_Id(postId);
+    public boolean hasUserInteracted(UUID postId, InteractionType interactionType) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        return postInteractionRepository.existsByPost_IdAndUser_IdAndInteraction(postId, currentUserId, interactionType);
     }
 
     @Transactional

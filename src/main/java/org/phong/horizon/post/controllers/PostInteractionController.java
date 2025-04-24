@@ -54,6 +54,12 @@ public class PostInteractionController {
         return RestApiResponse.noContent();
     }
 
+    @GetMapping("/{interactionType}/me-is-interacted")
+    public ResponseEntity<RestApiResponse<Boolean>> hasMeInteracted(@PathVariable UUID postId, @PathVariable String interactionType) {
+        boolean hasInteracted = postInteractionService.hasUserInteracted(postId, InteractionType.fromString(interactionType));
+        return RestApiResponse.success(hasInteracted);
+    }
+
     @GetMapping()
     public ResponseEntity<RestApiResponse<List<PostInteractionRespond>>> getInteractionsByPostId(@PathVariable UUID postId) {
         List<PostInteractionRespond> interactions = postInteractionService.getInteractionsByPostId(postId);
