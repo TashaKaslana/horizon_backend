@@ -65,4 +65,16 @@ public class CommentController {
         commentService.deleteCommentById(commentId);
         return RestApiResponse.noContent();
     }
+
+    @PatchMapping("/{commentId}/pin")
+    public ResponseEntity<RestApiResponse<Void>> pinComment(@PathVariable UUID commentId) {
+        commentService.pinComment(commentId);
+        return RestApiResponse.noContent();
+    }
+
+    @PatchMapping("/{commentId}/unpin")
+    public ResponseEntity<RestApiResponse<Void>> unpinComment(@PathVariable UUID commentId) {
+        commentService.unpinComment(commentId);
+        return RestApiResponse.noContent();
+    }
 }

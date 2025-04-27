@@ -6,7 +6,10 @@ CREATE TYPE notification_type AS ENUM (
     'LIKE_COMMENT',
     'MENTION_COMMENT',
     'REPLY_COMMENT',
-    'SYSTEM_MESSAGE'
+    'SYSTEM_MESSAGE',
+    'REPORT_COMMENT',
+    'REPORT_POST',
+    'COMMENT_PINNED'
     );
 
 CREATE TABLE notifications
@@ -22,7 +25,7 @@ CREATE TABLE notifications
     is_read           BOOLEAN                  DEFAULT FALSE NOT NULL,
     is_deleted        BOOLEAN                  DEFAULT FALSE NOT NULL,
     created_at        TIMESTAMP WITH TIME ZONE default now() NOT NULL,
-    deleted_at        TIMESTAMP WITH TIME ZONE NULL,
+    deleted_at        TIMESTAMP WITH TIME ZONE               NULL,
     CONSTRAINT pk_notifications PRIMARY KEY (id)
 );
 

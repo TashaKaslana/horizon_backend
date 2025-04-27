@@ -21,4 +21,8 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     void restoreAllByUser_Id(UUID id);
 
     long countAllByPost_Id(UUID postId);
+
+    @Modifying
+    @Query("UPDATE Comment c SET c.isPinned = true WHERE c.post.id = :postId")
+    void removePinnedCommentInPost(UUID postId);
 }

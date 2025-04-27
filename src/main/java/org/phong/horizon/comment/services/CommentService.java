@@ -9,6 +9,8 @@ import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.enums.CommentErrorEnums;
 import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.events.CommentDeleted;
+import org.phong.horizon.comment.events.CommentPinned;
+import org.phong.horizon.comment.events.CommentUnPinned;
 import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.exceptions.CommentNotFoundException;
 import org.phong.horizon.comment.infrastructure.mapstruct.CommentMapper;
@@ -42,7 +44,7 @@ public class CommentService {
     private final AuthService authService;
     private final PostService postService;
     private final ApplicationEventPublisher eventPublisher;
-
+    
     @Transactional
     public CommentCreatedDto createComment(CreateCommentDto request) {
         Comment comment = commentMapper.toEntity(request);
@@ -149,6 +151,50 @@ public class CommentService {
     }
 
     @Transactional
+    public void pinComment(UUID commentId) {
+        Comment comment = findById(commentId);
+        if (isNotAllowToWrite(comment)) {
+            log.info("Not allow to pin comment");
+            throw new CommentNotFoundException(CommentErrorEnums.UNAUTHORIZED_ACCESS.getMessage());
+        }
+
+        removePinnedCommentByPostId(comment.getPost().getId());
+
+        comment.setIsPinned(true);
+        commentRepository.save(comment);
+        log.debug("Comment pinned: {}", comment.getId());
+
+        eventPublisher.publishEvent(new CommentPinned(
+                this,
+                comment.getId(),
+                comment.getPost().getId(),
+                authService.getUserIdFromContext(),
+                comment.getUser().getId()
+        ));
+    }
+
+    @Transactional
+    public void unpinComment(UUID commentId) {
+        Comment comment = findById(commentId);
+        if (isNotAllowToWrite(comment)) {
+            log.info("Not allow to unpin comment");
+            throw new CommentNotFoundException(CommentErrorEnums.UNAUTHORIZED_ACCESS.getMessage());
+        }
+
+        comment.setIsPinned(false);
+        commentRepository.save(comment);
+        log.debug("Comment unpinned: {}", comment.getId());
+
+        eventPublisher.publishEvent(new CommentUnPinned(
+                this,
+                comment.getId(),
+                comment.getPost().getId(),
+                authService.getUserIdFromContext(),
+                comment.getUser().getId()
+        ));
+    }
+
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteAllComments() {
         commentRepository.deleteAll();
@@ -166,6 +212,11 @@ public class CommentService {
                     log.info("Comment not found: {}", commentId);
                     return new CommentNotFoundException(CommentErrorEnums.COMMENT_NOT_FOUND.getMessage());
                 });
+    }
+
+    @Transactional
+    public void removePinnedCommentByPostId(UUID postId) {
+        commentRepository.removePinnedCommentInPost(postId);
     }
 
     @Transactional(readOnly = true)

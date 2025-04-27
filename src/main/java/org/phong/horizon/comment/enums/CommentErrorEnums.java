@@ -11,8 +11,13 @@ public enum CommentErrorEnums {
     COMMENT_ALREADY_DELETED("This comment has already been deleted"),
     UNAUTHORIZED_ACCESS("Access to the comment is denied"),
     MISSING_COMMENT_CONTENT("Comment content cannot be empty"),
-    INVALID_USER("The user does not exist");
-
+    INVALID_USER("The user does not exist"),
+    COMMENT_ALREADY_PINNED("Comment is already pinned"),
+    COMMENT_ALREADY_UNPINNED("Comment is already unpinned"),
+    COMMENT_PINNED("Comment pinned successfully"),
+    COMMENT_UNPINNED("Comment unpinned successfully"),
+    COMMENT_DELETED("Comment deleted successfully"),
+    COMMENT_REPORTED("Comment reported successfully");
     private final String message;
 
     CommentErrorEnums(String message) {
