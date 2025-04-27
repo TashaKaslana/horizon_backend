@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.enums.Role;
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCreatedDto;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -142,9 +144,14 @@ public class PostService {
         Post savedPost = postRepository.save(updatedPost);
         log.info("Updated post: {}", savedPost);
 
+        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
+
         eventPublisher.publishEvent(new PostUpdatedEvent(
                 this, savedPost.getId(), currentUserId, savedPost.getCaption(), savedPost.getDescription(),
-                ObjectHelper.extractChangesWithCommonsLang(postMapper.toDto1(oldPost), postMapper.toDto1(savedPost))
+                ObjectHelper.extractChangesWithCommonsLang(postMapper.toDto1(oldPost), postMapper.toDto1(savedPost)),
+                userAgent, clientIp
         ));
     }
 

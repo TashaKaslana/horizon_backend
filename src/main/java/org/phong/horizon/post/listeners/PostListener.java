@@ -2,7 +2,6 @@ package org.phong.horizon.post.listeners;
 
 import lombok.AllArgsConstructor;
 import org.phong.horizon.core.enums.SystemCategory;
-import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -64,8 +62,8 @@ public class PostListener {
                         event.getUserId(),
                         SystemCategory.USER.getName(),
                         event.getUserId(),
-                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
-                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
+                        event.getUserAgent(),
+                        event.getClientIp()
                 )
         ));
     }

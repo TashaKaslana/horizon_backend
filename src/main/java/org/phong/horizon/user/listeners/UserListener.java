@@ -2,7 +2,6 @@ package org.phong.horizon.user.listeners;
 
 import lombok.AllArgsConstructor;
 import org.phong.horizon.core.enums.SystemCategory;
-import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Map;
-import java.util.Objects;
 
 
 @Component
@@ -42,7 +40,7 @@ public class UserListener {
         ));
     }
 
-    //why I send event to notification the user has been deleted account? This is nonsense but just keep it
+    //why do I send event to notification the user has deleted the account? This is nonsense but just keep it
     @EventListener
     @TransactionalEventListener
     @Async
@@ -80,8 +78,8 @@ public class UserListener {
                         event.getUserId(),
                         SystemCategory.USER.getName(),
                         event.getUserId(),
-                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
-                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
+                        event.getUserAgent(),
+                        event.getClientIp()
                 )
         ));
     }
@@ -108,8 +106,8 @@ public class UserListener {
                         event.getUserId(),
                         SystemCategory.USER.getName(),
                         event.getUserId(),
-                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
-                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
+                        event.getUserAgent(),
+                        event.getClientIp()
                 )
         ));
     }

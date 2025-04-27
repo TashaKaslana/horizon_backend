@@ -42,7 +42,7 @@ public class CommentController {
         return RestApiResponse.success(commentService.getCommentById(commentId));
     }
 
-    @GetMapping("/post/{postId}")
+    @GetMapping("/posts/{postId}")
     public ResponseEntity<RestApiResponse<List<CommentRespond>>> getAllCommentsByPostId(Pageable pageable, @PathVariable UUID postId) {
         return RestApiResponse.success(commentService.getAllCommentsByPostId(pageable, postId));
     }

@@ -19,12 +19,14 @@ public final class CommentCreated extends ApplicationEvent implements Serializab
     private final UUID postId;
     private final UUID userId;
     private final String content;
+    private final UUID currentUserId;
 
-    public CommentCreated(Object source, UUID id, UUID postId, UUID userId, String content) {
+    public CommentCreated(Object source, UUID id, UUID postId, UUID userId, String content, UUID currentUserId) {
         super(source);
         this.id = id;
         this.postId = postId;
         this.userId = userId;
         this.content = content;
+        this.currentUserId = currentUserId;
     }
 }

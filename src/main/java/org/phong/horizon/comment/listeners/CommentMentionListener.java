@@ -1,7 +1,9 @@
 package org.phong.horizon.comment.listeners;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.events.CommentMentionCreatedEvent;
+import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.services.CommentMentionService;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.enums.NotificationType;
@@ -24,8 +26,15 @@ public class CommentMentionListener {
     @EventListener
     @TransactionalEventListener
     @Async
-    public void onCommentCreated(CommentMentionCreatedEvent event) {
-        commentMentionService.createMentions(event.getCommentId());
+    public void onCommentCreated(CommentCreated event) {
+        commentMentionService.createMentions(event.getId(), event.getCurrentUserId());
+    }
+
+    @EventListener
+    @TransactionalEventListener
+    @Async
+    public void onCommentUpdated(CommentUpdated event) {
+        commentMentionService.renewMentions(event.getCommentId(), event.getCurrentUserId());
     }
 
     @EventListener

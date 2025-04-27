@@ -35,29 +35,29 @@ public class CommentMentionService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createMentions(UUID commentId) {
+    public void createMentions(UUID commentId, UUID currentUserId) {
         Comment comment = commentService.findById(commentId);
         if (comment != null) {
-            createMentionsInternal(comment);
+            createMentionsInternal(comment, currentUserId);
         } else {
             log.warn("Comment not found in createMentionsForListener: {}", commentId);
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void renewMentions(UUID commentId) {
+    public void renewMentions(UUID commentId, UUID currentUserId) {
         deleteMentions(commentId);
         Comment comment = commentService.findById(commentId);
 
         if (comment != null) {
-            createMentionsInternal(comment);
+            createMentionsInternal(comment, currentUserId);
         } else {
             log.warn("Comment with ID: {} not found for renewing mentions", commentId);
         }
     }
 
-    private void createMentionsInternal(Comment comment) {
-        List<String> mentionUsernames = extractMentions(comment.getContent());
+    private void createMentionsInternal(Comment comment, UUID currentUserId) {
+        List<String> mentionUsernames = extractMentions(comment.getContent(), currentUserId);
         if (mentionUsernames.isEmpty()) {
             log.debug("No mentions found in content for comment: {}", comment.getId());
             return;
@@ -125,8 +125,9 @@ public class CommentMentionService {
         ));
     }
 
-    private List<String> extractMentions(String content) {
-        String currentUserName = userService.findById(authService.getUserIdFromContext()).getUsername();
+    private List<String> extractMentions(String content, UUID currentUserId) {
+        User currentUser = userService.findById(currentUserId);
+
         if (content == null || content.isEmpty()) {
             return Collections.emptyList();
         }
@@ -135,7 +136,7 @@ public class CommentMentionService {
                 .results()
                 .map(match -> match.group().substring(1))
                 .distinct()
-                .filter(username -> !username.equals(currentUserName))
+                .filter(username -> !username.equals(currentUser.getUsername()))
                 .toList();
     }
 

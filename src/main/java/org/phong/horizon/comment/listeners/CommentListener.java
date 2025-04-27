@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.core.enums.SystemCategory;
-import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
@@ -18,7 +17,6 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -31,18 +29,19 @@ public class CommentListener {
     @Async
     public void onCommentUpdated(CommentUpdated event) {
         eventPublisher.publishEvent(new CreateHistoryLogEvent(
-                this,
-                new CreateHistoryActivity(
-                        ActivityTypeCode.POST_UPDATE,
-                        "Comment updated",
-                        Map.of("diffChange", event.getAdditionalInfo()),
-                        event.getUserId(),
-                        SystemCategory.USER.getName(),
-                        event.getUserId(),
-                        Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent"),
-                        HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest())
+                        this,
+                        new CreateHistoryActivity(
+                                ActivityTypeCode.POST_UPDATE,
+                                "Comment updated",
+                                Map.of("diffChange", event.getAdditionalInfo()),
+                                event.getUserId(),
+                                SystemCategory.USER.getName(),
+                                event.getUserId(),
+                                event.getUserAgent(),
+                                event.getClientIp()
+                        )
                 )
-        ));
+        );
     }
 
     @TransactionalEventListener

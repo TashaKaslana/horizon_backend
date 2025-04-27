@@ -3,6 +3,7 @@ package org.phong.horizon.user.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
@@ -14,8 +15,8 @@ import org.phong.horizon.user.enums.UserErrorEnums;
 import org.phong.horizon.user.events.UserAccountUpdatedEvent;
 import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
-import org.phong.horizon.user.events.UserRestoreEvent;
 import org.phong.horizon.user.events.UserInfoUpdatedEvent;
+import org.phong.horizon.user.events.UserRestoreEvent;
 import org.phong.horizon.user.exceptions.UserAlreadyExistsException;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -143,12 +145,17 @@ public class UserService {
 
         User newUser = userRepository.save(temp);
 
+        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
         publisher.publishEvent(new UserInfoUpdatedEvent(
                 this, newUser.getId(), newUser.getUsername(), newUser.getEmail(),
                 ObjectHelper.extractChangesWithCommonsLang(
                         userMapper.toCloneDto(oldUser),
                         userMapper.toCloneDto(newUser)
-                )
+                ),
+                userAgent,
+                clientIp
         ));
         log.info("Successfully updated user with ID: {}", newUser.getId());
 
@@ -168,13 +175,19 @@ public class UserService {
 
         log.info("Updated user account with ID: {}", updatedUser.getId());
 
+        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
+
         publisher.publishEvent(new UserAccountUpdatedEvent(
                 this, updatedUser.getId(), updatedUser.getUsername(), updatedUser.getEmail(),
                 updatedUser.getProfileImage(), updatedUser.getCoverImage(), updatedUser.getBio(),
                 ObjectHelper.extractChangesWithCommonsLang(
                         userMapper.toCloneDto(oldUser),
                         userMapper.toCloneDto(updatedUser)
-                ))
+                ),
+                userAgent,
+                clientIp)
         );
 
         return userMapper.toDto(updatedUser);

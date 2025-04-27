@@ -17,9 +17,11 @@ import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface CommentMapper {
+    @Mapping(source = "postId", target = "post.id")
     @Mapping(source = "parentCommentId", target = "parentComment.id")
     Comment toEntity(CommentRespond commentRespond);
 
+    @Mapping(source = "post.id", target = "postId")
     @Mapping(source = "parentComment.id", target = "parentCommentId")
     CommentRespond toDto(Comment comment);
 

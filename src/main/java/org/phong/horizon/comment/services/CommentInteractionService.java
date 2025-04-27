@@ -97,6 +97,7 @@ public class CommentInteractionService {
         return list.stream().map(mapper::toDto2).collect(Collectors.toList());
     }
 
+
     @Transactional
     public void deleteInteractionsByUserId(UUID userId) {
         repository.deleteAllByUser_Id(userId);

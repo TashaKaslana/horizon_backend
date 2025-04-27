@@ -19,8 +19,10 @@ public class UserAccountUpdatedEvent extends ApplicationEvent {
     String coverImage;
     String bio;
     Map<String, FieldValueChange> additionalInfo;
+    String userAgent;
+    String clientIp;
 
-    public UserAccountUpdatedEvent(Object source, UUID userId, String username, String email, String profileImage, String coverImage, String bio, Map<String, FieldValueChange> additionalInfo) {
+    public UserAccountUpdatedEvent(Object source, UUID userId, String username, String email, String profileImage, String coverImage, String bio, Map<String, FieldValueChange> additionalInfo, String userAgent, String clientIp) {
         super(source);
         this.userId = userId;
         this.username = username;
@@ -29,5 +31,7 @@ public class UserAccountUpdatedEvent extends ApplicationEvent {
         this.coverImage = coverImage;
         this.bio = bio;
         this.additionalInfo = additionalInfo;
+        this.userAgent = userAgent;
+        this.clientIp = clientIp;
     }
 }

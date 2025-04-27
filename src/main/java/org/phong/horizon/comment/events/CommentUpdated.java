@@ -15,18 +15,26 @@ public final class CommentUpdated extends ApplicationEvent implements Serializab
     private final UUID userId;
     private final String content;
     private final Map<String, FieldValueChange> additionalInfo;
+    private final String userAgent;
+    private final String clientIp;
+    private final UUID currentUserId;
 
     public CommentUpdated(Object source,
                           UUID commentId,
                           UUID postId,
                           UUID userId,
                           String content,
-                          Map<String, FieldValueChange> additionalInfo) {
+                          Map<String, FieldValueChange> additionalInfo,
+                          String userAgent,
+                          String clientIp, UUID currentUserId) {
         super(source);
         this.commentId = commentId;
         this.postId = postId;
         this.userId = userId;
         this.content = content;
         this.additionalInfo = additionalInfo;
+        this.userAgent = userAgent;
+        this.clientIp = clientIp;
+        this.currentUserId = currentUserId;
     }
 }

@@ -16,6 +16,7 @@ import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentRepository;
 import org.phong.horizon.core.enums.Role;
 import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.services.PostService;
@@ -28,6 +29,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -66,7 +68,8 @@ public class CommentService {
                 createdComment.getId(),
                 createdComment.getPost().getId(),
                 createdComment.getUser().getId(),
-                createdComment.getContent()
+                createdComment.getContent(),
+                currentUserId
         ));
 
         return new CommentCreatedDto(createdComment.getId());
@@ -106,6 +109,10 @@ public class CommentService {
         commentRepository.save(newComment);
         log.info("Comment updated for commentId: {}", newComment.getId());
 
+        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
+
         eventPublisher.publishEvent(new CommentUpdated(
                 this,
                 newComment.getId(),
@@ -115,7 +122,10 @@ public class CommentService {
                 ObjectHelper.extractChangesWithCommonsLang(
                         commentMapper.toDto1(oldComment),
                         commentMapper.toDto1(newComment)
-                )
+                ),
+                userAgent,
+                clientIp,
+                authService.getUserIdFromContext()
         ));
     }
 
