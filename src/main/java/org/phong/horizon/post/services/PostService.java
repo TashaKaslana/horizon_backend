@@ -82,9 +82,14 @@ public class PostService {
     }
 
     @Transactional
-    public Page<PostResponse> getAllPublicPosts(Pageable pageable) {
-        return postRepository.findAllByVisibility(Visibility.PUBLIC, pageable)
-                .map(postMapper::toDto2);
+    public Page<PostResponse> getAllPublicPosts(Pageable pageable, UUID excludePostId) {
+        if (excludePostId == null) {
+            return postRepository.findAllByVisibility(Visibility.PUBLIC, pageable)
+                    .map(postMapper::toDto2);
+        } else {
+            return postRepository.findAllByVisibilityAndIdNot(Visibility.PUBLIC, excludePostId, pageable)
+                    .map(postMapper::toDto2);
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")

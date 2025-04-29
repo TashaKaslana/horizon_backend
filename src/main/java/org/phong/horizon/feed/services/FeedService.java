@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor
 public class FeedService {
@@ -18,8 +20,8 @@ public class FeedService {
     private final CommentService commentService;
     private final PostInteractionService postInteractionService;
 
-    public Page<FeedPage> getFeedForMe(Pageable pageable) {
-        Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable);
+    public Page<FeedPage> getFeedForMe(Pageable pageable, UUID excludePostId) {
+        Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable, excludePostId);
         return feedPage.map(post -> {
             PostStatistic statistic = new PostStatistic(
                     postInteractionService.getCountInteractionByPostId(post.id()),
