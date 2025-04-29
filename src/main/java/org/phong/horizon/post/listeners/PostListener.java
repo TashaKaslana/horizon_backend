@@ -28,6 +28,8 @@ public class PostListener {
     private final ApplicationEventPublisher eventPublisher;
     private final PostService postService;
 
+    @Async
+    @TransactionalEventListener
     @EventListener
     public void onPostCreated(PostCreatedEvent event) {
         eventPublisher.publishEvent(new CreateNotificationEvent(
@@ -41,6 +43,8 @@ public class PostListener {
         ));
     }
 
+    @Async
+    @TransactionalEventListener
     @EventListener
     public void onPostUpdated(PostUpdatedEvent event) {
         eventPublisher.publishEvent(new CreateNotificationEvent(
@@ -68,6 +72,8 @@ public class PostListener {
         ));
     }
 
+    @Async
+    @TransactionalEventListener
     @EventListener
     public void onPostDeleted(PostDeletedEvent event) {
         eventPublisher.publishEvent(new CreateNotificationEvent(

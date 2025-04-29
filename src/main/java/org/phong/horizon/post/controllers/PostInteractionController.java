@@ -7,7 +7,7 @@ import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.core.enums.InteractionType;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.CreatePostInteraction;
-import org.phong.horizon.post.dtos.PostInteractionRespond;
+import org.phong.horizon.post.dtos.PostInteractionResponse;
 import org.phong.horizon.post.services.PostInteractionService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -61,8 +61,8 @@ public class PostInteractionController {
     }
 
     @GetMapping()
-    public ResponseEntity<RestApiResponse<List<PostInteractionRespond>>> getInteractionsByPostId(@PathVariable UUID postId) {
-        List<PostInteractionRespond> interactions = postInteractionService.getInteractionsByPostId(postId);
+    public ResponseEntity<RestApiResponse<List<PostInteractionResponse>>> getInteractionsByPostId(@PathVariable UUID postId) {
+        List<PostInteractionResponse> interactions = postInteractionService.getInteractionsByPostId(postId);
         return RestApiResponse.success(interactions);
     }
 }

@@ -6,15 +6,15 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
-import org.phong.horizon.post.dtos.PostInteractionRespond;
+import org.phong.horizon.post.dtos.PostInteractionResponse;
 import org.phong.horizon.post.infrastructure.persistence.entities.PostInteraction;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PostInteractionMapper {
-    PostInteraction toEntity(PostInteractionRespond postInteractionRespond);
+    PostInteraction toEntity(PostInteractionResponse postInteractionResponse);
 
-    PostInteractionRespond toDto(PostInteraction postInteraction);
+    PostInteractionResponse toDto(PostInteraction postInteraction);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    PostInteraction partialUpdate(PostInteractionRespond postInteractionRespond, @MappingTarget PostInteraction postInteraction);
+    PostInteraction partialUpdate(PostInteractionResponse postInteractionResponse, @MappingTarget PostInteraction postInteraction);
 }

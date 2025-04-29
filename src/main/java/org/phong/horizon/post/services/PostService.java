@@ -1,5 +1,6 @@
 package org.phong.horizon.post.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.enums.Role;
@@ -9,7 +10,7 @@ import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCreatedDto;
-import org.phong.horizon.post.dtos.PostRespond;
+import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.enums.PostErrorEnums;
 import org.phong.horizon.post.events.PostCreatedEvent;
@@ -17,8 +18,10 @@ import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
 import org.phong.horizon.post.exceptions.PostNotFoundException;
 import org.phong.horizon.post.exceptions.PostPermissionDenialException;
+import org.phong.horizon.post.exceptions.PostWithAssetNotFoundException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
+import org.phong.horizon.post.infrastructure.persistence.repositories.PostCategoryRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
 import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
@@ -48,13 +51,14 @@ public class PostService {
     private final StorageService storageService;
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
+    private final PostCategoryRepository postCategoryRepository;
 
     @PostAuthorize("hasRole('ADMIN') or " +
             "returnObject.visibility == T(org.phong.horizon.core.enums.Visibility).PUBLIC or " +
 //            "(returnObject.visibility != T(org.phong.horizon.infrastructure.enums.Visibility).PRIVATE and @authService.isFriend(returnObject.user.id)) or " +
             "returnObject.user.id == authentication.principal.id")
     @Transactional(readOnly = true)
-    public PostRespond getPostById(UUID id) {
+    public PostResponse getPostById(UUID id) {
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
         );
@@ -62,7 +66,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostRespond> getMeAllPosts() {
+    public List<PostResponse> getMeAllPosts() {
         return postRepository.findAllByUser_Id(authService.getUserIdFromContext())
                 .stream()
                 .map(postMapper::toDto2)
@@ -70,7 +74,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostRespond> getAllPublicPosts() {
+    public List<PostResponse> getAllPublicPosts() {
         return postRepository.findAllByVisibility(Visibility.PUBLIC)
                 .stream()
                 .map(postMapper::toDto2)
@@ -78,21 +82,21 @@ public class PostService {
     }
 
     @Transactional
-    public Page<PostRespond> getAllPublicPosts(Pageable pageable) {
+    public Page<PostResponse> getAllPublicPosts(Pageable pageable) {
         return postRepository.findAllByVisibility(Visibility.PUBLIC, pageable)
                 .map(postMapper::toDto2);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public List<PostRespond> getAllPostsForAdmin() {
+    public List<PostResponse> getAllPostsForAdmin() {
         return postRepository.findAll().stream()
                 .map(postMapper::toDto2)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<PostRespond> getAllPublicPostsByUserId(UUID userId) {
+    public List<PostResponse> getAllPublicPostsByUserId(UUID userId) {
         return postRepository.findAllByUser_IdAndVisibility(userId, Visibility.PUBLIC)
                 .stream()
                 .map(postMapper::toDto2)
@@ -102,7 +106,13 @@ public class PostService {
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
         AssetRespond assetRespond = storageService.createAsset(request.videoAsset());
-        Asset asset = storageService.getRefById(assetRespond.id());
+        Asset asset;
+
+        try {
+            asset = storageService.getRefById(assetRespond.id());
+        } catch (EntityNotFoundException e) {
+            throw new PostWithAssetNotFoundException(PostErrorEnums.POST_ASSET_NOT_FOUND.getMessage());
+        }
 
         UUID currentUserId = authService.getUserIdFromContext();
         User currentUser = userService.getRefById(currentUserId);
@@ -111,6 +121,7 @@ public class PostService {
 
         post.setUser(currentUser);
         post.setVideoAsset(asset);
+        post.setCategory(postCategoryRepository.getReferenceByName(request.categoryName()));
         Post createdPost = postRepository.save(post);
 
         eventPublisher.publishEvent(new PostCreatedEvent(
@@ -141,12 +152,15 @@ public class PostService {
             updatedPost.setVideoAsset(asset);
         }
 
+        if (request.categoryName() != null) {
+            updatedPost.setCategory(postCategoryRepository.getReferenceByName(request.categoryName()));
+        }
+
         Post savedPost = postRepository.save(updatedPost);
         log.info("Updated post: {}", savedPost);
 
         String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
         String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
-
 
         eventPublisher.publishEvent(new PostUpdatedEvent(
                 this, savedPost.getId(), currentUserId, savedPost.getCaption(), savedPost.getDescription(),

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.enums.InteractionType;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.post.dtos.CreatePostInteraction;
-import org.phong.horizon.post.dtos.PostInteractionRespond;
+import org.phong.horizon.post.dtos.PostInteractionResponse;
 import org.phong.horizon.post.enums.PostInteractionError;
 import org.phong.horizon.post.exceptions.PostInteractionAlreadyExistException;
 import org.phong.horizon.post.exceptions.PostInteractionNotFoundException;
@@ -67,7 +67,7 @@ public class PostInteractionService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostInteractionRespond> getInteractionsByPostId(UUID postId) {
+    public List<PostInteractionResponse> getInteractionsByPostId(UUID postId) {
         List<PostInteraction> interactions = postInteractionRepository.findAllByPost_Id(postId);
 
         return interactions.stream().map(postInteractionMapper::toDto).collect(Collectors.toList());

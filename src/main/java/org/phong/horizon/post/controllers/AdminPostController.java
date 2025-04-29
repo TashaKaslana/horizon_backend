@@ -3,7 +3,7 @@ package org.phong.horizon.post.controllers;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
-import org.phong.horizon.post.dtos.PostRespond;
+import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class AdminPostController {
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<List<PostRespond>>> getAllPostsForAdmin() {
+    public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPostsForAdmin() {
         return RestApiResponse.success(postService.getAllPostsForAdmin());
     }
 

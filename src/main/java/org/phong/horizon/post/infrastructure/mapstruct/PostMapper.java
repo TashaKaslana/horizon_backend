@@ -10,7 +10,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCloneDto;
-import org.phong.horizon.post.dtos.PostRespond;
+import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.storage.infrastructure.mapper.AssetMapper;
@@ -27,16 +27,18 @@ public interface PostMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(UpdatePostRequest updatePostRequest, @MappingTarget Post post);
 
-    Post toEntity(PostRespond postRespond);
+    @Mapping(source = "categoryName", target = "category.name")
+    Post toEntity(PostResponse postResponse);
 
+    @Mapping(source = "category.name", target = "categoryName")
     @Mappings({
             @Mapping(target = "videoPlaybackUrl", source = "videoAsset", qualifiedByName = "videoPlaybackUrl"),
             @Mapping(target = "videoThumbnailUrl", source = "videoAsset", qualifiedByName = "videoThumbnailUrl"),
     })
-    PostRespond toDto2(Post post);
+    PostResponse toDto2(Post post);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Post partialUpdate(PostRespond postRespond, @MappingTarget Post post);
+    Post partialUpdate(PostResponse postResponse, @MappingTarget Post post);
 
     Post clonePost(Post post);
 
@@ -44,9 +46,11 @@ public interface PostMapper {
     @Mapping(source = "videoAsset.id", target = "videoAssetId")
     PostCloneDto toDto1(Post post);
 
+    @Mapping(source = "categoryName", target = "category.name")
     @Mapping(source = "userId", target = "user.id")
     Post toEntity(CreatePostRequest createPostRequest);
 
+    @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "user.id", target = "userId")
     CreatePostRequest toDto3(Post post);
 

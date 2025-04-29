@@ -31,7 +31,8 @@ import java.util.List;
 @Table(name = "posts", indexes = {
         @Index(name = "idx_posts_created_at", columnList = "created_at"),
         @Index(name = "idx_posts_user", columnList = "user_id"),
-        @Index(name = "idx_posts_tags", columnList = "tags")
+        @Index(name = "idx_posts_tags", columnList = "tags"),
+        @Index(name = "idx_post_category_id", columnList = "category_id")
 })
 @AttributeOverrides({
         @AttributeOverride(name = "createdAt", column = @Column(name = "created_at")),
@@ -68,4 +69,9 @@ public class Post extends BaseEntity {
 
     @Column(name = "is_author_deleted")
     private Boolean isAuthorDeleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "category_id")
+    private PostCategory category;
 }
