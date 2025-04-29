@@ -10,6 +10,6 @@ import java.util.UUID;
 /**
  * DTO for {@link org.phong.horizon.post.infrastructure.persistence.entities.PostInteraction}
  */
-public record PostInteractionRespond(UUID id, UserSummaryRespond user, InteractionType interaction,
-                                     Instant createdAt) implements Serializable {
+public record PostInteractionResponse(UUID id, UserSummaryRespond user, InteractionType interaction,
+                                      Instant createdAt) implements Serializable {
 }

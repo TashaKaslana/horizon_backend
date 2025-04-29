@@ -23,7 +23,12 @@ public enum PostErrorEnums {
     POST_DELETION_FAILED("POST_012", "Failed to delete post. Please try again."),
     TAG_LIMIT_EXCEEDED("POST_013", "You can only add up to 10 tags."),
     POST_VIDEO_PROCESSING_ERROR("POST_014", "Error processing video. Please try again later."),
-    POST_ASSET_ALREADY_EXISTS("POST_015", "Post with asset already exists."),;
+    POST_ASSET_ALREADY_EXISTS("POST_015", "Post with asset already exists."),
+    POST_ASSET_NOT_FOUND("POST_016", "Post asset not found."),
+
+    POST_CATEGORY_NOT_FOUND("POST_017", "Post category not found."),
+    POST_CATEGORY_EXISTS("POST_018", "Post category already exists."),;
+
 
     private final String code;
     private final String message;

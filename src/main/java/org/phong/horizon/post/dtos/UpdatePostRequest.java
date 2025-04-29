@@ -17,5 +17,6 @@ public record UpdatePostRequest(
         @NotNull Double duration,
         @NotBlank @Size(max = 10) String visibility,
         List<String> tags,
-        @NotNull UUID videoAssetId) implements Serializable {
+        @NotNull UUID videoAssetId,
+        @NotNull String categoryName) implements Serializable {
 }

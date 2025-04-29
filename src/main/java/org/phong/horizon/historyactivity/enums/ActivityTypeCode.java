@@ -25,6 +25,11 @@ public enum ActivityTypeCode {
     POST_CREATE("post_create"),
     POST_UPDATE("post_update"),
     POST_DELETE("post_delete"),
+    POST_CATEGORY_UPDATE("post_category_update"),
+    POST_CATEGORY_DELETE("post_category_delete"),
+    POST_CATEGORY_CREATE("post_category_create"),
+    POST_BOOKMARK("post_bookmark"),
+    POST_UNBOOKMARK("post_unbookmark"),
 
     // Interaction Category
     POST_VIEW("post_view"),
@@ -49,7 +54,7 @@ public enum ActivityTypeCode {
     CONTENT_MODERATION_ACTION("content_moderation_action"),
 
     // Security Category
-    SUSPICIOUS_ACTIVITY_ALERT("suspicious_activity_alert");
+    SUSPICIOUS_ACTIVITY_ALERT("suspicious_activity_alert"),;
 
     private final String code;
 

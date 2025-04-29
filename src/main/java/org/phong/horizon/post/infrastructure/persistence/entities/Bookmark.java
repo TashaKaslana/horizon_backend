@@ -1,4 +1,4 @@
-package org.phong.horizon.comment.infrastructure.persistence.entities;
+package org.phong.horizon.post.infrastructure.persistence.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,26 +12,29 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "report_comment", indexes = {
-        @Index(name = "idx_report_comment_user_id", columnList = "user_id, message_type")
+@Table(name = "bookmarks", indexes = {
+        @Index(name = "idx_bookmarks_user_post", columnList = "user_id, post_id")
 })
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReportComment {
+@Builder
+public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
@@ -39,26 +42,19 @@ public class ReportComment {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "comment_id", nullable = false)
-    private Comment comment;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @NotNull
-    @Column(name = "reason", nullable = false, length = Integer.MAX_VALUE)
-    private String reason;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
+    @NotNull
     @ColumnDefault("now()")
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
-    private Instant createdAt;
-
-    @ColumnDefault("now()")
-    @Column(name = "updated_at")
-    @UpdateTimestamp
-    private Instant updatedAt;
-
+    private OffsetDateTime createdAt;
 }
