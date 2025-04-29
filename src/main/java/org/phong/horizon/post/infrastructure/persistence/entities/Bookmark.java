@@ -51,7 +51,6 @@ public class Bookmark {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @NotNull
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private OffsetDateTime createdAt;

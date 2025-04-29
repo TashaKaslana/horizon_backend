@@ -65,7 +65,7 @@ public class PostCategoryController {
     public ResponseEntity<RestApiResponse<PostCategory>> createPostCategory(@RequestBody CreatePostCategoryRequest postCategory) {
         PostCategory createdCategory = postCategoryService.createPostCategory(postCategory);
 
-        return RestApiResponse.success(createdCategory);
+        return RestApiResponse.created(createdCategory);
     }
 
     @LogActivity(

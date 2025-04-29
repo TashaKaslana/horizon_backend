@@ -23,13 +23,17 @@ class PostBookmarkController {
     PostBookmarkService postBookmarkService;
     
     @PostMapping()
-    public void bookmarkPost(@PathVariable UUID postId) {
+    public ResponseEntity<RestApiResponse<Void>> bookmarkPost(@PathVariable UUID postId) {
         postBookmarkService.bookmarkPost(postId);
+
+        return RestApiResponse.created();
     }
 
     @DeleteMapping()
-    public void deleteBookmark(@PathVariable UUID postId) {
+    public ResponseEntity<RestApiResponse<Void>> deleteBookmark(@PathVariable UUID postId) {
         postBookmarkService.deleteBookmark(postId);
+
+        return RestApiResponse.noContent();
     }
 
     @GetMapping()
