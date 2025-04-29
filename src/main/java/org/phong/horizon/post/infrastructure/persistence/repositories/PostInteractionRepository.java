@@ -3,6 +3,7 @@ package org.phong.horizon.post.infrastructure.persistence.repositories;
 import org.phong.horizon.core.enums.InteractionType;
 import org.phong.horizon.post.infrastructure.persistence.entities.PostInteraction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +21,7 @@ public interface PostInteractionRepository extends JpaRepository<PostInteraction
     long countAllByPost_Id(UUID postId);
 
     boolean existsByPost_IdAndUser_IdAndInteraction(UUID postId, UUID currentUserId, InteractionType interactionType);
+
+    @Query("SELECT pi.post.id FROM PostInteraction pi WHERE pi.post.id IN :postIds AND pi.user.id = :currentUserId")
+    List<UUID> findAllByPost_IdsInAndUser_Id(List<UUID> postIds, UUID currentUserId);
 }

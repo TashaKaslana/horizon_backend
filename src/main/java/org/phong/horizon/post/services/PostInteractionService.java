@@ -78,6 +78,12 @@ public class PostInteractionService {
         return postInteractionRepository.existsByPost_IdAndUser_IdAndInteraction(postId, currentUserId, interactionType);
     }
 
+    public List<UUID> getPostIdsInteractedByPostIds(List<UUID> postIds) {
+        UUID currentUserId = authService.getUserIdFromContext();
+
+        return postInteractionRepository.findAllByPost_IdsInAndUser_Id(postIds, currentUserId);
+    }
+
     @Transactional
     public void deleteInteractionsByUserId(UUID userId) {
         postInteractionRepository.deleteAllByUser_Id(userId);

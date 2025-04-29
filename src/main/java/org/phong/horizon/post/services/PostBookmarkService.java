@@ -15,6 +15,7 @@ import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -54,5 +55,14 @@ public class PostBookmarkService {
 
     public boolean isBookmarked(UUID postId) {
         return bookmarkRepository.existsByUser_IdAndPost_Id(authService.getUserIdFromContext(), postId);
+    }
+
+    public long getCountBookmarksByPostId(UUID postId) {
+        return bookmarkRepository.countAllByPost_Id(postId);
+    }
+
+    public List<UUID> getBookmarkedIdsByPostId(List<UUID> postIds) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        return bookmarkRepository.findAllByPost_IdsInAndUser_Id(postIds, currentUserId);
     }
 }
