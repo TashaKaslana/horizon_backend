@@ -6,7 +6,7 @@ import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
-import org.phong.horizon.notification.dtos.NotificationRespond;
+import org.phong.horizon.notification.dtos.NotificationResponse;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.enums.NotificationErrorEnum;
 import org.phong.horizon.notification.exceptions.NotificationAccessDenialException;
@@ -42,7 +42,7 @@ public class NotificationService {
     private final AuthService authService;
 
     @Transactional(readOnly = true)
-    public Page<NotificationRespond> getMyNotifications(
+    public Page<NotificationResponse> getMyNotifications(
             Pageable pageable,
             NotificationFilterCriteria filters
     ) {
@@ -60,9 +60,9 @@ public class NotificationService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public Page<NotificationRespond> getAllNotificationByRecipientId(Pageable pageable,
-                                                                     UUID recipientId,
-                                                                     NotificationFilterCriteria filters) {
+    public Page<NotificationResponse> getAllNotificationByRecipientId(Pageable pageable,
+                                                                      UUID recipientId,
+                                                                      NotificationFilterCriteria filters) {
         Specification<Notification> specification = NotificationSpecifications.buildSpecification(
                 recipientId,
                 filters
@@ -74,7 +74,7 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public NotificationRespond getNotificationById(UUID notificationId) {
+    public NotificationResponse getNotificationById(UUID notificationId) {
         Notification notification = findById(notificationId);
         if (isNotAllowedToAccessNotification(notification)) {
             log.warn("User {} tried to get notification {} but was denied", authService.getUserIdFromContext(), notificationId);

@@ -11,5 +11,5 @@ import java.util.UUID;
  * DTO for {@link org.phong.horizon.post.infrastructure.persistence.entities.PostReport}
  */
 public record PostReportResponse(UUID id, @NotNull String reason, Instant createdAt, @NotNull UserSummaryRespond user,
-                                 @NotNull PostResponse post) implements Serializable {
+                                 @NotNull PostSummaryResponse post) implements Serializable {
 }

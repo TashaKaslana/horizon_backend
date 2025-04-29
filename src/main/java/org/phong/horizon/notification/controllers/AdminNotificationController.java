@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
-import org.phong.horizon.notification.dtos.NotificationRespond;
+import org.phong.horizon.notification.dtos.NotificationResponse;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.services.NotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
@@ -30,10 +30,10 @@ public class AdminNotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<RestApiResponse<List<NotificationRespond>>> getAllNotificationByRecipientId(Pageable pageable,
-                                                                                                      @PathVariable UUID recipientId,
-                                                                                                      @Valid NotificationFilterCriteria filters) {
-        Page<NotificationRespond> notifications = notificationService.getAllNotificationByRecipientId(pageable, recipientId, filters);
+    public ResponseEntity<RestApiResponse<List<NotificationResponse>>> getAllNotificationByRecipientId(Pageable pageable,
+                                                                                                       @PathVariable UUID recipientId,
+                                                                                                       @Valid NotificationFilterCriteria filters) {
+        Page<NotificationResponse> notifications = notificationService.getAllNotificationByRecipientId(pageable, recipientId, filters);
         return RestApiResponse.success(notifications);
     }
 
