@@ -36,12 +36,12 @@ public class PostReportController {
         return RestApiResponse.success(reportService.getAllReports(pageable));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/report")
     public ResponseEntity<RestApiResponse<PostReportResponse>> getReportById(@PathVariable UUID id) {
         return RestApiResponse.success(reportService.getReportById(id));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/report")
     public ResponseEntity<RestApiResponse<Void>> deleteReport(@PathVariable UUID id) {
         reportService.deleteReport(id);
         return RestApiResponse.noContent();
