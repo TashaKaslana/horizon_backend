@@ -48,12 +48,15 @@ public interface PostMapper {
     PostCloneDto toDto1(Post post);
 
     @Mapping(source = "categoryName", target = "category.name")
+    @Mapping(source = "userId", target = "user.id")
     Post toEntity(CreatePostRequest createPostRequest);
 
     @Mapping(source = "category.name", target = "categoryName")
+    @Mapping(source = "user.id", target = "userId")
     CreatePostRequest toDto3(Post post);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(source = "userId", target = "user.id")
     Post partialUpdate(CreatePostRequest createPostRequest, @MappingTarget Post post);
 
     @Mapping(source = "user.id", target = "userId")
