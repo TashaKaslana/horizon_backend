@@ -46,4 +46,23 @@ public class FeedService {
             return new FeedPage(post, statistic);
         });
     }
+
+    public FeedPage getFeedForMe(UUID postId) {
+        PostResponse post = postService.getPostById(postId);
+        List<UUID> postInteractionList = postInteractionService.getPostIdsInteractedByPostIds(
+                List.of(postId)
+        );
+        List<UUID> postBookmarkList = postBookmarkService.getBookmarkedIdsByPostId(
+                List.of(postId)
+        );
+
+        PostStatistic statistic = new PostStatistic(
+                postInteractionService.getCountInteractionByPostId(post.id()),
+                commentService.getCountCommentsByPostId(post.id()),
+                postBookmarkService.getCountBookmarksByPostId(post.id()),
+                postInteractionList.contains(post.id()),
+                postBookmarkList.contains(post.id())
+        );
+        return new FeedPage(post, statistic);
+    }
 }
