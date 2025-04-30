@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/api/posts")
 public class PostReportController {
     private final PostReportService reportService;
 
@@ -26,12 +26,12 @@ public class PostReportController {
         this.reportService = reportService;
     }
 
-    @PostMapping
-    public ResponseEntity<RestApiResponse<PostReportResponse>> reportPost(@RequestBody PostReportRequest request) {
-        return RestApiResponse.created(reportService.reportPost(request));
+    @PostMapping("/{postId}/report")
+    public ResponseEntity<RestApiResponse<PostReportResponse>> reportPost(@PathVariable UUID postId, @RequestBody PostReportRequest request) {
+        return RestApiResponse.created(reportService.reportPost(postId, request));
     }
 
-    @GetMapping
+    @GetMapping("/reports")
     public ResponseEntity<RestApiResponse<List<PostReportResponse>>> getAllReports(Pageable pageable) {
         return RestApiResponse.success(reportService.getAllReports(pageable));
     }

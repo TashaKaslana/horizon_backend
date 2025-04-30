@@ -32,8 +32,8 @@ public class PostReportService {
     PostReportMapper postReportMapper;
 
     @Transactional
-    public PostReportResponse reportPost(PostReportRequest request) {
-        Post post = postService.getRefById(request.postId());
+    public PostReportResponse reportPost(UUID postId, PostReportRequest request) {
+        Post post = postService.getRefById(postId);
         User user = userService.getRefById(authService.getUserIdFromContext());
 
         PostReport report = postReportMapper.toEntity(request);
