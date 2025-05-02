@@ -33,28 +33,33 @@ public class FollowService {
     private final FollowMapper followMapper;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     public Page<FollowOneSideRespond> getMyFollowers(Pageable pageable) {
         UUID userId = authService.getUserIdFromContext();
         return followRepository.findAllByFollowing_Id(userId, pageable)
                 .map(followMapper::mapToFollowerSide);
     }
 
+    @Transactional
     public Page<FollowOneSideRespond> getMyFollowing(Pageable pageable) {
         UUID userId = authService.getUserIdFromContext();
         return followRepository.findAllByFollower_Id(userId, pageable)
                 .map(followMapper::mapToFollowingSide);
     }
 
+    @Transactional
     public Page<FollowOneSideRespond> getFollowersByUserId(UUID userId, Pageable pageable) {
         return followRepository.findAllByFollowing_Id(userId, pageable).map(followMapper::mapToFollowerSide);
 
     }
 
+    @Transactional
     public Page<FollowOneSideRespond> getFollowingByUserId(UUID userId, Pageable pageable) {
         return followRepository.findAllByFollower_Id(userId, pageable)
                 .map(followMapper::mapToFollowerSide);
     }
 
+    @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Page<FollowRespond> getAll(Pageable pageable) {
         return followRepository.findAll(pageable).map(followMapper::toDto);
