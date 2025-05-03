@@ -29,6 +29,9 @@ public class User extends BaseEntity {
     @Column(name = "auth0_id", nullable = false)
     private String auth0Id;
 
+    @Column(name = "display_name", length = 50)
+    private String displayName;
+
     @Column(name = "first_name", length = 100)
     private String firstName;
 

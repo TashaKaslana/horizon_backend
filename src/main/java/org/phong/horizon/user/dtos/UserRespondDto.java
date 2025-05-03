@@ -13,5 +13,5 @@ import java.util.UUID;
 public record UserRespondDto(Instant createdAt, Instant updatedAt, UUID id, String auth0Id, String firstName,
                              String lastName, String username, String email, String phoneNumber, LocalDate dateOfBirth,
                              String gender, String bio, String profileImage, String coverImage, String country,
-                             String city, Instant deletedAt) implements Serializable {
+                             String city, Instant deletedAt, String displayName) implements Serializable {
 }

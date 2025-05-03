@@ -7,6 +7,6 @@ import java.util.UUID;
 /**
  * DTO for {@link org.phong.horizon.user.infrastructure.persistence.entities.User}
  */
-public record UserSummaryRespond(UUID id, String firstName, String lastName, String username, String profileImage,
+public record UserSummaryRespond(UUID id, String displayName, String username, String profileImage,
                                  String coverImage, Instant createdAt) implements Serializable {
 }

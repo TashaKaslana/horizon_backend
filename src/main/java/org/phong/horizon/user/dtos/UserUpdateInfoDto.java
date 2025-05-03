@@ -16,6 +16,7 @@ import java.time.LocalDate;
 public record UserUpdateInfoDto(
         @NotBlank(message = "First name cannot be blank") String firstName,
         @NotBlank(message = "Last name cannot be blank") String lastName,
+        @NotBlank(message = "Display name cannot be blank") String displayName,
 
         @Size(max = 15, message = "Phone number cannot exceed 15 characters") String phoneNumber,
         @Past(message = "Date of birth must be in the past") LocalDate dateOfBirth,

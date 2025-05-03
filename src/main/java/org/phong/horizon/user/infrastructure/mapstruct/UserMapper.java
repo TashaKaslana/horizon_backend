@@ -9,6 +9,7 @@ import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCloneDto;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
+import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
@@ -57,4 +58,11 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserAccountUpdate userAccountUpdate, @MappingTarget User user);
+
+    User toEntity(UserIntroduction userIntroduction);
+
+    UserIntroduction toDto5(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User partialUpdate(UserIntroduction userIntroduction, @MappingTarget User user);
 }
