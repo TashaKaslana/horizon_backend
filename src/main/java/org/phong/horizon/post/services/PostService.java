@@ -152,11 +152,6 @@ public class PostService {
 
         Post updatedPost = postMapper.partialUpdate(request, originalPost);
 
-        if (request.videoAssetId() != null) {
-            Asset asset = storageService.findAssetById(request.videoAssetId());
-            updatedPost.setVideoAsset(asset);
-        }
-
         if (request.categoryName() != null) {
             updatedPost.setCategory(postCategoryRepository.getReferenceByName(request.categoryName()));
         }

@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * DTO for {@link org.phong.horizon.post.infrastructure.persistence.entities.Post}
@@ -16,6 +15,5 @@ public record UpdatePostRequest(
         @NotBlank String description,
         @NotBlank @Size(max = 10) String visibility,
         List<String> tags,
-        @NotNull UUID videoAssetId,
         @NotNull String categoryName) implements Serializable {
 }
