@@ -14,7 +14,6 @@ import java.util.UUID;
 public record UpdatePostRequest(
         @NotBlank @Size(max = 255) String caption,
         @NotBlank String description,
-        @NotNull Double duration,
         @NotBlank @Size(max = 10) String visibility,
         List<String> tags,
         @NotNull UUID videoAssetId,
