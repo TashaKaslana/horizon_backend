@@ -1,7 +1,6 @@
 package org.phong.horizon.post.infrastructure.persistence.repositories;
 
 import org.phong.horizon.core.enums.Visibility;
-import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +9,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {

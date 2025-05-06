@@ -9,13 +9,18 @@ import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
 import org.phong.horizon.notification.dtos.NotificationResponse;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.enums.NotificationErrorEnum;
+import org.phong.horizon.notification.enums.NotificationType;
 import org.phong.horizon.notification.exceptions.NotificationAccessDenialException;
 import org.phong.horizon.notification.exceptions.NotificationsNotFoundException;
 import org.phong.horizon.notification.infrastructure.mapstruct.NotificationMapper;
 import org.phong.horizon.notification.infrastructure.persistence.entities.Notification;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
+import org.phong.horizon.post.dtos.PostSummaryResponse;
+import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.user.dtos.UserSummaryRespond;
+import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.data.domain.Page;
@@ -36,6 +41,8 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final UserMapper userMapper;
+    private final PostMapper postMapper;
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
@@ -55,7 +62,25 @@ public class NotificationService {
 
         Page<Notification> notifications = notificationRepository.findAll(specification, pageable);
 
-        return notifications.map(notificationMapper::toDto2);
+        return  notifications.map(notification -> {
+            String content = generateNotificationContent(notification);
+
+            NotificationResponse response = notificationMapper.toDto2(notification);
+            return new NotificationResponse(
+                    response.id(),
+                    response.recipientUser(),
+                    response.senderUser(),
+                    response.post(),
+                    response.comment(),
+                    content,
+                    response.type(),
+                    response.extraData(),
+                    response.isRead(),
+                    response.isDeleted(),
+                    response.createdAt(),
+                    response.deletedAt()
+            );
+        });
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -84,7 +109,7 @@ public class NotificationService {
         return notificationMapper.toDto2(notification);
     }
 
-    //internal service, do not expose to controller
+    //internal service, do not expose it to controller
     @Transactional
     public void createEventNotification(UUID senderUserId, CreateNotificationRequest request) {
         try {
@@ -130,6 +155,27 @@ public class NotificationService {
             notification.setComment(commentService.getRefById(request.getCommentId()));
         }
     }
+
+    private String generateNotificationContent(Notification notification) {
+        UserSummaryRespond sender = userMapper.toDto3(notification.getSenderUser());
+        PostSummaryResponse post = postMapper.toDto(notification.getPost());
+        NotificationType type = notification.getType();
+
+        return switch (type) {
+            case LIKE_POST -> "@" + sender.username() + " liked your post.";
+            case COMMENT_POST -> "@" + sender.username() + " commented on your post.";
+            case LIKE_COMMENT -> "@" + sender.username() + " liked your comment.";
+            case REPLY_COMMENT -> "@" + sender.username() + " replied to your comment.";
+            case MENTION_COMMENT -> "@" + sender.username() + " mentioned you in a comment.";
+            case NEW_FOLLOWER -> "@" + sender.username() + " followed you.";
+            case UN_FOLLOWER -> "@" + sender.username() + " unfollowed you.";
+            case REPORT_COMMENT -> "Your comment was reported.";
+            case REPORT_POST -> "Your post was reported.";
+            case COMMENT_PINNED -> "Your comment was pinned.";
+            case SYSTEM_MESSAGE -> notification.getContent();
+        };
+    }
+
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
