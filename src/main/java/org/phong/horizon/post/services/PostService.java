@@ -21,7 +21,6 @@ import org.phong.horizon.post.exceptions.PostPermissionDenialException;
 import org.phong.horizon.post.exceptions.PostWithAssetNotFoundException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
-import org.phong.horizon.post.infrastructure.persistence.repositories.PostCategoryRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
 import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
@@ -51,7 +50,7 @@ public class PostService {
     private final StorageService storageService;
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
-    private final PostCategoryRepository postCategoryRepository;
+    private final PostCategoryService postCategoryService;
 
     @PostAuthorize("hasRole('ADMIN') or " +
             "returnObject.visibility == T(org.phong.horizon.core.enums.Visibility).PUBLIC or " +
@@ -82,13 +81,27 @@ public class PostService {
     }
 
     @Transactional
-    public Page<PostResponse> getAllPublicPosts(Pageable pageable, UUID excludePostId) {
-        if (excludePostId == null) {
-            return postRepository.findAllByVisibility(Visibility.PUBLIC, pageable)
-                    .map(postMapper::toDto2);
+    public Page<PostResponse> getAllPublicPosts(Pageable pageable, UUID excludePostId, String categoryName) {
+        if (categoryName != null && !categoryName.isBlank()) {
+            if (excludePostId == null) {
+                return postRepository.findAllByVisibilityAndCategoryName(
+                        Visibility.PUBLIC, categoryName.toUpperCase(), pageable
+                ).map(postMapper::toDto2);
+            } else {
+                return postRepository.findAllByVisibilityAndIdNotAndCategoryName(
+                        Visibility.PUBLIC, excludePostId, categoryName.toUpperCase(), pageable
+                ).map(postMapper::toDto2);
+            }
         } else {
-            return postRepository.findAllByVisibilityAndIdNot(Visibility.PUBLIC, excludePostId, pageable)
-                    .map(postMapper::toDto2);
+            if (excludePostId == null) {
+                return postRepository.findAllByVisibility(
+                        Visibility.PUBLIC, pageable
+                ).map(postMapper::toDto2);
+            } else {
+                return postRepository.findAllByVisibilityAndIdNot(
+                        Visibility.PUBLIC, excludePostId, pageable
+                ).map(postMapper::toDto2);
+            }
         }
     }
 
@@ -126,7 +139,7 @@ public class PostService {
 
         post.setUser(currentUser);
         post.setVideoAsset(asset);
-        post.setCategory(postCategoryRepository.getReferenceByName(request.categoryName()));
+        post.setCategory(postCategoryService.getRefByName(request.categoryName().toUpperCase()));
         Post createdPost = postRepository.save(post);
 
         eventPublisher.publishEvent(new PostCreatedEvent(
@@ -153,7 +166,7 @@ public class PostService {
         Post updatedPost = postMapper.partialUpdate(request, originalPost);
 
         if (request.categoryName() != null) {
-            updatedPost.setCategory(postCategoryRepository.getReferenceByName(request.categoryName()));
+            updatedPost.setCategory(postCategoryService.getRefByName(request.categoryName().toUpperCase()));
         }
 
         Post savedPost = postRepository.save(updatedPost);

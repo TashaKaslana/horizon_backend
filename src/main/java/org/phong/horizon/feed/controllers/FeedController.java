@@ -23,8 +23,9 @@ public class FeedController {
 
     @GetMapping()
     public ResponseEntity<RestApiResponse<List<FeedPage>>> getFeed(Pageable pageable,
-                                                                   @RequestParam(required = false) UUID excludePostId) {
-        return RestApiResponse.success(feedService.getFeedForMe(pageable, excludePostId));
+                                                                   @RequestParam(required = false) UUID excludePostId,
+                                                                   @RequestParam(required = false) String categoryName) {
+        return RestApiResponse.success(feedService.getFeedForMe(pageable, excludePostId, categoryName));
     }
 
     @GetMapping("/posts/{postId}")

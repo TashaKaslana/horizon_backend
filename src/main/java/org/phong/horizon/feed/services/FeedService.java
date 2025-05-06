@@ -26,8 +26,8 @@ public class FeedService {
     PostInteractionService postInteractionService;
     PostBookmarkService postBookmarkService;
 
-    public Page<FeedPage> getFeedForMe(Pageable pageable, UUID excludePostId) {
-        Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable, excludePostId);
+    public Page<FeedPage> getFeedForMe(Pageable pageable, UUID excludePostId, String categoryName) {
+        Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable, excludePostId, categoryName);
         List<UUID> postInteractionList = postInteractionService.getPostIdsInteractedByPostIds(
                 feedPage.toList().stream().map(PostResponse::id).toList()
         );
