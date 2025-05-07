@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class NotificationFilterCriteria {
     private NotificationType type;
+    private String groupType;
     private Boolean isRead;
     private Boolean isDeleted;
     private Boolean includeRecipientUser;

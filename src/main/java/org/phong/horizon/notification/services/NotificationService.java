@@ -234,6 +234,52 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    @Transactional
+    public void markAllNotificationsAsRead(String type) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        if (type == null) {
+            notificationRepository.markAllNotificationsAsRead(currentUserId, true);
+        } else {
+            NotificationType notificationType = NotificationType.valueOf(type);
+            notificationRepository.markAllNotificationsAsReadByType(currentUserId, notificationType, true);
+        }
+    }
+
+    @Transactional
+    public void unmarkNotificationAsRead(UUID notificationId) {
+        Notification notification = findById(notificationId);
+        if (isNotAllowedToAccessNotification(notification)) {
+            log.warn("User {} tried to unmark notification {} but was denied", authService.getUserIdFromContext(), notificationId);
+            throw new NotificationAccessDenialException(NotificationErrorEnum.NOTIFICATION_ACCESS_DENIED.getMessage());
+        }
+
+        notification.setIsRead(false);
+
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void unmarkAllNotificationsAsRead(String type) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        if (type == null) {
+            notificationRepository.markAllNotificationsAsRead(currentUserId, false);
+        } else {
+            NotificationType notificationType = NotificationType.valueOf(type);
+            notificationRepository.markAllNotificationsAsReadByType(currentUserId, notificationType, false);
+        }
+    }
+
+    @Transactional
+    public void dismissAll(String type) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        if (type == null) {
+            notificationRepository.dismissAll(currentUserId, true);
+        } else {
+            NotificationType notificationType = NotificationType.valueOf(type);
+            notificationRepository.dismissAllByType(currentUserId, notificationType, true);
+        }
+    }
+
     @Transactional(readOnly = true)
     protected boolean isNotAllowedToAccessNotification(Notification notification) {
         return !notification.getRecipientUser().getId().equals(authService.getUserIdFromContext());

@@ -47,9 +47,33 @@ public class NotificationController {
         return RestApiResponse.noContent();
     }
 
-    @PutMapping("/{notificationId}/mark-as-read")
+    @PatchMapping("/{notificationId}/mark-as-read")
     public ResponseEntity<RestApiResponse<Void>> markNotificationAsRead(@PathVariable UUID notificationId) {
         notificationService.markNotificationAsRead(notificationId);
+        return RestApiResponse.noContent();
+    }
+
+    @PatchMapping("/mark-all-as-read")
+    public ResponseEntity<RestApiResponse<Void>> markAllNotificationsAsRead(@RequestParam(required = false) String type) {
+        notificationService.markAllNotificationsAsRead(type);
+        return RestApiResponse.noContent();
+    }
+
+    @PatchMapping("/{notificationId}/unmark-as-read")
+    public ResponseEntity<RestApiResponse<Void>> unmarkNotificationAsRead(@PathVariable UUID notificationId) {
+        notificationService.unmarkNotificationAsRead(notificationId);
+        return RestApiResponse.noContent();
+    }
+
+    @PatchMapping("/unmark-all-as-read")
+    public ResponseEntity<RestApiResponse<Void>> unmarkAllNotificationsAsRead(@RequestParam(required = false) String type) {
+        notificationService.unmarkAllNotificationsAsRead(type);
+        return RestApiResponse.noContent();
+    }
+
+    @DeleteMapping("/dismiss-all")
+    public ResponseEntity<RestApiResponse<Void>> dismissAllNotifications(@RequestParam(required = false) String type) {
+        notificationService.dismissAll(type);
         return RestApiResponse.noContent();
     }
 }

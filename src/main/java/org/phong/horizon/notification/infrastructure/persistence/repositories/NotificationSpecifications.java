@@ -3,7 +3,9 @@ package org.phong.horizon.notification.infrastructure.persistence.repositories;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
+import org.phong.horizon.notification.enums.NotificationType;
 import org.phong.horizon.notification.infrastructure.persistence.entities.Notification;
+import org.phong.horizon.notification.utils.NotificationTypeHelper;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -24,6 +26,10 @@ public class NotificationSpecifications {
             }
             if (filters.getType() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), filters.getType()));
+            }
+            if (filters.getGroupType() != null) {
+                NotificationType[] types = NotificationTypeHelper.convertGroupType(filters.getGroupType());
+                predicates.add(root.get("type").in((Object[]) types));
             }
             if (filters.getIsRead() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("isRead"), filters.getIsRead()));
