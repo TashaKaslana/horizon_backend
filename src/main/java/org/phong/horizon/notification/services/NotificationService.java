@@ -7,6 +7,7 @@ import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
 import org.phong.horizon.notification.dtos.NotificationResponse;
+import org.phong.horizon.notification.dtos.NotificationStatistic;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.enums.NotificationErrorEnum;
 import org.phong.horizon.notification.enums.NotificationType;
@@ -14,6 +15,7 @@ import org.phong.horizon.notification.exceptions.NotificationAccessDenialExcepti
 import org.phong.horizon.notification.exceptions.NotificationsNotFoundException;
 import org.phong.horizon.notification.infrastructure.mapstruct.NotificationMapper;
 import org.phong.horizon.notification.infrastructure.persistence.entities.Notification;
+import org.phong.horizon.notification.infrastructure.persistence.projections.NotificationStatisticProjection;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
 import org.phong.horizon.post.dtos.PostSummaryResponse;
@@ -31,6 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -279,6 +284,25 @@ public class NotificationService {
             notificationRepository.dismissAllByType(currentUserId, notificationType, true);
         }
     }
+
+    public NotificationStatistic getStatisticsForUser(UUID userId) {
+        List<NotificationStatisticProjection> stats =
+                notificationRepository.getNotificationStatisticsByUserId(userId);
+
+        Map<NotificationType, NotificationStatistic.NotificationCount> map = new EnumMap<>(NotificationType.class);
+
+        for (NotificationStatisticProjection stat : stats) {
+            NotificationType type = NotificationType.valueOf(stat.getType());
+            NotificationStatistic.NotificationCount count = new NotificationStatistic.NotificationCount(
+                    (int) stat.getTotal(),
+                    (int) stat.getUnread()
+            );
+            map.put(type, count);
+        }
+
+        return NotificationStatistic.from(map);
+    }
+
 
     @Transactional(readOnly = true)
     protected boolean isNotAllowedToAccessNotification(Notification notification) {

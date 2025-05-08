@@ -3,6 +3,7 @@ package org.phong.horizon.notification.controllers;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.notification.dtos.NotificationFilterCriteria;
 import org.phong.horizon.notification.dtos.NotificationResponse;
+import org.phong.horizon.notification.dtos.NotificationStatistic;
 import org.phong.horizon.notification.services.NotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,12 @@ public class NotificationController {
     public ResponseEntity<RestApiResponse<NotificationResponse>> getNotificationById(@PathVariable UUID notificationId) {
         NotificationResponse notification = notificationService.getNotificationById(notificationId);
         return RestApiResponse.success(notification);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<NotificationStatistic> getNotificationStatistics(@RequestParam UUID userId) {
+        NotificationStatistic statistic = notificationService.getStatisticsForUser(userId);
+        return ResponseEntity.ok(statistic);
     }
 
     @DeleteMapping("/{notificationId}/soft")
