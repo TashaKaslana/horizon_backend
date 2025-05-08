@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -292,26 +293,27 @@ public class NotificationService {
 
         Map<String, NotificationStatistic.NotificationCount> groupedStats = new HashMap<>();
 
+        List<String> allGroupTypes = Arrays.asList("like", "follow", "comment", "mention", "post", "system");
+        for (String groupType : allGroupTypes) {
+            groupedStats.put(groupType, new NotificationStatistic.NotificationCount(0, 0));
+        }
+
         for (NotificationStatisticProjection stat : rawStats) {
             String groupType = NotificationTypeHelper.getGroupType(stat.getType());
 
-            NotificationStatistic.NotificationCount existing = groupedStats.getOrDefault(
-                    groupType,
-                    new NotificationStatistic.NotificationCount(0, 0)
-            );
-
+            NotificationStatistic.NotificationCount existing = groupedStats.get(groupType);
             int count = Math.toIntExact(existing.count() + stat.getTotal());
             int unread = Math.toIntExact(existing.unreadCount() + stat.getUnread());
 
             groupedStats.put(groupType, new NotificationStatistic.NotificationCount(count, unread));
         }
 
-        return new NotificationStatistic(
-                groupedStats.values().stream().mapToInt(NotificationStatistic.NotificationCount::count).sum(),
-                groupedStats.values().stream().mapToInt(NotificationStatistic.NotificationCount::unreadCount).sum(),
-                groupedStats
-        );
+        int totalCount = groupedStats.values().stream().mapToInt(NotificationStatistic.NotificationCount::count).sum();
+        int totalUnreadCount = groupedStats.values().stream().mapToInt(NotificationStatistic.NotificationCount::unreadCount).sum();
+
+        return new NotificationStatistic(totalCount, totalUnreadCount, groupedStats);
     }
+
 
     @Transactional(readOnly = true)
     protected boolean isNotAllowedToAccessNotification(Notification notification) {

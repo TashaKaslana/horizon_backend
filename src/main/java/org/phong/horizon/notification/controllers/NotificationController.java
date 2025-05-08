@@ -37,9 +37,9 @@ public class NotificationController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<NotificationStatistic> getNotificationStatistics() {
+    public ResponseEntity<RestApiResponse<NotificationStatistic>> getNotificationStatistics() {
         NotificationStatistic statistic = notificationService.getStatistics();
-        return ResponseEntity.ok(statistic);
+        return RestApiResponse.success(statistic);
     }
 
     @DeleteMapping("/{notificationId}/soft")
