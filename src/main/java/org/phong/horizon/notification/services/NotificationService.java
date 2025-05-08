@@ -18,6 +18,7 @@ import org.phong.horizon.notification.infrastructure.persistence.entities.Notifi
 import org.phong.horizon.notification.infrastructure.persistence.projections.NotificationStatisticProjection;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
+import org.phong.horizon.notification.utils.NotificationTypeHelper;
 import org.phong.horizon.post.dtos.PostSummaryResponse;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.services.PostService;
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -285,24 +286,32 @@ public class NotificationService {
         }
     }
 
-    public NotificationStatistic getStatisticsForUser(UUID userId) {
-        List<NotificationStatisticProjection> stats =
-                notificationRepository.getNotificationStatisticsByUserId(userId);
+    public NotificationStatistic getStatistics() {
+        UUID currentUserId = authService.getUserIdFromContext();
+        List<NotificationStatisticProjection> rawStats = notificationRepository.getNotificationStatisticsByUserId(currentUserId);
 
-        Map<NotificationType, NotificationStatistic.NotificationCount> map = new EnumMap<>(NotificationType.class);
+        Map<String, NotificationStatistic.NotificationCount> groupedStats = new HashMap<>();
 
-        for (NotificationStatisticProjection stat : stats) {
-            NotificationType type = NotificationType.valueOf(stat.getType());
-            NotificationStatistic.NotificationCount count = new NotificationStatistic.NotificationCount(
-                    (int) stat.getTotal(),
-                    (int) stat.getUnread()
+        for (NotificationStatisticProjection stat : rawStats) {
+            String groupType = NotificationTypeHelper.getGroupType(stat.getType());
+
+            NotificationStatistic.NotificationCount existing = groupedStats.getOrDefault(
+                    groupType,
+                    new NotificationStatistic.NotificationCount(0, 0)
             );
-            map.put(type, count);
+
+            int count = Math.toIntExact(existing.count() + stat.getTotal());
+            int unread = Math.toIntExact(existing.unreadCount() + stat.getUnread());
+
+            groupedStats.put(groupType, new NotificationStatistic.NotificationCount(count, unread));
         }
 
-        return NotificationStatistic.from(map);
+        return new NotificationStatistic(
+                groupedStats.values().stream().mapToInt(NotificationStatistic.NotificationCount::count).sum(),
+                groupedStats.values().stream().mapToInt(NotificationStatistic.NotificationCount::unreadCount).sum(),
+                groupedStats
+        );
     }
-
 
     @Transactional(readOnly = true)
     protected boolean isNotAllowedToAccessNotification(Notification notification) {

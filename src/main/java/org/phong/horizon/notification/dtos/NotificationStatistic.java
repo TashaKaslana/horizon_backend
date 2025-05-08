@@ -2,26 +2,24 @@ package org.phong.horizon.notification.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.phong.horizon.notification.enums.NotificationType;
 
 import java.util.Map;
 
 @Getter
 @AllArgsConstructor
 public class NotificationStatistic {
-
     private final int allCount;
     private final int allUnreadCount;
-    private final Map<NotificationType, NotificationCount> stats;
+    private final Map<String, NotificationCount> stats;
 
-    public NotificationCount get(NotificationType type) {
+    public NotificationCount get(String type) {
         return stats.getOrDefault(type, new NotificationCount(0, 0));
     }
 
         public record NotificationCount(int count, int unreadCount) {
     }
 
-    public static NotificationStatistic from(Map<NotificationType, NotificationCount> stats) {
+    public static NotificationStatistic from(Map<String, NotificationCount> stats) {
         int total = 0;
         int totalUnread = 0;
 

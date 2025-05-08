@@ -44,4 +44,5 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     GROUP BY type
    \s""", nativeQuery = true)
     List<NotificationStatisticProjection> getNotificationStatisticsByUserId(@Param("userId") UUID userId);
+
 }

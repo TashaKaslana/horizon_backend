@@ -37,8 +37,8 @@ public class NotificationController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<NotificationStatistic> getNotificationStatistics(@RequestParam UUID userId) {
-        NotificationStatistic statistic = notificationService.getStatisticsForUser(userId);
+    public ResponseEntity<NotificationStatistic> getNotificationStatistics() {
+        NotificationStatistic statistic = notificationService.getStatistics();
         return ResponseEntity.ok(statistic);
     }
 
