@@ -3,6 +3,7 @@ package org.phong.horizon.follow.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.follow.dtos.FollowOneSideRespond;
+import org.phong.horizon.follow.dtos.FollowOverview;
 import org.phong.horizon.follow.dtos.FollowRespond;
 import org.phong.horizon.follow.enums.FollowErrorEnums;
 import org.phong.horizon.follow.events.UserFollowedEvent;
@@ -11,6 +12,7 @@ import org.phong.horizon.follow.exceptions.FollowSelfException;
 import org.phong.horizon.follow.infrastructure.mapstruct.FollowMapper;
 import org.phong.horizon.follow.infrastructure.persistence.entities.Follow;
 import org.phong.horizon.follow.infrastructure.persistence.entities.FollowId;
+import org.phong.horizon.follow.infrastructure.persistence.projections.FollowOverviewProjection;
 import org.phong.horizon.follow.infrastructure.persistence.repositories.FollowRepository;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.user.services.UserService;
@@ -50,13 +52,22 @@ public class FollowService {
     @Transactional
     public Page<FollowOneSideRespond> getFollowersByUserId(UUID userId, Pageable pageable) {
         return followRepository.findAllByFollowing_Id(userId, pageable).map(followMapper::mapToFollowerSide);
-
     }
 
     @Transactional
     public Page<FollowOneSideRespond> getFollowingByUserId(UUID userId, Pageable pageable) {
         return followRepository.findAllByFollower_Id(userId, pageable)
                 .map(followMapper::mapToFollowerSide);
+    }
+
+    public FollowOverview getFollowOverviewById(UUID id) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        FollowOverviewProjection projection = followRepository.getFollowOverviewProjectionByUserId(id, currentUserId);
+        return new FollowOverview(
+                projection.getIsMeFollowing(),
+                projection.getTotalFollowers(),
+                projection.getTotalFollowing()
+        );
     }
 
     @Transactional

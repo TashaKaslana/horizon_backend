@@ -8,6 +8,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
+import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
@@ -41,6 +42,11 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<RestApiResponse<UserSummaryRespond>> getUserSummary(@PathVariable UUID id) {
         return RestApiResponse.success(userService.getUserSummary(id));
+    }
+
+    @GetMapping("/{id}/intro")
+    public ResponseEntity<RestApiResponse<UserIntroduction>> getUserIntroduction(@PathVariable UUID id) {
+        return RestApiResponse.success(userService.getUserIntroduction(id));
     }
 
     @PostMapping()

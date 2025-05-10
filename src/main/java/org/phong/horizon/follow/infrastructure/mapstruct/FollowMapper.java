@@ -8,8 +8,10 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.follow.dtos.FollowOneSideRespond;
+import org.phong.horizon.follow.dtos.FollowOverview;
 import org.phong.horizon.follow.dtos.FollowRespond;
 import org.phong.horizon.follow.infrastructure.persistence.entities.Follow;
+import org.phong.horizon.follow.infrastructure.persistence.projections.FollowOverviewProjection;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.services.UserService;
 
@@ -38,4 +40,6 @@ public interface FollowMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Follow partialUpdate(FollowOneSideRespond followOneSideRespond, @MappingTarget Follow follow);
+
+    FollowOverview toOverview(FollowOverviewProjection projection);
 }

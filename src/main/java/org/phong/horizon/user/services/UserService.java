@@ -8,6 +8,7 @@ import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
+import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
@@ -73,6 +74,11 @@ public class UserService {
         Page<User> users = userRepository.findAll(pageable);
 
         return users.map(userMapper::toDto3);
+    }
+
+    @Transactional
+    public UserIntroduction getUserIntroduction(UUID uuid) {
+        return userMapper.toDto5(findById(uuid));
     }
 
     @Transactional

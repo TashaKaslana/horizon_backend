@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.follow.dtos.FollowOneSideRespond;
+import org.phong.horizon.follow.dtos.FollowOverview;
 import org.phong.horizon.follow.services.FollowService;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
@@ -38,6 +39,11 @@ public class FollowController {
     @GetMapping("/{userId}/following")
     public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getFollowingByUserId(@PathVariable UUID userId, Pageable pageable) {
         return RestApiResponse.success(followService.getFollowingByUserId(userId, pageable));
+    }
+
+    @GetMapping("{userId}/overview")
+    public ResponseEntity<RestApiResponse<FollowOverview>> getOverview(@PathVariable UUID userId) {
+        return RestApiResponse.success(followService.getFollowOverviewById(userId));
     }
 
     @PostMapping("/{followingId}")
