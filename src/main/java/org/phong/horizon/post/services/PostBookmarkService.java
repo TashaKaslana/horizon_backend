@@ -61,7 +61,7 @@ public class PostBookmarkService {
         return bookmarkRepository.countAllByPost_Id(postId);
     }
 
-    public List<UUID> getBookmarkedIdsByPostId(List<UUID> postIds) {
+    public List<UUID> getMeBookmarkedIdsByPostId(List<UUID> postIds) {
         UUID currentUserId = authService.getUserIdFromContext();
         return bookmarkRepository.findAllByPost_IdsInAndUser_Id(postIds, currentUserId);
     }

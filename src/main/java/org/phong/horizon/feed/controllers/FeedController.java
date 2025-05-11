@@ -28,6 +28,13 @@ public class FeedController {
         return RestApiResponse.success(feedService.getFeedForMe(pageable, excludePostId, categoryName));
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<RestApiResponse<List<FeedPage>>> getFeedByUserId(Pageable pageable,
+                                                                   @PathVariable UUID userId,
+                                                                   @RequestParam(required = false) UUID excludePostId) {
+        return RestApiResponse.success(feedService.getFeedByUserId(pageable, userId, excludePostId));
+    }
+
     @GetMapping("/posts/{postId}")
     public ResponseEntity<RestApiResponse<FeedPage>> getFeed(@PathVariable UUID postId) {
         return RestApiResponse.success(feedService.getFeedForMe(postId));

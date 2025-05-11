@@ -114,11 +114,16 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getAllPublicPostsByUserId(UUID userId) {
-        return postRepository.findAllByUser_IdAndVisibility(userId, Visibility.PUBLIC)
-                .stream()
-                .map(postMapper::toDto2)
-                .collect(Collectors.toList());
+    public Page<PostResponse> getAllPublicPostsByUserId(Pageable pageable, UUID userId, UUID excludePostId) {
+        if (excludePostId == null) {
+            return postRepository
+                    .findAllByUser_IdAndVisibility(pageable, userId, Visibility.PUBLIC)
+                    .map(postMapper::toDto2);
+        } else {
+            return postRepository
+                    .findAllByUser_IdAndVisibilityAndIdNot(pageable, userId, Visibility.PUBLIC, excludePostId)
+                    .map(postMapper::toDto2);
+        }
     }
 
     @Transactional

@@ -28,10 +28,10 @@ public class FeedService {
 
     public Page<FeedPage> getFeedForMe(Pageable pageable, UUID excludePostId, String categoryName) {
         Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable, excludePostId, categoryName);
-        List<UUID> postInteractionList = postInteractionService.getPostIdsInteractedByPostIds(
+        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(
                 feedPage.toList().stream().map(PostResponse::id).toList()
         );
-        List<UUID> postBookmarkList = postBookmarkService.getBookmarkedIdsByPostId(
+        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(
                 feedPage.toList().stream().map(PostResponse::id).toList()
         );
 
@@ -49,10 +49,10 @@ public class FeedService {
 
     public FeedPage getFeedForMe(UUID postId) {
         PostResponse post = postService.getPostById(postId);
-        List<UUID> postInteractionList = postInteractionService.getPostIdsInteractedByPostIds(
+        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(
                 List.of(postId)
         );
-        List<UUID> postBookmarkList = postBookmarkService.getBookmarkedIdsByPostId(
+        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(
                 List.of(postId)
         );
 
@@ -64,5 +64,27 @@ public class FeedService {
                 postBookmarkList.contains(post.id())
         );
         return new FeedPage(post, statistic);
+    }
+
+    public Page<FeedPage> getFeedByUserId(Pageable pageable, UUID userId, UUID excludePostId) {
+        Page<PostResponse> posts = postService.getAllPublicPostsByUserId(pageable, userId, excludePostId);
+        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(
+                posts.stream().map(PostResponse::id).toList()
+        );
+        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(
+                posts.stream().map(PostResponse::id).toList()
+        );
+
+        return posts.map(post -> {
+            PostStatistic statistic = new PostStatistic(
+                    postInteractionService.getCountInteractionByPostId(post.id()),
+                    commentService.getCountCommentsByPostId(post.id()),
+                    postBookmarkService.getCountBookmarksByPostId(post.id()),
+                    postInteractionList.contains(post.id()),
+                    postBookmarkList.contains(post.id())
+            );
+
+            return new FeedPage(post, statistic);
+        });
     }
 }

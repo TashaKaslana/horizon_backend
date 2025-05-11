@@ -10,6 +10,7 @@ import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +43,8 @@ public class PostController {
     }
 
     @GetMapping("/users/{userId}/public")
-    public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPublicPostsByUserId(@PathVariable UUID userId) {
-        return RestApiResponse.success(postService.getAllPublicPostsByUserId(userId));
+    public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPublicPostsByUserId(Pageable pageable, @PathVariable UUID userId) {
+        return RestApiResponse.success(postService.getAllPublicPostsByUserId(pageable, userId, null));
     }
 
     @PostMapping

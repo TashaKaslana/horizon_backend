@@ -18,7 +18,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     List<Post> findAllByVisibility(Visibility visibility);
 
-    List<Post> findAllByUser_IdAndVisibility(UUID userId, Visibility visibility);
+    Page<Post> findAllByUser_IdAndVisibility(Pageable page, UUID userId, Visibility visibility);
 
     @Modifying
     @Query("UPDATE Post p SET p.isAuthorDeleted = true WHERE p.user.id = :id")
@@ -38,4 +38,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     Page<Post> findAllByVisibilityAndCategoryName(Visibility visibility, String categoryName, Pageable pageable);
 
     Page<Post> findAllByVisibilityAndIdNotAndCategoryName(Visibility visibility, UUID excludePostId, String categoryName, Pageable pageable);
+
+    Page<Post> findAllByUser_IdAndVisibilityAndIdNot(Pageable pageable, UUID userId, Visibility visibility, UUID excludePostId);
 }
