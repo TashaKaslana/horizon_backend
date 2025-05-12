@@ -31,6 +31,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -232,5 +235,17 @@ public class CommentService {
     @Transactional
     public void restoreCommentsByPostId(UUID postId) {
         commentRepository.restoreAllByUser_Id(postId);
+    }
+
+    public Map<UUID, Long> getCountCommentsByPostIds(List<UUID> idList) {
+        List<Object[]> comments = commentRepository.countCommentsByIds(idList);
+
+        Map<UUID, Long> commentMap = new HashMap<>();
+
+        for (Object[] comment : comments) {
+            commentMap.put((UUID) comment[0], (Long) comment[1]);
+        }
+
+        return commentMap;
     }
 }

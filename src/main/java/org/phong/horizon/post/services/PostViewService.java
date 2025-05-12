@@ -11,6 +11,9 @@ import org.phong.horizon.post.infrastructure.persistence.repositories.ViewReposi
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -34,6 +37,18 @@ public class PostViewService {
 
     public long getTotalViews(UUID postId) {
         return viewRepository.countByPostId(postId);
+    }
+
+    public Map<UUID, Long> getTotalListView(List<UUID> postIds) {
+        List<Object[]> views = viewRepository.countViewsByPostIds(postIds);
+
+        Map<UUID, Long> viewMap = new HashMap<>();
+
+        for (Object[] view : views) {
+            viewMap.put((UUID) view[0], (Long) view[1]);
+        }
+
+        return viewMap;
     }
 
     private boolean shouldRecordView(UUID postId, UUID userId, String ipAddress) {

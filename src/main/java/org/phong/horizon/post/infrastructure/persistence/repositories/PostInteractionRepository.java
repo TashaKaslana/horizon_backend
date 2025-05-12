@@ -24,4 +24,7 @@ public interface PostInteractionRepository extends JpaRepository<PostInteraction
 
     @Query("SELECT pi.post.id FROM PostInteraction pi WHERE pi.post.id IN :postIds AND pi.user.id = :currentUserId")
     List<UUID> findAllByPost_IdsInAndUser_Id(List<UUID> postIds, UUID currentUserId);
+
+    @Query("SELECT pi.post.id, COUNT(pi) FROM PostInteraction pi WHERE pi.post.id IN :postIds GROUP BY pi.post.id")
+    List<Object[]> countPostInteractionByPostIds(List<UUID> postIds);
 }

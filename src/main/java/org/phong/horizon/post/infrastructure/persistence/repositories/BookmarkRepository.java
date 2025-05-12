@@ -17,4 +17,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, UUID> {
 
     @Query("SELECT b.post.id FROM Bookmark b WHERE b.post.id IN :postIds AND b.user.id = :currentUserId")
     List<UUID> findAllByPost_IdsInAndUser_Id(List<UUID> postIds, UUID currentUserId);
+
+    @Query("SELECT b.post.id, COUNT(b.id) FROM Bookmark b WHERE b.post.id IN :postIds GROUP BY b.post.id")
+    List<Object[]> countBookmarkByPostIds(List<UUID> postIds);
 }

@@ -18,7 +18,9 @@ import org.phong.horizon.user.services.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -88,5 +90,17 @@ public class PostInteractionService {
     @Transactional
     public void deleteInteractionsByUserId(UUID userId) {
         postInteractionRepository.deleteAllByUser_Id(userId);
+    }
+
+    public Map<UUID, Long> getCountInteractionByPostIds(List<UUID> idList) {
+        List<Object[]> views = postInteractionRepository.countPostInteractionByPostIds(idList);
+
+        Map<UUID, Long> viewMap = new HashMap<>();
+
+        for (Object[] view : views) {
+            viewMap.put((UUID) view[0], (Long) view[1]);
+        }
+
+        return viewMap;
     }
 }

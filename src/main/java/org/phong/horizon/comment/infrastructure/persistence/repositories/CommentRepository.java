@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
@@ -25,4 +26,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Modifying
     @Query("UPDATE Comment c SET c.isPinned = true WHERE c.post.id = :postId")
     void removePinnedCommentInPost(UUID postId);
+
+    @Query("SELECT c.post.id, COUNT(c.id) FROM Comment c WHERE c.post.id IN :postIds GROUP BY c.post.id")
+    List<Object[]> countCommentsByIds(List<UUID> postIds);
 }

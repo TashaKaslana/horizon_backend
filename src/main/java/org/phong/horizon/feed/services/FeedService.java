@@ -10,11 +10,13 @@ import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.services.PostBookmarkService;
 import org.phong.horizon.post.services.PostInteractionService;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.post.services.PostViewService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -25,41 +27,26 @@ public class FeedService {
     CommentService commentService;
     PostInteractionService postInteractionService;
     PostBookmarkService postBookmarkService;
+    PostViewService postViewService;
 
     public Page<FeedPage> getFeedForMe(Pageable pageable, UUID excludePostId, String categoryName) {
         Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable, excludePostId, categoryName);
-        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(
-                feedPage.toList().stream().map(PostResponse::id).toList()
-        );
-        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(
-                feedPage.toList().stream().map(PostResponse::id).toList()
-        );
-
-        return feedPage.map(post -> {
-            PostStatistic statistic = new PostStatistic(
-                    postInteractionService.getCountInteractionByPostId(post.id()),
-                    commentService.getCountCommentsByPostId(post.id()),
-                    postBookmarkService.getCountBookmarksByPostId(post.id()),
-                    postInteractionList.contains(post.id()),
-                    postBookmarkList.contains(post.id())
-            );
-            return new FeedPage(post, statistic);
-        });
+        return getFeedPages(feedPage);
     }
 
     public FeedPage getFeedForMe(UUID postId) {
         PostResponse post = postService.getPostById(postId);
-        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(
-                List.of(postId)
-        );
-        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(
-                List.of(postId)
-        );
+        List<UUID> idList = List.of(postId);
+
+        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(idList);
+        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(idList);
+        Map<UUID, Long> totalListView = postViewService.getTotalListView(idList);
 
         PostStatistic statistic = new PostStatistic(
                 postInteractionService.getCountInteractionByPostId(post.id()),
                 commentService.getCountCommentsByPostId(post.id()),
                 postBookmarkService.getCountBookmarksByPostId(post.id()),
+                totalListView.getOrDefault(post.id(),  0L),
                 postInteractionList.contains(post.id()),
                 postBookmarkList.contains(post.id())
         );
@@ -68,23 +55,55 @@ public class FeedService {
 
     public Page<FeedPage> getFeedByUserId(Pageable pageable, UUID userId, UUID excludePostId) {
         Page<PostResponse> posts = postService.getAllPublicPostsByUserId(pageable, userId, excludePostId);
-        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(
-                posts.stream().map(PostResponse::id).toList()
-        );
-        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(
-                posts.stream().map(PostResponse::id).toList()
-        );
+        return getFeedPages(posts);
+    }
+
+    private Page<FeedPage> getFeedPages(Page<PostResponse> posts) {
+        Result result = getStatisticResult(posts);
 
         return posts.map(post -> {
+            UUID postId = post.id();
+
             PostStatistic statistic = new PostStatistic(
-                    postInteractionService.getCountInteractionByPostId(post.id()),
-                    commentService.getCountCommentsByPostId(post.id()),
-                    postBookmarkService.getCountBookmarksByPostId(post.id()),
-                    postInteractionList.contains(post.id()),
-                    postBookmarkList.contains(post.id())
+                    result.interactionCountMap().getOrDefault(postId, 0L),
+                    result.commentCountMap().getOrDefault(postId, 0L),
+                    result.bookmarkCountMap().getOrDefault(postId, 0L),
+                    result.totalListView().getOrDefault(postId, 0L),
+                    result.postInteractionList().contains(postId),
+                    result.postBookmarkList().contains(postId)
             );
 
             return new FeedPage(post, statistic);
         });
+
     }
+
+    private Result getStatisticResult(Page<PostResponse> posts) {
+        List<UUID> idList = posts.toList().stream().map(PostResponse::id).toList();
+
+        List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(idList);
+        List<UUID> postBookmarkList = postBookmarkService.getMeBookmarkedIdsByPostId(idList);
+        Map<UUID, Long> totalListView = postViewService.getTotalListView(idList);
+        Map<UUID, Long> interactionCountMap = postInteractionService.getCountInteractionByPostIds(idList);
+        Map<UUID, Long> commentCountMap = commentService.getCountCommentsByPostIds(idList);
+        Map<UUID, Long> bookmarkCountMap = postBookmarkService.getCountBookmarksByPostIds(idList);
+
+        return new Result(
+                postInteractionList,
+                postBookmarkList,
+                totalListView,
+                interactionCountMap,
+                commentCountMap,
+                bookmarkCountMap
+        );
+    }
+
+    private record Result(
+            List<UUID> postInteractionList,
+            List<UUID> postBookmarkList,
+            Map<UUID, Long> totalListView,
+            Map<UUID, Long> interactionCountMap,
+            Map<UUID, Long> commentCountMap,
+            Map<UUID, Long> bookmarkCountMap
+    ) {}
 }
