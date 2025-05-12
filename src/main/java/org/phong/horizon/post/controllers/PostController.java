@@ -7,6 +7,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostResponse;
+import org.phong.horizon.post.dtos.TotalPostResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.core.responses.RestApiResponse;
@@ -45,6 +46,11 @@ public class PostController {
     @GetMapping("/users/{userId}/public")
     public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPublicPostsByUserId(Pageable pageable, @PathVariable UUID userId) {
         return RestApiResponse.success(postService.getAllPublicPostsByUserId(pageable, userId, null));
+    }
+
+    @GetMapping("/users/{userId}/total-posts")
+    public ResponseEntity<RestApiResponse<TotalPostResponse>> getCountAllPostsByUserId(@PathVariable UUID userId) {
+        return RestApiResponse.success(new TotalPostResponse(postService.getCountAllPostByUserId(userId)));
     }
 
     @PostMapping

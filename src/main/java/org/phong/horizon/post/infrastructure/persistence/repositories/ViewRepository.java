@@ -17,4 +17,6 @@ public interface ViewRepository extends JpaRepository<PostView, UUID> {
 
   @Query("SELECT pv.postId, COUNT(pv) FROM PostView pv WHERE pv.postId IN :postIds GROUP BY pv.postId")
   List<Object[]> countViewsByPostIds(@Param("postIds") List<UUID> postIds);
+
+  long countAllByUserIdIs(UUID userId);
 }

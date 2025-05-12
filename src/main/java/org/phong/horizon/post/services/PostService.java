@@ -126,6 +126,10 @@ public class PostService {
         }
     }
 
+    public long getCountAllPostByUserId(UUID userId) {
+        return postRepository.countAllByUserId(userId);
+    }
+
     @Transactional
     public PostCreatedDto createPost(CreatePostRequest request) {
         AssetRespond assetRespond = storageService.createAsset(request.videoAsset());

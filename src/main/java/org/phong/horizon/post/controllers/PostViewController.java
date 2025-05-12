@@ -32,4 +32,10 @@ public class PostViewController {
         PostViewRespond res = new PostViewRespond(postViewService.getTotalViews(postId));
         return RestApiResponse.success(res);
     }
+
+    @GetMapping("/users/{userId}/total-views")
+    public ResponseEntity<RestApiResponse<PostViewRespond>> getTotalViewsByUserId(@PathVariable UUID userId) {
+        PostViewRespond res = new PostViewRespond(postViewService.getAllTotalViewsByUserId(userId));
+        return RestApiResponse.success(res);
+    }
 }

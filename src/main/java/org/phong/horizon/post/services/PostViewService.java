@@ -35,6 +35,10 @@ public class PostViewService {
         }
     }
 
+    public long getAllTotalViewsByUserId(UUID userId) {
+        return viewRepository.countAllByUserIdIs(userId);
+    }
+
     public long getTotalViews(UUID postId) {
         return viewRepository.countByPostId(postId);
     }

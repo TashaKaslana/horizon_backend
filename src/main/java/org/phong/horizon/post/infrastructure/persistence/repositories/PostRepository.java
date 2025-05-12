@@ -40,4 +40,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     Page<Post> findAllByVisibilityAndIdNotAndCategoryName(Visibility visibility, UUID excludePostId, String categoryName, Pageable pageable);
 
     Page<Post> findAllByUser_IdAndVisibilityAndIdNot(Pageable pageable, UUID userId, Visibility visibility, UUID excludePostId);
+
+    long countAllByUserId(UUID userId);
 }
