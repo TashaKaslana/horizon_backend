@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface ViewRepository extends JpaRepository<PostView, UUID> {
   boolean existsByPostIdAndUserIdAndViewedAtAfter(UUID postId, UUID userId, LocalDateTime time);
   boolean existsByPostIdAndIpAddressAndViewedAtAfter(UUID postId, String ipAddress, LocalDateTime time);
+
+  long countByPostId(UUID postId);
 }

@@ -32,6 +32,9 @@ public class PostViewService {
         }
     }
 
+    public long getTotalViews(UUID postId) {
+        return viewRepository.countByPostId(postId);
+    }
 
     private boolean shouldRecordView(UUID postId, UUID userId, String ipAddress) {
         LocalDateTime windowStart = LocalDateTime.now().minusMinutes(10);
