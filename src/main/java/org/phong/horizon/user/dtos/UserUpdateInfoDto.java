@@ -23,6 +23,7 @@ public record UserUpdateInfoDto(
         @Size(max = 10, message = "Gender cannot exceed 10 characters") String gender,
 
         @Size(max = 100, message = "Country name cannot exceed 100 characters") String country,
-        @Size(max = 100, message = "City name cannot exceed 100 characters") String city
+        @Size(max = 100, message = "City name cannot exceed 100 characters") String city,
+        @Size(max = 500, message = "Bio cannot exceed 500 characters") String bio
 ) implements Serializable {
 }
