@@ -8,6 +8,7 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
+import org.phong.horizon.user.dtos.UserImageUpdate;
 import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
@@ -68,6 +69,12 @@ public class UserController {
     @PutMapping("/me/account")
     public ResponseEntity<RestApiResponse<UserRespondDto>> updateUserAccount(@Valid @RequestBody UserAccountUpdate request) {
         return RestApiResponse.success(userService.updateMeAccount(request));
+    }
+
+    @PutMapping("me/update-image")
+    public ResponseEntity<RestApiResponse<Void>> updateUserAccount(@Valid @RequestBody UserImageUpdate request) {
+        userService.updateCurrentUserImage(request);
+        return RestApiResponse.success();
     }
 
     @DeleteMapping("/me")

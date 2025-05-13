@@ -8,6 +8,7 @@ import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
+import org.phong.horizon.user.dtos.UserImageUpdate;
 import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
@@ -197,6 +198,19 @@ public class UserService {
         );
 
         return userMapper.toDto(updatedUser);
+    }
+
+    //TODO: finish
+    @Transactional
+    public void updateCurrentUserImage(UserImageUpdate request) {
+        User user = findById(authService.getUserIdFromContext());
+        User oldUser = userMapper.cloneUser(user);
+
+        User updatedUser = userMapper.partialUpdate(request, user);
+//        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+//        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
+        userRepository.save(updatedUser);
     }
 
 //    private void updateRoles(User user, List<String> roles) {
