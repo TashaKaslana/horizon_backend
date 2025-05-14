@@ -7,5 +7,5 @@ import java.util.UUID;
 public record ActivityDisplayDto(
     UUID id,
     List<ActivityPart> parts,
-    Instant timestamp
+    Instant createdAt
 ) {}
