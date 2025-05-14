@@ -70,12 +70,6 @@ public class StorageController {
     }
 
     @PostMapping("/signature")
-    @LogActivity(
-            activityCode = ActivityTypeCode.ASSET_SIGNATURE,
-            description = "Generate upload signature",
-            targetType = SystemCategory.ASSET
-//            targetIdExpression = "#result.body.data.id"
-    )
     public ResponseEntity<RestApiResponse<Map<String, Object>>> generateUploadSignature(@RequestBody Map<String, Object> paramsFromClient) {
         Map<String, Object> signature = storageService.generateUploadSignature(paramsFromClient);
         return RestApiResponse.success(signature);

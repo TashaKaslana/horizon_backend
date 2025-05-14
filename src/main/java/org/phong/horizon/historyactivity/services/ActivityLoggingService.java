@@ -2,6 +2,8 @@ package org.phong.horizon.historyactivity.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.historyactivity.dtos.ActivityDisplayDto;
+import org.phong.horizon.historyactivity.dtos.ActivityPart;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.dtos.HistoryActivityDto;
 import org.phong.horizon.historyactivity.enums.HistoryActivityBusinessError;
@@ -18,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,6 +31,7 @@ public class ActivityLoggingService {
     private final HistoryActivityRepository historyActivityRepository;
     private final HistoryActivityMapper historyActivityMapper;
     private final UserService userService;
+    private final ActivityMessageBuilder messageBuilder;
 
     @Transactional
     public void logActivity(CreateHistoryActivity request) {
@@ -78,5 +82,15 @@ public class ActivityLoggingService {
     @PreAuthorize("hasRole('ROLE_ADMIN') or @authService.isPrincipal(#userId)")
     public Page<HistoryActivityDto> getAllActivitiesByUserId(UUID userId, Pageable pageable) {
         return historyActivityRepository.findAllByUser_Id(userId, pageable).map(historyActivityMapper::toDto1);
+    }
+
+    @Transactional
+    public Page<ActivityDisplayDto> getActivitiesWithJsonMessage(UUID userId, Pageable pageable) {
+        return historyActivityRepository.findAllByUser_Id(userId, pageable)
+                .map(history -> {
+                    HistoryActivityDto dto = historyActivityMapper.toDto1(history);
+                    List<ActivityPart> parts = messageBuilder.buildMessageParts(dto);
+                    return new ActivityDisplayDto(dto.id(), parts, dto.createdAt());
+                });
     }
 }
