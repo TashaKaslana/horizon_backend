@@ -1,0 +1,57 @@
+package org.phong.horizon.admin.notification.infrastructure.entities;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.phong.horizon.admin.notification.enums.AdminNotificationType;
+import org.phong.horizon.admin.notification.enums.NotificationRelatedType;
+import org.phong.horizon.admin.notification.enums.NotificationSeverity;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "admin_notifications", indexes = {
+        @Index(name = "idx_admin_notifications_type", columnList = "type"),
+        @Index(name = "idx_admin_notifications_severity", columnList = "severity"),
+        @Index(name = "idx_admin_notifications_created_at", columnList = "created_at")
+})
+public class AdminNotification {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
+    private UUID id;
+
+    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
+    private String title;
+
+    @Column(name = "message", nullable = false, columnDefinition = "TEXT")
+    private String message;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private AdminNotificationType type; // Corrected enum type
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "severity", nullable = false)
+    private NotificationSeverity severity;
+
+    @Column(name = "source", columnDefinition = "TEXT")
+    private String source;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "related_type")
+    private NotificationRelatedType relatedType;
+
+    @Column(name = "related_id")
+    private UUID relatedId;
+
+    @Column(name = "is_read", nullable = false)
+    private Boolean isRead = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMPTZ DEFAULT NOW()")
+    private OffsetDateTime createdAt;
+}
+
