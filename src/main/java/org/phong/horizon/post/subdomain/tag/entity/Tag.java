@@ -23,10 +23,10 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.AUTO) // Matches uuid_generate_v4() with appropriate Hibernate config
     private UUID id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String slug;
 
     @Column(columnDefinition = "TEXT")
