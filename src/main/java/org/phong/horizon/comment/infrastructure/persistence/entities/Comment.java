@@ -4,6 +4,8 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
@@ -12,8 +14,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.phong.horizon.core.enums.CommentStatus;
 import org.phong.horizon.core.superclass.BaseEntity;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
@@ -60,4 +64,10 @@ public class Comment extends BaseEntity {
 
     @Column(name = "is_author_deleted")
     private Boolean isAuthorDeleted;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @ColumnDefault("'Pending'")
+    private CommentStatus status;
 }
+
