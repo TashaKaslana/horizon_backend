@@ -113,7 +113,7 @@ public class UserService {
 
         User user = userMapper.toEntity(userCreateDto);
         if (userCreateDto.status() == null) {
-            user.setStatus(UserStatus.Pending);
+            user.setStatus(UserStatus.PENDING);
         } else {
             user.setStatus(userCreateDto.status());
         }
