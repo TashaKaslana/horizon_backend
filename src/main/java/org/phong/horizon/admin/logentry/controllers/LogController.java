@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.admin.logentry.dtos.CreateLogEntryRequest;
 import org.phong.horizon.admin.logentry.dtos.LogEntryDto;
+import org.phong.horizon.admin.logentry.dtos.LogSearchCriteriaDto;
 import org.phong.horizon.admin.logentry.services.LogService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +28,8 @@ public class LogController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<LogEntryDto>> getAllLogEntries(Pageable pageable) {
-        Page<LogEntryDto> logs = logService.getAllLogEntries(pageable);
+    public ResponseEntity<Page<LogEntryDto>> getAllLogEntries(Pageable pageable, LogSearchCriteriaDto logSearchCriteriaDto) {
+        Page<LogEntryDto> logs = logService.getAllLogEntries(pageable, logSearchCriteriaDto);
         return ResponseEntity.ok(logs);
     }
 
