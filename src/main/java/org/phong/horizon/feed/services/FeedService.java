@@ -7,6 +7,7 @@ import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.feed.dtos.FeedPage;
 import org.phong.horizon.feed.dtos.PostStatistic;
 import org.phong.horizon.post.dtos.PostResponse;
+import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.services.PostBookmarkService;
 import org.phong.horizon.post.services.PostInteractionService;
 import org.phong.horizon.post.services.PostService;
@@ -14,6 +15,7 @@ import org.phong.horizon.post.services.PostViewService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -28,14 +30,17 @@ public class FeedService {
     PostInteractionService postInteractionService;
     PostBookmarkService postBookmarkService;
     PostViewService postViewService;
+    PostMapper postMapper;
 
+    @Transactional
     public Page<FeedPage> getFeedForMe(Pageable pageable, UUID excludePostId, String categoryName) {
         Page<PostResponse> feedPage = postService.getAllPublicPosts(pageable, excludePostId, categoryName);
         return getFeedPages(feedPage);
     }
 
+    @Transactional
     public FeedPage getFeedForMe(UUID postId) {
-        PostResponse post = postService.getPostById(postId);
+        PostResponse post = postMapper.toDto2(postService.findPostById(postId));
         List<UUID> idList = List.of(postId);
 
         List<UUID> postInteractionList = postInteractionService.getPostIdsMeInteractedByPostIds(idList);
@@ -53,6 +58,7 @@ public class FeedService {
         return new FeedPage(post, statistic);
     }
 
+    @Transactional
     public Page<FeedPage> getFeedByUserId(Pageable pageable, UUID userId, UUID excludePostId) {
         Page<PostResponse> posts = postService.getAllPublicPostsByUserId(pageable, userId, excludePostId);
         return getFeedPages(posts);
