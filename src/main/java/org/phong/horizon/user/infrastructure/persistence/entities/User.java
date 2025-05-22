@@ -4,11 +4,19 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.phong.horizon.user.enums.UserStatus;
 import org.phong.horizon.core.superclass.BaseEntity;
+import org.phong.horizon.user.infrastructure.persistence.entities.role.Role;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -70,4 +78,16 @@ public class User extends BaseEntity {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
+
+    @Column(name = "last_login")
+    private Instant lastLogin;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @ColumnDefault("'Pending'")
+    private UserStatus status;
 }
