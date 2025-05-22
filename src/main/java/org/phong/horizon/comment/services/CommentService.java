@@ -77,7 +77,7 @@ public class CommentService {
                 currentUserId
         ));
 
-        return new CommentCreatedDto(createdComment.getId());
+        return new CommentCreatedDto(createdComment.getId(), createdComment.getStatus());
     }
 
     @Transactional(readOnly = true)

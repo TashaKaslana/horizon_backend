@@ -1,49 +1,51 @@
 package org.phong.horizon.comment.controllers;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.comment.dtos.CreateReportComment;
-import org.phong.horizon.comment.dtos.ReportCommentResponse;
-import org.phong.horizon.comment.services.CommentReportService;
 import org.phong.horizon.core.responses.RestApiResponse;
-import org.springframework.data.domain.Pageable;
+import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.report.dto.CreateReportRequest;
+import org.phong.horizon.report.dto.ReportDto;
+import org.phong.horizon.report.enums.ModerationItemType;
+import org.phong.horizon.report.services.ReportService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/comments/reports")
+@RequestMapping("/api/comments")
 @AllArgsConstructor
 public class CommentReportController {
-    private final CommentReportService commentReportService;
+    private final ReportService reportService;
+    private final AuthService authService;
 
-    @PostMapping
-    public ResponseEntity<RestApiResponse<Void>> reportComment(@RequestBody CreateReportComment request) {
-        commentReportService.reportComment(request);
-        return RestApiResponse.success();
+    @PostMapping("/{commentId}/report")
+    public ResponseEntity<RestApiResponse<ReportDto>> reportComment(@PathVariable UUID commentId, @RequestBody org.phong.horizon.comment.dtos.CreateReportComment request) {
+        UUID reporterId = authService.getUserIdFromContext();
+        CreateReportRequest createReportRequest = new CreateReportRequest();
+        createReportRequest.setReason(request.reason());
+        createReportRequest.setItemType(ModerationItemType.COMMENT);
+        createReportRequest.setCommentId(commentId);
+
+        ReportDto createdReport = reportService.createReport(createReportRequest, reporterId);
+        return RestApiResponse.created(createdReport);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/reports/{id}")
     public ResponseEntity<RestApiResponse<Void>> deleteReportComment(@PathVariable("id") UUID reportId) {
-        commentReportService.deleteReportComment(reportId);
-        return RestApiResponse.success();
+        reportService.deleteReport(reportId);
+        return RestApiResponse.noContent();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RestApiResponse<ReportCommentResponse>> getReportComment(@PathVariable("id") UUID reportId) {
-        return RestApiResponse.success(commentReportService.getReportCommentById(reportId));
-    }
-
-    @GetMapping
-    public ResponseEntity<RestApiResponse<List<ReportCommentResponse>>> getAllReportComments(Pageable pageable) {
-        return RestApiResponse.success(commentReportService.getAllReportComments(pageable));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<RestApiResponse<List<ReportCommentResponse>>> getReportCommentsByUser(
-            @PathVariable UUID userId,
-            Pageable pageable) {
-        return RestApiResponse.success(commentReportService.getReportCommentsByUserId(userId, pageable));
+    @GetMapping("/reports/{id}")
+    public ResponseEntity<RestApiResponse<ReportDto>> getReportComment(@PathVariable("id") UUID reportId) {
+        ReportDto reportDto = reportService.getReportById(reportId);
+        return RestApiResponse.success(reportDto);
     }
 }
