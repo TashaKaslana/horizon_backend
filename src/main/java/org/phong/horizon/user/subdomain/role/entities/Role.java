@@ -1,4 +1,4 @@
-package org.phong.horizon.user.infrastructure.persistence.entities.role;
+package org.phong.horizon.user.subdomain.role.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
