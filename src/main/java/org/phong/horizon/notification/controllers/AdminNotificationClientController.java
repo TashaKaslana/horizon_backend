@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/notifications")
+@RequestMapping("/api/admin/notification-client")
 @AllArgsConstructor
-public class AdminNotificationController {
+public class AdminNotificationClientController {
     private final NotificationService notificationService;
 
     @GetMapping("/recipient/{recipientId}")

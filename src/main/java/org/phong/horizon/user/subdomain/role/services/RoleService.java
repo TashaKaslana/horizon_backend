@@ -1,6 +1,7 @@
 package org.phong.horizon.user.subdomain.role.services;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.user.subdomain.permission.entities.Permission;
 import org.phong.horizon.user.subdomain.permission.services.PermissionService;
 import org.phong.horizon.user.subdomain.role.dtos.AssignPermissionsToRoleRequest;
@@ -18,8 +19,6 @@ import org.phong.horizon.user.subdomain.role.mappers.RoleMapper;
 import org.phong.horizon.user.subdomain.role.repositories.RolePermissionRepository;
 import org.phong.horizon.user.subdomain.role.repositories.RoleRepository;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository; // For checking if role is in use
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,15 +33,14 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RoleService {
-
-    private static final Logger log = LoggerFactory.getLogger(RoleService.class);
 
     private final RoleRepository roleRepository;
     private final PermissionService permissionService;
     private final RolePermissionRepository rolePermissionRepository;
     private final RoleMapper roleMapper;
-    private final UserRepository userRepository; // To check if role is assigned to any user
+    private final UserRepository userRepository;
 
     @Transactional
     public RoleDto createRole(CreateRoleRequest request) {
