@@ -6,11 +6,12 @@ import org.phong.horizon.post.subdomain.tag.dto.CreateTagRequest;
 import org.phong.horizon.post.subdomain.tag.dto.TagResponse;
 import org.phong.horizon.post.subdomain.tag.dto.UpdateTagRequest;
 import org.phong.horizon.post.subdomain.tag.service.TagService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,8 +34,11 @@ public class PostTagController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TagResponse>> getAllTags() {
-        List<TagResponse> tags = tagService.getAllTags();
+    public ResponseEntity<Page<TagResponse>> getAllTags(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String slug,
+            Pageable pageable) {
+        Page<TagResponse> tags = tagService.getAllTags(name, slug, pageable);
         return ResponseEntity.ok(tags);
     }
 

@@ -11,14 +11,16 @@ import org.phong.horizon.post.subdomain.tag.exception.TagNotFoundException;
 import org.phong.horizon.post.subdomain.tag.exception.TagPropertyConflictException;
 import org.phong.horizon.post.subdomain.tag.mapper.TagMapper;
 import org.phong.horizon.post.subdomain.tag.repository.TagRepository;
+import org.phong.horizon.post.subdomain.tag.specification.TagSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,12 +36,12 @@ public class TagService {
         UUID currentUserId = authService.getUserIdFromContext();
 
         // Check for existing slug
-        tagRepository.findBySlug(createTagRequest.getSlug()).ifPresent(existingTag -> {
+        tagRepository.findBySlug(createTagRequest.getSlug()).ifPresent(_ -> {
             throw new TagPropertyConflictException("Slug already exists: " + createTagRequest.getSlug());
         });
 
         // Check for existing name
-        tagRepository.findByName(createTagRequest.getName()).ifPresent(existingTag -> {
+        tagRepository.findByName(createTagRequest.getName()).ifPresent(_ -> {
             throw new TagPropertyConflictException("Name already exists: " + createTagRequest.getName());
         });
 
@@ -60,10 +62,11 @@ public class TagService {
     }
 
     @Transactional(readOnly = true)
-    public List<TagResponse> getAllTags() {
-        return tagRepository.findAll().stream()
-                .map(tagMapper::toTagResponse)
-                .collect(Collectors.toList());
+    public Page<TagResponse> getAllTags(String name, String slug, Pageable pageable) {
+        Specification<Tag> spec = Specification.where(TagSpecification.nameContains(name))
+                                             .and(TagSpecification.slugEquals(slug));
+        return tagRepository.findAll(spec, pageable)
+                .map(tagMapper::toTagResponse);
     }
 
     @Transactional
