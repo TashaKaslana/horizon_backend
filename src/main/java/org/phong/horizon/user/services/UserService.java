@@ -14,6 +14,7 @@ import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.enums.UserErrorEnums;
+import org.phong.horizon.user.enums.UserStatus;
 import org.phong.horizon.user.events.UserAccountUpdatedEvent;
 import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
@@ -111,6 +112,11 @@ public class UserService {
         }
 
         User user = userMapper.toEntity(userCreateDto);
+        if (userCreateDto.status() == null) {
+            user.setStatus(UserStatus.Pending);
+        } else {
+            user.setStatus(userCreateDto.status());
+        }
         User createdUser = userRepository.save(user);
 
         log.info("Created user: {}", createdUser);
@@ -138,17 +144,9 @@ public class UserService {
         User oldUser = userMapper.cloneUser(original);
         User temp = userMapper.partialUpdate(userUpdateInfoDto, original);
 
-//        if (userUpdateDto.username() != null) {
-//            updateUsername(temp, userUpdateDto.username());
-//        }
-//
-//        if (userUpdateDto.email() != null) {
-//            updateEmail(temp, userUpdateDto.email());
-//        }
-
-//        if (userUpdateDto.getRoles() != null) {
-//            updateRoles(user, userUpdateDto.getRoles());
-//        }
+        if (userUpdateInfoDto.status() != null) {
+            temp.setStatus(userUpdateInfoDto.status());
+        }
 
         User newUser = userRepository.save(temp);
 
@@ -185,7 +183,7 @@ public class UserService {
         String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
         String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
 
-
+        // Use oldUser for logging changes
         publisher.publishEvent(new UserAccountUpdatedEvent(
                 this, updatedUser.getId(), updatedUser.getUsername(), updatedUser.getEmail(),
                 updatedUser.getProfileImage(), updatedUser.getCoverImage(), updatedUser.getBio(),
@@ -204,7 +202,7 @@ public class UserService {
     @Transactional
     public void updateCurrentUserImage(UserImageUpdate request) {
         User user = findById(authService.getUserIdFromContext());
-        User oldUser = userMapper.cloneUser(user);
+//        User oldUser = userMapper.cloneUser(user);
 
         User updatedUser = userMapper.partialUpdate(request, user);
 //        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");

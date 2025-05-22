@@ -3,6 +3,7 @@ package org.phong.horizon.user.dtos;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.enums.UserStatus;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,6 +23,8 @@ public record UserCreateDto(
 
         @NotBlank(message = "Email cannot be blank")
         @Email(message = "Email must be valid")
-        String email
+        String email,
+
+        UserStatus status
 ) implements Serializable {
 }

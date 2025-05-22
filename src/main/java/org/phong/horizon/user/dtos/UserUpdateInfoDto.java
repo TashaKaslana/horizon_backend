@@ -1,6 +1,7 @@
 package org.phong.horizon.user.dtos;
 
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.enums.UserStatus;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
@@ -24,6 +25,7 @@ public record UserUpdateInfoDto(
 
         @Size(max = 100, message = "Country name cannot exceed 100 characters") String country,
         @Size(max = 100, message = "City name cannot exceed 100 characters") String city,
-        @Size(max = 500, message = "Bio cannot exceed 500 characters") String bio
+        @Size(max = 500, message = "Bio cannot exceed 500 characters") String bio,
+        UserStatus status
 ) implements Serializable {
 }
