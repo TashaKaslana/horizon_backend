@@ -17,7 +17,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.phong.horizon.core.enums.CommentStatus;
+import org.phong.horizon.comment.enums.CommentStatus;
 import org.phong.horizon.core.superclass.BaseEntity;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;

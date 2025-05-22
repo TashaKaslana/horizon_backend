@@ -2,6 +2,7 @@ package org.phong.horizon.comment.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.phong.horizon.comment.enums.CommentStatus;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -12,5 +13,7 @@ import java.util.UUID;
 public record CreateCommentDto(
         @NotNull UUID postId,
         @NotBlank String content,
-        UUID parentCommentId) implements Serializable {
+        UUID parentCommentId,
+        CommentStatus status) implements Serializable {
 }
+
