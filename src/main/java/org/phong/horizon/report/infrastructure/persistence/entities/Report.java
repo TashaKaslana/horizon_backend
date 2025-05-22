@@ -1,4 +1,4 @@
-package org.phong.horizon.report.infrastructure.entities;
+package org.phong.horizon.report.infrastructure.persistence.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package org.phong.horizon.report.specifications;
 
-import org.phong.horizon.report.infrastructure.entities.Report;
+import org.phong.horizon.report.infrastructure.persistence.entities.Report;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.springframework.data.jpa.domain.Specification;

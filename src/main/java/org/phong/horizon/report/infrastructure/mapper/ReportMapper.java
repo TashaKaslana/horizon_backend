@@ -1,4 +1,4 @@
-package org.phong.horizon.report.mapper;
+package org.phong.horizon.report.infrastructure.mapper;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -10,10 +10,8 @@ import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.report.dto.CreateReportRequest;
 import org.phong.horizon.report.dto.ReportDto;
 import org.phong.horizon.report.dto.UpdateReportRequest;
-import org.phong.horizon.report.infrastructure.entities.Report;
+import org.phong.horizon.report.infrastructure.persistence.entities.Report;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
-
-import java.util.UUID;
 
 @Mapper(
         componentModel = "spring",
