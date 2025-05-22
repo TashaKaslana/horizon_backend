@@ -1,4 +1,4 @@
-package org.phong.horizon.post.events;
+package org.phong.horizon.post.subdomain.category.events;
 
 import lombok.AccessLevel;
 import lombok.Getter;

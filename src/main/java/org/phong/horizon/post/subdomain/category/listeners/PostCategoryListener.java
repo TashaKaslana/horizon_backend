@@ -1,4 +1,4 @@
-package org.phong.horizon.post.listeners;
+package org.phong.horizon.post.subdomain.category.listeners;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,7 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
-import org.phong.horizon.post.events.PostCategoryUpdate;
+import org.phong.horizon.post.subdomain.category.events.PostCategoryUpdate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;

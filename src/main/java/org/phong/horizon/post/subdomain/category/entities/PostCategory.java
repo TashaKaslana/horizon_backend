@@ -1,4 +1,4 @@
-package org.phong.horizon.post.infrastructure.persistence.entities;
+package org.phong.horizon.post.subdomain.category.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

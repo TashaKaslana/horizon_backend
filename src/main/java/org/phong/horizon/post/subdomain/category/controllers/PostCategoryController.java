@@ -1,4 +1,4 @@
-package org.phong.horizon.post.controllers;
+package org.phong.horizon.post.subdomain.category.controllers;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,11 +7,11 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
-import org.phong.horizon.post.dtos.CreatePostCategoryRequest;
-import org.phong.horizon.post.dtos.PostCategorySummary;
-import org.phong.horizon.post.dtos.UpdatePostCategoryRequest;
-import org.phong.horizon.post.infrastructure.persistence.entities.PostCategory;
-import org.phong.horizon.post.services.PostCategoryService;
+import org.phong.horizon.post.subdomain.category.dtos.CreatePostCategoryRequest;
+import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
+import org.phong.horizon.post.subdomain.category.dtos.UpdatePostCategoryRequest;
+import org.phong.horizon.post.subdomain.category.entities.PostCategory;
+import org.phong.horizon.post.subdomain.category.services.PostCategoryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

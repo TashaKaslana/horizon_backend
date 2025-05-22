@@ -3,6 +3,8 @@ package org.phong.horizon.post.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.core.utils.HttpRequestUtils;
+import org.phong.horizon.post.subdomain.category.exceptions.PostCategoryExistsException;
+import org.phong.horizon.post.subdomain.category.exceptions.PostCategoryNotFoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;

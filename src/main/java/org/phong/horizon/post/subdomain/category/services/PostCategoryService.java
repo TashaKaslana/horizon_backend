@@ -1,21 +1,22 @@
-package org.phong.horizon.post.services;
+package org.phong.horizon.post.subdomain.category.services;
 
+import com.github.slugify.Slugify;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
-import org.phong.horizon.post.dtos.CreatePostCategoryRequest;
-import org.phong.horizon.post.dtos.PostCategorySummary;
-import org.phong.horizon.post.dtos.UpdatePostCategoryRequest;
 import org.phong.horizon.post.enums.PostErrorEnums;
-import org.phong.horizon.post.events.PostCategoryUpdate;
-import org.phong.horizon.post.exceptions.PostCategoryExistsException;
-import org.phong.horizon.post.exceptions.PostCategoryNotFoundException;
-import org.phong.horizon.post.infrastructure.mapstruct.PostCategoryMapper;
-import org.phong.horizon.post.infrastructure.persistence.entities.PostCategory;
-import org.phong.horizon.post.infrastructure.persistence.repositories.PostCategoryRepository;
+import org.phong.horizon.post.subdomain.category.dtos.CreatePostCategoryRequest;
+import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
+import org.phong.horizon.post.subdomain.category.dtos.UpdatePostCategoryRequest;
+import org.phong.horizon.post.subdomain.category.entities.PostCategory;
+import org.phong.horizon.post.subdomain.category.events.PostCategoryUpdate;
+import org.phong.horizon.post.subdomain.category.exceptions.PostCategoryExistsException;
+import org.phong.horizon.post.subdomain.category.exceptions.PostCategoryNotFoundException;
+import org.phong.horizon.post.subdomain.category.mapstruct.PostCategoryMapper;
+import org.phong.horizon.post.subdomain.category.repositories.PostCategoryRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,7 +68,15 @@ public class PostCategoryService {
             throw new PostCategoryExistsException(PostErrorEnums.POST_CATEGORY_EXISTS.getMessage());
         }
 
-        return postCategoryRepository.save(PostCategory.builder().name(request.name().toUpperCase()).build());
+        Slugify slugify = Slugify.builder().build();
+        String baseSlug = slugify.slugify(request.name());
+        String uniqueSlug = baseSlug + "-" + UUID.randomUUID().toString().substring(0, 8);
+        PostCategory postCategory = PostCategory.builder()
+                .name(request.name().toUpperCase())
+                .slug(uniqueSlug)
+                .build();
+
+        return postCategoryRepository.save(postCategory);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -81,7 +90,11 @@ public class PostCategoryService {
         }
 
         PostCategory partialUpdate = mapper.partialUpdate(request, postCategory);
+        Slugify slugify = Slugify.builder().build();
+        String baseSlug = slugify.slugify(request.name());
+        String uniqueSlug = baseSlug + "-" + UUID.randomUUID().toString().substring(0, 8);
         partialUpdate.setName(request.name().toUpperCase());
+        partialUpdate.setSlug(uniqueSlug);
 
         PostCategory savedPostCategory = postCategoryRepository.save(partialUpdate);
 

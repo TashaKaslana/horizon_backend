@@ -23,6 +23,7 @@ import org.phong.horizon.post.exceptions.PostWithAssetNotFoundException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
+import org.phong.horizon.post.subdomain.category.services.PostCategoryService;
 import org.phong.horizon.storage.dtos.AssetRespond;
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
 import org.phong.horizon.storage.service.StorageService;
