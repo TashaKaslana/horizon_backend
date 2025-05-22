@@ -1,7 +1,6 @@
 package org.phong.horizon.admin.notification.infrastructure.dtos;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.phong.horizon.admin.notification.enums.AdminNotificationType;
 import org.phong.horizon.admin.notification.enums.NotificationSeverity;
 import org.springframework.format.annotation.DateTimeFormat;
