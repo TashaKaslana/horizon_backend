@@ -18,13 +18,13 @@ import org.phong.horizon.report.infrastructure.mapper.ReportMapper;
 import org.phong.horizon.report.specifications.ReportSpecifications;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -90,24 +90,23 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReportDto> getAllReports() {
-        return reportRepository.findAll().stream()
-                .map(reportMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<ReportDto> getAllReports(Pageable pageable) {
+        return reportRepository.findAll(pageable)
+                .map(reportMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public List<ReportDto> searchReports(
+    public Page<ReportDto> searchReports(
             UUID reporterId,
             UUID reportedUserId,
             ModerationStatus status,
             ModerationItemType itemType,
-            UUID itemId
+            UUID itemId,
+            Pageable pageable
     ) {
         Specification<Report> spec = ReportSpecifications.withDynamicQuery(reporterId, reportedUserId, status, itemType, itemId);
-        return reportRepository.findAll(spec).stream()
-                .map(reportMapper::toDto)
-                .collect(Collectors.toList());
+        Page<Report> reportPage = reportRepository.findAll(spec, pageable);
+        return reportPage.map(reportMapper::toDto);
     }
 
     @Transactional
