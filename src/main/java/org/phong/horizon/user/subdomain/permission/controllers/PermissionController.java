@@ -2,16 +2,17 @@ package org.phong.horizon.user.subdomain.permission.controllers;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.user.subdomain.permission.dtos.CreatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.dtos.PermissionDto;
 import org.phong.horizon.user.subdomain.permission.dtos.UpdatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.services.PermissionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,39 +23,39 @@ public class PermissionController {
     private final PermissionService permissionService;
 
     @PostMapping
-    public ResponseEntity<PermissionDto> createPermission(@Valid @RequestBody CreatePermissionRequest request) {
+    public ResponseEntity<RestApiResponse<PermissionDto>> createPermission(@Valid @RequestBody CreatePermissionRequest request) {
         PermissionDto createdPermission = permissionService.createPermission(request);
-        return new ResponseEntity<>(createdPermission, HttpStatus.CREATED);
+        return RestApiResponse.created(createdPermission);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PermissionDto> getPermissionById(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<PermissionDto>> getPermissionById(@PathVariable UUID id) {
         PermissionDto permissionDto = permissionService.getPermissionById(id);
-        return ResponseEntity.ok(permissionDto);
+        return RestApiResponse.success(permissionDto);
     }
 
     @GetMapping("/slug/{slug}")
-    public ResponseEntity<PermissionDto> getPermissionBySlug(@PathVariable String slug) {
+    public ResponseEntity<RestApiResponse<PermissionDto>> getPermissionBySlug(@PathVariable String slug) {
         PermissionDto permissionDto = permissionService.getPermissionBySlug(slug);
-        return ResponseEntity.ok(permissionDto);
+        return RestApiResponse.success(permissionDto);
     }
 
     @GetMapping
-    public ResponseEntity<Page<PermissionDto>> getAllPermissions(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<PermissionDto>>> getAllPermissions(Pageable pageable) {
         Page<PermissionDto> permissions = permissionService.getAllPermissions(pageable);
-        return ResponseEntity.ok(permissions);
+        return RestApiResponse.success(permissions);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PermissionDto> updatePermission(@PathVariable UUID id, @Valid @RequestBody UpdatePermissionRequest request) {
+    public ResponseEntity<RestApiResponse<PermissionDto>> updatePermission(@PathVariable UUID id, @Valid @RequestBody UpdatePermissionRequest request) {
         PermissionDto updatedPermission = permissionService.updatePermission(id, request);
-        return ResponseEntity.ok(updatedPermission);
+        return RestApiResponse.success(updatedPermission);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePermission(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<Void>> deletePermission(@PathVariable UUID id) {
         permissionService.deletePermission(id);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }
 

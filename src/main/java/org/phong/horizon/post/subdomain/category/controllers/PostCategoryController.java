@@ -88,7 +88,8 @@ public class PostCategoryController {
             targetIdExpression = "#postCategoryId"
     )
     @DeleteMapping("/{postCategoryId}")
-    public void deletePostCategory(@PathVariable UUID postCategoryId) {
+    public ResponseEntity<RestApiResponse<Void>> deletePostCategory(@PathVariable UUID postCategoryId) {
         postCategoryService.deletePostCategory(postCategoryId);
+        return RestApiResponse.noContent();
     }
 }

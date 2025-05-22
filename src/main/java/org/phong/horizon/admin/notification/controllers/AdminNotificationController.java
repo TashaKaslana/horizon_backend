@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
 import org.phong.horizon.admin.notification.services.AdminNotificationService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,36 +21,41 @@ public class AdminNotificationController {
     private final AdminNotificationService adminNotificationService;
 
     @GetMapping
-    public ResponseEntity<Page<AdminNotificationDto>> getAllNotifications(
+    public ResponseEntity<RestApiResponse<List<AdminNotificationDto>>> getAllNotifications(
             Pageable pageable,
             AdminNotificationFilterDto filterDto) {
-        return ResponseEntity.ok(adminNotificationService.getAllNotifications(pageable, filterDto));
+        Page<AdminNotificationDto> notifications = adminNotificationService.getAllNotifications(pageable, filterDto);
+        return RestApiResponse.success(notifications);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AdminNotificationDto> getNotificationById(@PathVariable UUID id) {
-        return ResponseEntity.ok(adminNotificationService.getNotificationById(id));
+    public ResponseEntity<RestApiResponse<AdminNotificationDto>> getNotificationById(@PathVariable UUID id) {
+        AdminNotificationDto notification = adminNotificationService.getNotificationById(id);
+        return RestApiResponse.success(notification);
     }
 
     @PostMapping
-    public ResponseEntity<AdminNotificationDto> createNotification(@RequestBody AdminNotificationDto adminNotificationDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(adminNotificationService.createNotification(adminNotificationDto));
+    public ResponseEntity<RestApiResponse<AdminNotificationDto>> createNotification(@RequestBody AdminNotificationDto adminNotificationDto) {
+        AdminNotificationDto createdNotification = adminNotificationService.createNotification(adminNotificationDto);
+        return RestApiResponse.created(createdNotification);
     }
 
     @PatchMapping("/{id}/read")
-    public ResponseEntity<AdminNotificationDto> markAsRead(@PathVariable UUID id) {
-        return ResponseEntity.ok(adminNotificationService.markAsRead(id));
+    public ResponseEntity<RestApiResponse<AdminNotificationDto>> markAsRead(@PathVariable UUID id) {
+        AdminNotificationDto notification = adminNotificationService.markAsRead(id);
+        return RestApiResponse.success(notification);
     }
 
     @PatchMapping("/{id}/unread")
-    public ResponseEntity<AdminNotificationDto> markAsUnread(@PathVariable UUID id) {
-        return ResponseEntity.ok(adminNotificationService.markAsUnread(id));
+    public ResponseEntity<RestApiResponse<AdminNotificationDto>> markAsUnread(@PathVariable UUID id) {
+        AdminNotificationDto notification = adminNotificationService.markAsUnread(id);
+        return RestApiResponse.success(notification);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable UUID id) {
+    public ResponseEntity<RestApiResponse<Void>> deleteNotification(@PathVariable UUID id) {
         adminNotificationService.deleteNotification(id);
-        return ResponseEntity.noContent().build();
+        return RestApiResponse.noContent();
     }
 }
 
