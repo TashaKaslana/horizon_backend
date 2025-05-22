@@ -2,7 +2,6 @@ package org.phong.horizon.user.infrastructure.mapstruct;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -17,12 +16,16 @@ import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.phong.horizon.user.subdomain.role.mappers.RoleMapper;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {
+                RoleMapper.class
+        }
+)
 public interface UserMapper {
     User toEntity(UserRespondDto userRespondDto);
 
-    @Mapping(source = "role.name", target = "role")
     UserRespondDto toDto(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

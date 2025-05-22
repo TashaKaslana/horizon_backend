@@ -20,7 +20,8 @@ import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
                 PostMapper.class,
                 CommentMapper.class
         },
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE
 )
 public interface ReportMapper {
 
@@ -30,12 +31,7 @@ public interface ReportMapper {
     @Mapping(target = "reporterId", source = "reporter.id")
     ReportDto toDto(Report report);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "reporter", ignore = true)
-    @Mapping(target = "status", constant = "PENDING")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "moderatorNotes", ignore = true)
+    @Mapping(target = "status", constant = "Pending")
     Report toEntity(CreateReportRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

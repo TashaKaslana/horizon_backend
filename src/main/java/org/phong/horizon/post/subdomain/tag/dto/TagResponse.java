@@ -3,7 +3,7 @@ package org.phong.horizon.post.subdomain.tag.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -13,8 +13,8 @@ public class TagResponse {
     private String name;
     private String slug;
     private String description;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private UUID createdBy;
     private UUID updatedBy;
 }

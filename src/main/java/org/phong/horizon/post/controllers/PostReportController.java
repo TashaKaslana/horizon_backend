@@ -1,9 +1,13 @@
 package org.phong.horizon.post.controllers;
 
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.post.dtos.PostReportRequest;
-import org.phong.horizon.post.dtos.PostReportResponse;
-import org.phong.horizon.post.services.PostReportService;
+import org.phong.horizon.report.dto.CreateReportRequest;
+import org.phong.horizon.report.dto.ReportDto;
+import org.phong.horizon.report.enums.ModerationItemType;
+import org.phong.horizon.report.services.ReportService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,28 +24,39 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/posts")
 public class PostReportController {
-    private final PostReportService reportService;
+    private final ReportService reportService;
+    private final AuthService authService;
 
-    public PostReportController(PostReportService reportService) {
+    public PostReportController(ReportService reportService, AuthService authService) {
         this.reportService = reportService;
+        this.authService = authService;
     }
 
     @PostMapping("/{postId}/report")
-    public ResponseEntity<RestApiResponse<PostReportResponse>> reportPost(@PathVariable UUID postId, @RequestBody PostReportRequest request) {
-        return RestApiResponse.created(reportService.reportPost(postId, request));
+    public ResponseEntity<RestApiResponse<ReportDto>> reportPost(@PathVariable UUID postId, @RequestBody PostReportRequest request) {
+        UUID reporterId = authService.getUserIdFromContext();
+        CreateReportRequest createReportRequest = new CreateReportRequest();
+        createReportRequest.setReason(request.reason());
+        createReportRequest.setItemType(ModerationItemType.POST);
+        createReportRequest.setPostId(postId);
+
+        ReportDto createdReport = reportService.createReport(createReportRequest, reporterId);
+        return RestApiResponse.created(createdReport);
     }
 
     @GetMapping("/reports")
-    public ResponseEntity<RestApiResponse<List<PostReportResponse>>> getAllReports(Pageable pageable) {
-        return RestApiResponse.success(reportService.getAllReports(pageable));
+    public ResponseEntity<RestApiResponse<List<ReportDto>>> getAllReports(Pageable pageable) {
+        Page<ReportDto> reports = reportService.searchReports(null, null, null, ModerationItemType.POST, null, pageable);
+        return RestApiResponse.success(reports);
     }
 
-    @GetMapping("/{id}/report")
-    public ResponseEntity<RestApiResponse<PostReportResponse>> getReportById(@PathVariable UUID id) {
-        return RestApiResponse.success(reportService.getReportById(id));
+    @GetMapping("/reports/{id}")
+    public ResponseEntity<RestApiResponse<ReportDto>> getReportById(@PathVariable UUID id) {
+        ReportDto reportDto = reportService.getReportById(id);
+        return RestApiResponse.success(reportDto);
     }
 
-    @DeleteMapping("/{id}/report")
+    @DeleteMapping("/reports/{id}")
     public ResponseEntity<RestApiResponse<Void>> deleteReport(@PathVariable UUID id) {
         reportService.deleteReport(id);
         return RestApiResponse.noContent();
