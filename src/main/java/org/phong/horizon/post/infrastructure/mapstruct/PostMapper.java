@@ -10,6 +10,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostCloneDto;
+import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.dtos.PostSummaryResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
@@ -58,4 +59,7 @@ public interface PostMapper {
 
     @Mapping(source = "user.id", target = "userId")
     PostSummaryResponse toDto(Post post);
+
+    PostCreatedDto postToPostCreatedDto(Post post);
 }
+

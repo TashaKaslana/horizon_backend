@@ -3,6 +3,7 @@ package org.phong.horizon.post.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.post.enums.PostStatus;
 import org.phong.horizon.core.enums.Role;
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.core.services.AuthService;
@@ -149,6 +150,13 @@ public class PostService {
         post.setUser(currentUser);
         post.setVideoAsset(asset);
         post.setCategory(postCategoryService.getRefByName(request.categoryName().toUpperCase()));
+
+        if (request.status() == null) {
+            post.setStatus(PostStatus.Draft); // Default to Draft if not provided
+        } else {
+            post.setStatus(request.status());
+        }
+
         Post createdPost = postRepository.save(post);
 
         eventPublisher.publishEvent(new PostCreatedEvent(
@@ -156,7 +164,7 @@ public class PostService {
         ));
         log.info("Created new post: {}", createdPost);
 
-        return new PostCreatedDto(createdPost.getId());
+        return new PostCreatedDto(createdPost.getId(), createdPost.getStatus()); // Ensure status is included
     }
 
     @Transactional
@@ -176,6 +184,10 @@ public class PostService {
 
         if (request.categoryName() != null) {
             updatedPost.setCategory(postCategoryService.getRefByName(request.categoryName().toUpperCase()));
+        }
+
+        if (request.status() != null) { // Allow status update
+            updatedPost.setStatus(request.status());
         }
 
         Post savedPost = postRepository.save(updatedPost);

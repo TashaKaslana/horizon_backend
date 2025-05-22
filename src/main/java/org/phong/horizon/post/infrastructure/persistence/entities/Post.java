@@ -18,7 +18,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
-import org.phong.horizon.core.enums.PostStatus;
+import org.phong.horizon.post.enums.PostStatus;
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.core.superclass.BaseEntity;
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
@@ -81,4 +81,5 @@ public class Post extends BaseEntity {
     @ColumnDefault("'Draft'")
     private PostStatus status;
 }
+
 

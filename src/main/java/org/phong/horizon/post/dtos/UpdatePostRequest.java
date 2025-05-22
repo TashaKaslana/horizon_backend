@@ -3,6 +3,7 @@ package org.phong.horizon.post.dtos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.phong.horizon.post.enums.PostStatus;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,5 +16,7 @@ public record UpdatePostRequest(
         @NotBlank String description,
         @NotBlank @Size(max = 10) String visibility,
         List<String> tags,
-        @NotNull String categoryName) implements Serializable {
+        @NotNull String categoryName,
+        PostStatus status) implements Serializable {
 }
+

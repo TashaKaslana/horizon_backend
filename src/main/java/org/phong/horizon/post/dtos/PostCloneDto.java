@@ -1,6 +1,7 @@
 package org.phong.horizon.post.dtos;
 
 import org.phong.horizon.core.enums.Visibility;
+import org.phong.horizon.post.enums.PostStatus;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 
 import java.io.Serializable;
@@ -13,5 +14,6 @@ import java.util.UUID;
  */
 public record PostCloneDto(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id, UUID userId,
                            String caption, String description, UUID videoAssetId, Double duration,
-                           Visibility visibility, List<String> tags, Boolean isAuthorDeleted) implements Serializable {
+                           Visibility visibility, List<String> tags, PostStatus status, Boolean isAuthorDeleted) implements Serializable {
 }
+
