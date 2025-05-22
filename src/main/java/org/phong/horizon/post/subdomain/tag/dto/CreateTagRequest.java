@@ -15,8 +15,6 @@ public class CreateTagRequest {
     @NotBlank(message = "Slug cannot be blank")
     @Size(max = 255, message = "Slug cannot exceed 255 characters")
 
-    private String slug;
-
     private String description;
 }
 

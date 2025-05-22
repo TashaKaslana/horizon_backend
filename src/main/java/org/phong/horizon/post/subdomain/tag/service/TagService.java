@@ -1,5 +1,6 @@
 package org.phong.horizon.post.subdomain.tag.service;
 
+import com.github.slugify.Slugify;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.services.AuthService;
@@ -36,18 +37,21 @@ public class TagService {
         UUID currentUserId = authService.getUserIdFromContext();
 
         // Check for existing slug
-        tagRepository.findBySlug(createTagRequest.getSlug()).ifPresent(_ -> {
-            throw new TagPropertyConflictException("Slug already exists: " + createTagRequest.getSlug());
-        });
+//        tagRepository.findBySlug(createTagRequest.getSlug()).ifPresent(_ -> {
+//            throw new TagPropertyConflictException("Slug already exists: " + createTagRequest.getSlug());
+//        });
 
         // Check for existing name
         tagRepository.findByName(createTagRequest.getName()).ifPresent(_ -> {
             throw new TagPropertyConflictException("Name already exists: " + createTagRequest.getName());
         });
 
+        Slugify slugify = Slugify.builder().build();
+        String baseSlug = slugify.slugify(createTagRequest.getName());
+        String uniqueSlug = baseSlug + "-" + UUID.randomUUID().toString().substring(0, 8);
+
         Tag tag = tagMapper.toTag(createTagRequest);
-        tag.setCreatedBy(currentUserId);
-        tag.setUpdatedBy(currentUserId); // Typically, on creation, createdBy and updatedBy are the same
+        tag.setSlug(uniqueSlug);
 
         Tag savedTag = tagRepository.save(tag);
         log.info("Tag with id {} created by user {}", savedTag.getId(), currentUserId);
@@ -77,13 +81,13 @@ public class TagService {
                 .orElseThrow(() -> new TagNotFoundException("Tag not found with id: " + tagId));
 
         // Check for slug conflict if slug is being updated and is different from the current one
-        if (StringUtils.hasText(updateTagRequest.getSlug()) && !Objects.equals(tag.getSlug(), updateTagRequest.getSlug())) {
-            tagRepository.findBySlug(updateTagRequest.getSlug()).ifPresent(existingTag -> {
-                if (!existingTag.getId().equals(tagId)) {
-                    throw new TagPropertyConflictException("Slug already exists: " + updateTagRequest.getSlug());
-                }
-            });
-        }
+//        if (StringUtils.hasText(updateTagRequest.getSlug()) && !Objects.equals(tag.getSlug(), updateTagRequest.getSlug())) {
+//            tagRepository.findBySlug(updateTagRequest.getSlug()).ifPresent(existingTag -> {
+//                if (!existingTag.getId().equals(tagId)) {
+//                    throw new TagPropertyConflictException("Slug already exists: " + updateTagRequest.getSlug());
+//                }
+//            });
+//        }
 
         // Check for name conflict if name is being updated and is different from the current one
         if (StringUtils.hasText(updateTagRequest.getName()) && !Objects.equals(tag.getName(), updateTagRequest.getName())) {
@@ -94,10 +98,15 @@ public class TagService {
             });
         }
 
-        tagMapper.updateTagFromRequest(updateTagRequest, tag);
-        tag.setUpdatedBy(currentUserId);
+        //TODO: ensure slug is unique and update is not same
+        Slugify slugify = Slugify.builder().build();
+        String baseSlug = slugify.slugify(updateTagRequest.getName());
+        String uniqueSlug = baseSlug + "-" + UUID.randomUUID().toString().substring(0, 8);
 
-        Tag updatedTag = tagRepository.save(tag);
+        Tag preUpdate = tagMapper.updateTagFromRequest(updateTagRequest, tag);
+        preUpdate.setSlug(uniqueSlug);
+
+        Tag updatedTag = tagRepository.save(preUpdate);
         log.info("Tag with id {} updated by user {}", updatedTag.getId(), currentUserId);
         return tagMapper.toTagResponse(updatedTag);
     }

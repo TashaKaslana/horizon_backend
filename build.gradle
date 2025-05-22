@@ -43,6 +43,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation 'com.github.slugify:slugify:3.0.7'
 
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     annotationProcessor 'org.projectlombok:lombok'

@@ -12,9 +12,6 @@ public class UpdateTagRequest {
     @Size(max = 255, message = "Name cannot exceed 255 characters")
     private String name;
 
-    @Size(max = 255, message = "Slug cannot exceed 255 characters")
-    private String slug;
-
     private String description;
 }
 

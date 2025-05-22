@@ -25,6 +25,6 @@ public interface TagMapper {
     @Mapping(target = "updatedBy", ignore = true)
     Tag toTag(CreateTagRequest createTagRequest);
 
-    void updateTagFromRequest(UpdateTagRequest dto, @MappingTarget Tag entity);
+    Tag updateTagFromRequest(UpdateTagRequest dto, @MappingTarget Tag entity);
 }
 
