@@ -13,7 +13,7 @@ import java.util.List;
 public class LogSpecification {
 
     public Specification<LogEntry> filterByCriteria(LogSearchCriteriaDto criteria) {
-        return (root, query, criteriaBuilder) -> {
+        return (root, _, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (criteria.getSeverities() != null && !criteria.getSeverities().isEmpty()) {

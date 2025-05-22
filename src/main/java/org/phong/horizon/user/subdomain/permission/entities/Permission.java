@@ -1,9 +1,11 @@
-package org.phong.horizon.user.infrastructure.persistence.entities.role;
+package org.phong.horizon.user.subdomain.permission.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.phong.horizon.core.superclass.BaseEntity;
+import org.phong.horizon.user.subdomain.role.entities.RolePermission;
+
 import java.util.Set;
 
 @Getter

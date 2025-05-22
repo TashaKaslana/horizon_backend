@@ -16,7 +16,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.phong.horizon.user.enums.UserStatus;
 import org.phong.horizon.core.superclass.BaseEntity;
-import org.phong.horizon.user.infrastructure.persistence.entities.role.Role;
+import org.phong.horizon.user.subdomain.role.entities.Role;
 
 import java.time.Instant;
 import java.time.LocalDate;
