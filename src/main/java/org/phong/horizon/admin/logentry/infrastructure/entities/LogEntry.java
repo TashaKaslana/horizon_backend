@@ -3,6 +3,7 @@ package org.phong.horizon.admin.logentry.infrastructure.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.phong.horizon.admin.logentry.enums.LogSeverity;
@@ -43,7 +44,8 @@ public class LogEntry {
     @Column(name = "context", columnDefinition = "jsonb")
     private Map<String, Object> context;
 
-    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMPTZ DEFAULT NOW()")
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp
     private OffsetDateTime createdAt;
 }
 

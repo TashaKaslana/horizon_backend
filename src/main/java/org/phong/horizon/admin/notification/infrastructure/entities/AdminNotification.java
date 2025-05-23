@@ -3,6 +3,7 @@ package org.phong.horizon.admin.notification.infrastructure.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.phong.horizon.admin.notification.enums.AdminNotificationType;
@@ -53,7 +54,8 @@ public class AdminNotification {
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMPTZ DEFAULT NOW()")
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp
     private OffsetDateTime createdAt;
 }
 

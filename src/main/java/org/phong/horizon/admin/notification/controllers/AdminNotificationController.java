@@ -3,6 +3,7 @@ package org.phong.horizon.admin.notification.controllers;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
+import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.services.AdminNotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,7 @@ public class AdminNotificationController {
     }
 
     @PostMapping
-    public ResponseEntity<RestApiResponse<AdminNotificationDto>> createNotification(@RequestBody AdminNotificationDto adminNotificationDto) {
+    public ResponseEntity<RestApiResponse<AdminNotificationDto>> createNotification(@RequestBody CreateAdminNotification adminNotificationDto) {
         AdminNotificationDto createdNotification = adminNotificationService.createNotification(adminNotificationDto);
         return RestApiResponse.created(createdNotification);
     }

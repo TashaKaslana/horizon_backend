@@ -20,7 +20,7 @@ CREATE TABLE reports
 
     reason           TEXT                 NOT NULL,
     moderator_notes  TEXT,
-    status           moderation_status    NOT NULL DEFAULT 'Pending',
+    status           moderation_status    NOT NULL DEFAULT 'PENDING',
     item_type        moderation_item_type NOT NULL,
 
     post_id          UUID,

@@ -2,7 +2,7 @@ CREATE TABLE log_entries
 (
     id         UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
     timestamp  TIMESTAMPTZ  NOT NULL,
-    severity   VARCHAR(10)  NOT NULL CHECK (severity IN ('info', 'warning', 'error', 'critical')),
+    severity   VARCHAR(10)  NOT NULL CHECK (severity IN ('INFO', 'WARNING', 'ERROR', 'CRITICAL')),
     message    TEXT         NOT NULL,
     source     VARCHAR(255) NOT NULL,
     user_id    UUID,

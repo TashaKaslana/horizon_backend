@@ -3,6 +3,7 @@ package org.phong.horizon.report.infrastructure.persistence.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
@@ -10,6 +11,7 @@ import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -55,10 +57,12 @@ public class Report {
     @JoinColumn(name = "reporter_id", nullable = false)
     private User reporter;
 
-    @Column(name = "created_at", updatable = false, insertable = false, columnDefinition = "TIMESTAMPTZ DEFAULT NOW()")
+    @Column(name = "created_at", updatable = false, insertable = false)
+    @CreationTimestamp
     private OffsetDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false, columnDefinition = "TIMESTAMPTZ DEFAULT NOW()")
+    @Column(name = "updated_at", insertable = false)
+    @LastModifiedDate
     private OffsetDateTime updatedAt;
 }
 

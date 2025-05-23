@@ -3,6 +3,7 @@ package org.phong.horizon.admin.notification.services;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
+import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.exceptions.NotificationNotFoundException;
 import org.phong.horizon.admin.notification.infrastructure.entities.AdminNotification;
 import org.phong.horizon.admin.notification.mappers.AdminNotificationMapper;
@@ -43,9 +44,8 @@ public class AdminNotificationService {
     }
 
     @Transactional
-    public AdminNotificationDto createNotification(AdminNotificationDto adminNotificationDto) {
-        AdminNotification notification = adminNotificationMapper.toEntity(adminNotificationDto);
-        // Ensure isRead is false for new notifications if not explicitly set
+    public AdminNotificationDto createNotification(CreateAdminNotification createAdminNotificationDto) {
+        AdminNotification notification = adminNotificationMapper.toEntity(createAdminNotificationDto);
         if (notification.getIsRead() == null) {
             notification.setIsRead(false);
         }
