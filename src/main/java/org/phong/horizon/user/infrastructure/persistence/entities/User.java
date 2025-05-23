@@ -87,5 +87,5 @@ public class User extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false, length = 20)
-    private UserStatus status;
+    private UserStatus status = UserStatus.PENDING;
 }

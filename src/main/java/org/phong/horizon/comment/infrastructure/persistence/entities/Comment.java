@@ -66,6 +66,6 @@ public class Comment extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false, length = 20)
-    private CommentStatus status;
+    private CommentStatus status = CommentStatus.PENDING;
 }
 

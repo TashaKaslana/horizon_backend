@@ -7,6 +7,7 @@ import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.enums.CommentErrorEnums;
+import org.phong.horizon.comment.enums.CommentStatus;
 import org.phong.horizon.comment.events.CommentCreated;
 import org.phong.horizon.comment.events.CommentDeleted;
 import org.phong.horizon.comment.events.CommentPinned;
@@ -65,6 +66,8 @@ public class CommentService {
         } else {
             comment.setParentComment(null);
         }
+
+        comment.setStatus(CommentStatus.PENDING);
 
         Comment createdComment = commentRepository.save(comment);
         log.info("Comment created successfully, ID: {}", createdComment.getId());

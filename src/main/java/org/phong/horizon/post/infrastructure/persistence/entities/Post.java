@@ -79,7 +79,7 @@ public class Post extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false, length = 20)
-    private PostStatus status;
+    private PostStatus status = PostStatus.DRAFT;
 }
 
 
