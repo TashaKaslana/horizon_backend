@@ -1,25 +1,25 @@
 CREATE TYPE admin_notification_type AS ENUM (
-    'report',
-    'system',
-    'auth',
-    'moderation',
-    'error',
-    'quota'
+    'REPORT',
+    'SYSTEM',
+    'AUTH',
+    'MODERATION',
+    'ERROR',
+    'QUOTA'
     );
 
 CREATE TYPE notification_severity AS ENUM (
-    'info',
-    'warning',
-    'critical'
+    'INFO',
+    'WARNING',
+    'CRITICAL'
     );
 
 CREATE TYPE notification_related_type AS ENUM (
-    'user',
-    'post',
-    'comment',
-    'storage',
-    'auth',
-    'system'
+    'USER',
+    'POST',
+    'COMMENT',
+    'STORAGE',
+    'AUTH',
+    'SYSTEM'
     );
 
 

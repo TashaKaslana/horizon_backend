@@ -79,7 +79,6 @@ public class Post extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    @ColumnDefault("'Draft'")
     private PostStatus status;
 }
 
