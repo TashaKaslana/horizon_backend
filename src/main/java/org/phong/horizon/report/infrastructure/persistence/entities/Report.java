@@ -3,6 +3,8 @@ package org.phong.horizon.report.infrastructure.persistence.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
@@ -28,12 +30,13 @@ public class Report {
     @Column(name = "moderator_notes", columnDefinition = "TEXT")
     private String moderatorNotes;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ModerationStatus status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "item_type", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "item_type", columnDefinition = "moderation_item_type not null")
     private ModerationItemType itemType;
 
     @ManyToOne(fetch = FetchType.LAZY)

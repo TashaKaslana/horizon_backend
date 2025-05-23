@@ -1,18 +1,17 @@
 CREATE TYPE moderation_status AS ENUM (
-    'Pending',
-    'Reviewed_Approved',
-    'Reviewed_Rejected',
-    'ActionTaken_ContentRemoved',
-    'ActionTaken_UserWarned',
-    'ActionTaken_UserBanned',
-    'Resolved'
+    'PENDING',
+    'REVIEWED_APPROVED',
+    'REVIEWED_REJECTED',
+    'ACTIONTAKEN_CONTENTREMOVED',
+    'ACTIONTAKEN_USERWARNED',
+    'ACTIONTAKEN_USERBANNED',
+    'RESOLVED'
     );
 
-
 CREATE TYPE moderation_item_type AS ENUM (
-    'Post',
-    'Comment',
-    'User'
+    'POST',
+    'COMMENT',
+    'USER'
     );
 
 CREATE TABLE reports
@@ -38,9 +37,9 @@ CREATE TABLE reports
     CONSTRAINT fk_report_user FOREIGN KEY (reported_user_id) REFERENCES users (id) ON DELETE CASCADE,
 
     CHECK (
-        (item_type = 'Post' AND post_id IS NOT NULL AND comment_id IS NULL AND reported_user_id IS NULL) OR
-        (item_type = 'Comment' AND comment_id IS NOT NULL AND post_id IS NULL AND reported_user_id IS NULL) OR
-        (item_type = 'User' AND reported_user_id IS NOT NULL AND post_id IS NULL AND comment_id IS NULL)
+        (item_type = 'POST' AND post_id IS NOT NULL AND comment_id IS NULL AND reported_user_id IS NULL) OR
+        (item_type = 'COMMENT' AND comment_id IS NOT NULL AND post_id IS NULL AND reported_user_id IS NULL) OR
+        (item_type = 'USER' AND reported_user_id IS NOT NULL AND post_id IS NULL AND comment_id IS NULL)
         )
 );
 

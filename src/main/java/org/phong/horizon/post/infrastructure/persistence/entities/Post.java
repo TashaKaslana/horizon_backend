@@ -77,7 +77,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "category_id")
     private PostCategory category;
 
-    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false, length = 20)
     private PostStatus status;
 }

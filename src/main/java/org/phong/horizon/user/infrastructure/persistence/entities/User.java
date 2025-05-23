@@ -4,8 +4,6 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -13,7 +11,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.phong.horizon.user.enums.UserStatus;
 import org.phong.horizon.core.superclass.BaseEntity;
 import org.phong.horizon.user.subdomain.role.entities.Role;
@@ -86,8 +85,7 @@ public class User extends BaseEntity {
     @Column(name = "last_login")
     private Instant lastLogin;
 
-    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false, length = 20)
-    @ColumnDefault("'Pending'")
     private UserStatus status;
 }
