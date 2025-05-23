@@ -31,7 +31,7 @@ public interface ReportMapper {
     @Mapping(target = "reporterId", source = "reporter.id")
     ReportDto toDto(Report report);
 
-    @Mapping(target = "status", constant = "Pending")
+    @Mapping(target = "status", constant = "PENDING")
     Report toEntity(CreateReportRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

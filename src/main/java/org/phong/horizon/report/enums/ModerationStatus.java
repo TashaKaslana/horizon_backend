@@ -1,11 +1,11 @@
 package org.phong.horizon.report.enums;
 
 public enum ModerationStatus {
-    Pending,
-    Reviewed_Approved,
-    Reviewed_Rejected,
-    ActionTaken_ContentRemoved,
-    ActionTaken_UserWarned,
-    ActionTaken_UserBanned,
-    Resolved
+    PENDING,
+    REVIEWED_APPROVED,
+    REVIEWED_REJECTED,
+    ACTIONTAKEN_CONTENTREMOVED,
+    ACTIONTAKEN_USERWARNED,
+    ACTIONTAKEN_USERBANNED,
+    RESOLVED
 }

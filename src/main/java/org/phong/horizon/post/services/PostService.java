@@ -153,7 +153,7 @@ public class PostService {
         post.setCategory(postCategoryService.getRefByName(request.categoryName().toUpperCase()));
 
         if (request.status() == null) {
-            post.setStatus(PostStatus.Draft); // Default to Draft if not provided
+            post.setStatus(PostStatus.DRAFT);
         } else {
             post.setStatus(request.status());
         }
