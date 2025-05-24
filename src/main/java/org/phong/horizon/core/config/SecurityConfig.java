@@ -1,8 +1,8 @@
 package org.phong.horizon.core.config;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.core.exception.CustomAccessDeniedHandler;
-import org.phong.horizon.core.exception.CustomAuthenticationEntryPoint;
+import org.phong.horizon.core.exceptions.CustomAccessDeniedHandler;
+import org.phong.horizon.core.exceptions.CustomAuthenticationEntryPoint;
 import org.phong.horizon.core.services.InternalUserIdEnhancerFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,12 +1,18 @@
-package org.phong.horizon.core.exception;
+package org.phong.horizon.core.exceptions;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.admin.logentry.dtos.CreateLogEntryRequest;
+import org.phong.horizon.admin.logentry.enums.LogSeverity;
+import org.phong.horizon.admin.logentry.events.CreateLogEntryEvent;
 import org.phong.horizon.core.enums.SystemError;
 import org.phong.horizon.core.responses.ApiErrorResponse;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,11 +36,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final ApplicationEventPublisher eventPublisher;
+    private final AuthService authService;
+
+    private void publishLogEvent(LogSeverity severity, String eventMessage, String source, Throwable throwable, Map<String, Object> additionalContext) {
+        UUID userId = null;
+        try {
+            userId = authService.getUserIdFromContext();
+        } catch (Exception e) {
+            log.trace("Could not retrieve userId for log event: {}", e.getMessage());
+        }
+
+        CreateLogEntryRequest logRequest = new CreateLogEntryRequest();
+        logRequest.setSeverity(severity);
+        logRequest.setMessage(eventMessage + (throwable != null ? " - Exception: " + throwable.getMessage() : ""));
+        logRequest.setSource(source);
+        logRequest.setUserId(userId);
+
+        Map<String, Object> context = new HashMap<>();
+        if (additionalContext != null) {
+            context.putAll(additionalContext);
+        }
+        if (throwable != null) {
+            context.put("exceptionType", throwable.getClass().getName());
+        }
+        logRequest.setContext(context);
+
+        try {
+            eventPublisher.publishEvent(new CreateLogEntryEvent(this, logRequest));
+        } catch (Exception e) {
+            log.error("Failed to publish log event: {}", e.getMessage(), e);
+        }
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RestApiResponse<Void>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                               @NonNull WebRequest request) {
@@ -50,6 +92,11 @@ public class GlobalExceptionHandler {
                 fieldErrors.put(error.getField(), error.getDefaultMessage())
         );
 
+        Map<String, Object> logContext = new HashMap<>();
+        logContext.put("fieldErrors", fieldErrors);
+        logContext.put("globalErrors", globalErrors);
+        publishLogEvent(LogSeverity.WARNING, "Validation failed", HttpRequestUtils.getRequestPath(request), ex, logContext);
+
         return RestApiResponse.validationError(
                 HttpRequestUtils.getRequestPath(request),
                 SystemError.VALIDATION_FAILED_MSG.getErrorMessage(),
@@ -62,7 +109,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestApiResponse<Void>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                               @NonNull WebRequest request) {
         log.warn("Malformed JSON request: {}", ex.getMessage());
-
+        publishLogEvent(LogSeverity.WARNING, "Malformed JSON request", HttpRequestUtils.getRequestPath(request), ex, null);
         return RestApiResponse.badRequest(HttpRequestUtils.getRequestPath(request), SystemError.MALFORMED_REQUEST_MSG.getErrorMessage());
     }
 
@@ -72,6 +119,7 @@ public class GlobalExceptionHandler {
             @NonNull WebRequest request) {
         String message = SystemError.METHOD_NOT_SUPPORTED_MSG + ". Supported methods: " + ex.getSupportedHttpMethods();
         log.warn("Method Not Supported: {}", ex.getMessage());
+        publishLogEvent(LogSeverity.WARNING, "HTTP method not supported", HttpRequestUtils.getRequestPath(request), ex, Map.of("supportedMethods", String.valueOf(ex.getSupportedHttpMethods())));
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setAllow(Objects.requireNonNull(ex.getSupportedHttpMethods()));
@@ -94,7 +142,7 @@ public class GlobalExceptionHandler {
             @NonNull WebRequest request) {
         log.warn("Missing Request Parameter: {}", ex.getParameterName());
         String message = SystemError.MISSING_PARAMETER_MSG.getErrorMessage() + ": " + ex.getParameterName() + " (" + ex.getParameterType() + ")";
-
+        publishLogEvent(LogSeverity.WARNING, "Missing request parameter", HttpRequestUtils.getRequestPath(request), ex, Map.of("parameterName", ex.getParameterName(), "parameterType", ex.getParameterType()));
         ApiErrorResponse apiError = new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 message,
@@ -118,7 +166,7 @@ public class GlobalExceptionHandler {
                         violation -> violation.getPropertyPath().toString(),
                         ConstraintViolation::getMessage
                 ));
-
+        publishLogEvent(LogSeverity.WARNING, "Constraint violation", HttpRequestUtils.getRequestPath(request), ex, Map.of("constraintErrors", constraintErrors));
         ApiErrorResponse apiError = new ApiErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 SystemError.VALIDATION_FAILED_MSG,
@@ -134,11 +182,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestApiResponse<Void>> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex, WebRequest request) {
         log.warn("Data Integrity Violation: {}", ex.getMessage());
-
+        String rootCauseMessage = ex.getRootCause() != null ? ex.getRootCause().getMessage() : "N/A";
         if (ex.getRootCause() != null) {
-            log.warn("Root cause: {}", ex.getRootCause().getMessage());
+            log.warn("Root cause: {}", rootCauseMessage);
         }
-
+        publishLogEvent(LogSeverity.WARNING, "Data integrity violation", HttpRequestUtils.getRequestPath(request), ex, Map.of("rootCause", rootCauseMessage));
         return RestApiResponse.conflict(
                 HttpRequestUtils.getRequestPath(request),
                 SystemError.DATA_INTEGRITY_VIOLATION.getErrorMessage()
@@ -164,6 +212,18 @@ public class GlobalExceptionHandler {
                 null
         );
 
+        publishLogEvent(
+                LogSeverity.WARNING,
+                "Method argument type mismatch",
+                HttpRequestUtils.getRequestPath(request),
+                ex,
+                Map.of(
+                        "argumentName", ex.getName(),
+                        "requiredType", ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "null",
+                        "providedValueType", ex.getValue() != null ? ex.getValue().getClass().getSimpleName() : "null"
+                )
+        );
+
         return RestApiResponse.badRequest(apiError, SystemError.INVALID_ARGUMENT_TYPE_MSG.getErrorMessage());
     }
 
@@ -171,6 +231,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestApiResponse<Void>> handleNoHandlerFoundException(
             NoHandlerFoundException ex, WebRequest request) {
         log.debug("No Handler Found: {}", ex.getMessage());
+
+        publishLogEvent(
+                LogSeverity.WARNING,
+                "No handler found for request",
+                HttpRequestUtils.getRequestPath(request),
+                ex,
+                Map.of(
+                        "httpMethod", ex.getHttpMethod(),
+                        "requestURL", ex.getRequestURL()
+                )
+        );
 
         return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), SystemError.NOT_FOUND_ENDPOINT.getErrorMessage());
     }
@@ -180,13 +251,29 @@ public class GlobalExceptionHandler {
             AccessDeniedException ex, WebRequest request) {
         log.warn("Access Denied: {}", ex.getMessage());
 
+        publishLogEvent(
+                LogSeverity.WARNING,
+                "Access denied",
+                HttpRequestUtils.getRequestPath(request),
+                ex,
+                null
+        );
+
         return RestApiResponse.forbidden(HttpRequestUtils.getRequestPath(request), SystemError.ACCESS_DENIED.getErrorMessage());
     }
 
-    @ExceptionHandler({ AuthenticationException.class, InsufficientAuthenticationException.class })
+    @ExceptionHandler({AuthenticationException.class, InsufficientAuthenticationException.class})
     public ResponseEntity<RestApiResponse<Void>> handleAuthenticationException(
             AuthenticationException ex, WebRequest request) {
         log.warn("Authentication Failed: {}", ex.getMessage());
+
+        publishLogEvent(
+                LogSeverity.WARNING,
+                "Authentication failed",
+                HttpRequestUtils.getRequestPath(request),
+                ex,
+                null
+        );
 
         return RestApiResponse.unauthorized(HttpRequestUtils.getRequestPath(request), SystemError.AUTHENTICATION_FAILED.getErrorMessage());
     }
@@ -196,6 +283,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<RestApiResponse<Void>> handleGlobalException(
             Exception ex, WebRequest request) {
         log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
+
+        publishLogEvent(
+                LogSeverity.ERROR,
+                "Unhandled exception occurred",
+                HttpRequestUtils.getRequestPath(request),
+                ex,
+                null
+        );
 
         return RestApiResponse.internalServerError(HttpRequestUtils.getRequestPath(request), SystemError.GENERIC_ERROR_MSG.getErrorMessage());
     }
