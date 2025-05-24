@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.admin.logentry.dtos.CreateLogEntryRequest;
 import org.phong.horizon.admin.logentry.dtos.LogEntryDto;
 import org.phong.horizon.admin.logentry.dtos.LogSearchCriteriaDto;
+import org.phong.horizon.admin.logentry.exceptions.LogEntryNotFoundException;
 import org.phong.horizon.admin.logentry.infrastructure.entities.LogEntry;
 import org.phong.horizon.admin.logentry.infrastructure.mapstruct.LogMapper;
 import org.phong.horizon.admin.logentry.infrastructure.repositories.LogEntryRepository;
@@ -53,7 +54,7 @@ public class LogService {
     public LogEntryDto getLogEntryById(UUID id) {
         return logEntryRepository.findById(id)
                 .map(logMapper::toDto)
-                .orElseThrow(() -> new RuntimeException("LogEntry not found with id: " + id));
+                .orElseThrow(() -> new LogEntryNotFoundException("LogEntry not found with id: " + id));
     }
 }
 
