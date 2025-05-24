@@ -35,13 +35,4 @@ public class CommentSpecificExceptionHandler {
         log.warn("Comment Not Found: {}", ex.getMessage());
         return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), ex.getMessage());
     }
-
-    @ExceptionHandler(ReportCommentNotFoundException.class)
-    public ResponseEntity<RestApiResponse<Void>> handleReportCommentNotFoundException(ReportCommentNotFoundException ex,
-                                                                                       WebRequest request) {
-        log.debug("Report Comment Not Found: {}", ex.getMessage());
-        return RestApiResponse.notFound(HttpRequestUtils.getRequestPath(request), ex.getMessage());
-    }
-
-
 }

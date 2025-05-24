@@ -10,6 +10,7 @@ import org.phong.horizon.report.dto.ReportDto;
 import org.phong.horizon.report.enums.ReportErrorCode;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.enums.ModerationItemType;
+import org.phong.horizon.report.events.ReportCreatedEvent;
 import org.phong.horizon.report.exceptions.InvalidReportInputException;
 import org.phong.horizon.report.exceptions.ReportNotFoundException;
 import org.phong.horizon.report.infrastructure.persistence.entities.Report;
@@ -18,6 +19,7 @@ import org.phong.horizon.report.infrastructure.mapper.ReportMapper;
 import org.phong.horizon.report.specifications.ReportSpecifications;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,10 +36,13 @@ public class ReportService {
     private final UserService userService;
     private final PostService postService;
     private final CommentService commentService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public ReportDto createReport(CreateReportRequest request, UUID reporterId) {
         User reporter = userService.findById(reporterId);
+        UUID actualReportedUserId;
+        UUID reportedItemId;
 
         Report report = reportMapper.toEntity(request);
         report.setReporter(reporter);
@@ -52,6 +57,8 @@ public class ReportService {
                 if (post.getUser().getId().equals(reporterId)) {
                     throw new InvalidReportInputException("Users cannot report their own posts.");
                 }
+                actualReportedUserId = post.getUser().getId();
+                reportedItemId = post.getId();
                 break;
             case COMMENT:
                 if (request.getCommentId() == null) {
@@ -63,6 +70,8 @@ public class ReportService {
                 if (comment.getUser().getId().equals(reporterId)) {
                     throw new InvalidReportInputException("Users cannot report their own comments.");
                 }
+                actualReportedUserId = comment.getUser().getId();
+                reportedItemId = comment.getId();
                 break;
             case USER:
                 if (request.getReportedUserId() == null) {
@@ -73,12 +82,25 @@ public class ReportService {
                 if (reportedUser.getId().equals(reporterId)) {
                     throw new InvalidReportInputException(ReportErrorCode.CANNOT_REPORT_SELF);
                 }
+                actualReportedUserId = reportedUser.getId();
+                reportedItemId = reportedUser.getId();
                 break;
             default:
                 throw new InvalidReportInputException(ReportErrorCode.INVALID_ITEM_TYPE);
         }
 
         Report savedReport = reportRepository.save(report);
+
+        eventPublisher.publishEvent(new ReportCreatedEvent(
+                this,
+                savedReport.getId(),
+                reporterId,
+                reportedItemId,
+                request.getItemType(),
+                actualReportedUserId,
+                request.getReason()
+        ));
+
         return reportMapper.toDto(savedReport);
     }
 

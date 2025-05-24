@@ -1,4 +1,5 @@
 drop table if exists report_comment;
+DROP TABLE IF EXISTS post_report;
 
 ALTER TABLE roles
     ADD column created_by UUID;

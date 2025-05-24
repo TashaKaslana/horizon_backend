@@ -42,5 +42,3 @@ CREATE TABLE reports
         (item_type = 'USER' AND reported_user_id IS NOT NULL AND post_id IS NULL AND comment_id IS NULL)
         )
 );
-
-drop table post_report;
