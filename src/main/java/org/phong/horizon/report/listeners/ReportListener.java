@@ -6,8 +6,9 @@ import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotif
 import org.phong.horizon.admin.notification.enums.AdminNotificationType;
 import org.phong.horizon.admin.notification.enums.NotificationRelatedType;
 import org.phong.horizon.admin.notification.enums.NotificationSeverity;
-import org.phong.horizon.admin.notification.services.AdminNotificationService;
+import org.phong.horizon.admin.notification.events.CreateAdminNotificationEvent;
 import org.phong.horizon.report.events.ReportCreatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @AllArgsConstructor
 @Slf4j
 public class ReportListener {
-    private final AdminNotificationService adminNotificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @EventListener
     @Async
@@ -26,7 +27,7 @@ public class ReportListener {
         String title;
         String message;
         NotificationRelatedType relatedType;
-        NotificationSeverity severity = NotificationSeverity.WARNING; // Default severity
+        NotificationSeverity severity = NotificationSeverity.WARNING;
 
         switch (event.getItemType()) {
             case POST:
@@ -48,11 +49,11 @@ public class ReportListener {
                 relatedType = NotificationRelatedType.USER;
                 break;
             default:
-                log.warn("Unhandled item type in ReportListener: {}", event.getItemType());
+                log.warn("Unhandled item type in ReportListener for admin notification: {}", event.getItemType());
                 return;
         }
 
-        CreateAdminNotification adminNotification = new CreateAdminNotification(
+        CreateAdminNotification adminNotificationDto = new CreateAdminNotification(
                 title,
                 message,
                 AdminNotificationType.REPORT,
@@ -63,10 +64,10 @@ public class ReportListener {
         );
 
         try {
-            adminNotificationService.createNotification(adminNotification);
-            log.debug("Admin notification created for reportId: {}", event.getReportId());
+            eventPublisher.publishEvent(new CreateAdminNotificationEvent(this, adminNotificationDto));
+            log.debug("CreateAdminNotificationEvent published for reportId: {}", event.getReportId());
         } catch (Exception e) {
-            log.error("Failed to create admin notification for reportId: {}. Error: {}", event.getReportId(), e.getMessage(), e);
+            log.error("Failed to publish CreateAdminNotificationEvent for reportId: {}. Error: {}", event.getReportId(), e.getMessage(), e);
         }
     }
 }
