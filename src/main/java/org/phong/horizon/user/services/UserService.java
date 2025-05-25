@@ -47,6 +47,7 @@ public class UserService {
     private final AuthService authService;
     private final ApplicationEventPublisher publisher;
 
+    @Transactional(readOnly = true)
     public UserRespondDto getCurrentUser() {
         return userMapper.toDto(authService.getUser());
     }
@@ -72,6 +73,7 @@ public class UserService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    @Transactional(readOnly = true)
     public Page<UserSummaryRespond> getListUserSummary(Pageable pageable) {
         Page<User> users = userRepository.findAll(pageable);
 
@@ -81,6 +83,11 @@ public class UserService {
     @Transactional
     public UserIntroduction getUserIntroduction(UUID uuid) {
         return userMapper.toDto5(findById(uuid));
+    }
+
+    @Transactional
+    public boolean isUserExistsWithAuth0Id(String auth0Id) {
+        return userRepository.existsByAuth0Id(auth0Id);
     }
 
     @Transactional

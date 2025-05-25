@@ -50,6 +50,16 @@ public class UserController {
         return RestApiResponse.success(userService.getUserIntroduction(id));
     }
 
+    @GetMapping("/{userId}/exists")
+    public ResponseEntity<RestApiResponse<Boolean>> isUserExists(@PathVariable UUID userId) {
+        return RestApiResponse.success(userService.existsById(userId));
+    }
+
+    @GetMapping("/auth0/{auth0Id}/exists")
+    public ResponseEntity<RestApiResponse<Boolean>> isUserExistsByAuth0Id(@PathVariable String auth0Id) {
+        return RestApiResponse.success(userService.isUserExistsWithAuth0Id(auth0Id));
+    }
+
     @PostMapping()
     @LogActivity(
             activityCode = ActivityTypeCode.USER_CREATE,

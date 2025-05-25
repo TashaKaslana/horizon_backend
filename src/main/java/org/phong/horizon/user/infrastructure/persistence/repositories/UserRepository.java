@@ -34,4 +34,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
                            @Param("email") String email);
 
     boolean existsByRoleId(UUID id);
+
+    boolean existsByAuth0Id(String auth0Id);
 }
