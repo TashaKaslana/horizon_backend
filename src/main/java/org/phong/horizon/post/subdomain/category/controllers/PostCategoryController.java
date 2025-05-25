@@ -12,6 +12,7 @@ import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
 import org.phong.horizon.post.subdomain.category.dtos.UpdatePostCategoryRequest;
 import org.phong.horizon.post.subdomain.category.entities.PostCategory;
 import org.phong.horizon.post.subdomain.category.services.PostCategoryService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class PostCategoryController {
     PostCategoryService postCategoryService;
 
     @GetMapping()
-    public ResponseEntity<RestApiResponse<List<PostCategory>>> getPostCategories(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<PostCategory>>> getPostCategories(@ParameterObject Pageable pageable) {
         Page<PostCategory> categories = postCategoryService.getPostCategories(pageable);
 
         return RestApiResponse.success(categories);

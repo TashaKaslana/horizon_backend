@@ -9,6 +9,7 @@ import org.phong.horizon.report.dto.ReportDto;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.services.ReportService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class ReportController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<RestApiResponse<List<ReportDto>>> getAllReports(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<ReportDto>>> getAllReports(@ParameterObject Pageable pageable) {
         Page<ReportDto> reports = reportService.getAllReports(pageable);
         return RestApiResponse.success(reports);
     }
@@ -59,7 +60,7 @@ public class ReportController {
             @RequestParam(required = false) ModerationStatus status,
             @RequestParam(required = false) ModerationItemType itemType,
             @RequestParam(required = false) UUID itemId,
-            Pageable pageable) {
+            @ParameterObject Pageable pageable) {
         Page<ReportDto> reports = reportService.searchReports(reporterId, reportedUserId, status, itemType, itemId, pageable);
         return RestApiResponse.success(reports);
     }

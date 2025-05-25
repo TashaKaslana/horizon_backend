@@ -7,6 +7,7 @@ import org.phong.horizon.post.subdomain.tag.dto.CreateTagRequest;
 import org.phong.horizon.post.subdomain.tag.dto.TagResponse;
 import org.phong.horizon.post.subdomain.tag.dto.UpdateTagRequest;
 import org.phong.horizon.post.subdomain.tag.service.TagService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class PostTagController {
     public ResponseEntity<RestApiResponse<List<TagResponse>>> getAllTags(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String slug,
-            Pageable pageable) {
+            @ParameterObject Pageable pageable) {
         Page<TagResponse> tags = tagService.getAllTags(name, slug, pageable);
         return RestApiResponse.success(tags);
     }

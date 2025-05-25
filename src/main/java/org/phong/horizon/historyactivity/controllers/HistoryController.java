@@ -6,6 +6,7 @@ import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.historyactivity.dtos.ActivityDisplayDto;
 import org.phong.horizon.historyactivity.dtos.HistoryActivityDto;
 import org.phong.horizon.historyactivity.services.ActivityLoggingService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +25,12 @@ public class HistoryController {
     private final AuthService authService;
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<RestApiResponse<List<HistoryActivityDto>>> getHistoriesByUserId(@PathVariable UUID userId, Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<HistoryActivityDto>>> getHistoriesByUserId(@PathVariable UUID userId, @ParameterObject Pageable pageable) {
         return RestApiResponse.success(activityLoggingService.getAllActivitiesByUserId(userId, pageable));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<RestApiResponse<List<ActivityDisplayDto>>> getHistoriesForMe(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<ActivityDisplayDto>>> getHistoriesForMe(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(activityLoggingService.getActivitiesWithJsonMessage(
                 authService.getUserIdFromContext(),
                 pageable

@@ -8,6 +8,7 @@ import org.phong.horizon.notification.dtos.NotificationResponse;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.services.NotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,9 @@ public class AdminNotificationClientController {
     private final NotificationService notificationService;
 
     @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<RestApiResponse<List<NotificationResponse>>> getAllNotificationByRecipientId(Pageable pageable,
+    public ResponseEntity<RestApiResponse<List<NotificationResponse>>> getAllNotificationByRecipientId(@ParameterObject Pageable pageable,
                                                                                                        @PathVariable UUID recipientId,
-                                                                                                       @Valid NotificationFilterCriteria filters) {
+                                                                                                       @Valid @ParameterObject NotificationFilterCriteria filters) {
         Page<NotificationResponse> notifications = notificationService.getAllNotificationByRecipientId(pageable, recipientId, filters);
         return RestApiResponse.success(notifications);
     }

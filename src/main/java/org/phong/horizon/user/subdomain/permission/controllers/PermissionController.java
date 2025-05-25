@@ -7,6 +7,7 @@ import org.phong.horizon.user.subdomain.permission.dtos.CreatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.dtos.PermissionDto;
 import org.phong.horizon.user.subdomain.permission.dtos.UpdatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.services.PermissionService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class PermissionController {
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<List<PermissionDto>>> getAllPermissions(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<PermissionDto>>> getAllPermissions(@ParameterObject Pageable pageable) {
         Page<PermissionDto> permissions = permissionService.getAllPermissions(pageable);
         return RestApiResponse.success(permissions);
     }

@@ -6,6 +6,7 @@ import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificatio
 import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.services.AdminNotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class AdminNotificationController {
 
     @GetMapping
     public ResponseEntity<RestApiResponse<List<AdminNotificationDto>>> getAllNotifications(
-            Pageable pageable,
-            AdminNotificationFilterDto filterDto) {
+            @ParameterObject Pageable pageable,
+            @ParameterObject AdminNotificationFilterDto filterDto) {
         Page<AdminNotificationDto> notifications = adminNotificationService.getAllNotifications(pageable, filterDto);
         return RestApiResponse.success(notifications);
     }

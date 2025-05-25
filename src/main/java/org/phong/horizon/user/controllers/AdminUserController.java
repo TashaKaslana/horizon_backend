@@ -9,6 +9,7 @@ import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
 import org.phong.horizon.user.services.UserService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +35,7 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<List<UserSummaryRespond>>> getAllUsers(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<UserSummaryRespond>>> getAllUsers(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(userService.getListUserSummary(pageable));
     }
 

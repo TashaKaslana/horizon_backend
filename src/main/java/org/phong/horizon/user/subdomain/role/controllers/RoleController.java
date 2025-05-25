@@ -8,6 +8,7 @@ import org.phong.horizon.user.subdomain.role.dtos.CreateRoleRequest;
 import org.phong.horizon.user.subdomain.role.dtos.RoleDto;
 import org.phong.horizon.user.subdomain.role.dtos.UpdateRoleRequest;
 import org.phong.horizon.user.subdomain.role.services.RoleService;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class RoleController {
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<List<RoleDto>>> getAllRoles(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<RoleDto>>> getAllRoles(@ParameterObject Pageable pageable) {
         Page<RoleDto> roles = roleService.getAllRoles(pageable);
         return RestApiResponse.success(roles);
     }

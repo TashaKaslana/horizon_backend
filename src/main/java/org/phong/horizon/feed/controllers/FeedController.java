@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.feed.dtos.FeedPage;
 import org.phong.horizon.feed.services.FeedService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +23,14 @@ public class FeedController {
     private final FeedService feedService;
 
     @GetMapping()
-    public ResponseEntity<RestApiResponse<List<FeedPage>>> getFeed(Pageable pageable,
+    public ResponseEntity<RestApiResponse<List<FeedPage>>> getFeed(@ParameterObject Pageable pageable,
                                                                    @RequestParam(required = false) UUID excludePostId,
                                                                    @RequestParam(required = false) String categoryName) {
         return RestApiResponse.success(feedService.getFeedForMe(pageable, excludePostId, categoryName));
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<RestApiResponse<List<FeedPage>>> getFeedByUserId(Pageable pageable,
+    public ResponseEntity<RestApiResponse<List<FeedPage>>> getFeedByUserId(@ParameterObject Pageable pageable,
                                                                    @PathVariable UUID userId,
                                                                    @RequestParam(required = false) UUID excludePostId) {
         return RestApiResponse.success(feedService.getFeedByUserId(pageable, userId, excludePostId));

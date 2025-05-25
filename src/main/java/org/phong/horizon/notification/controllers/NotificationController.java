@@ -6,6 +6,7 @@ import org.phong.horizon.notification.dtos.NotificationResponse;
 import org.phong.horizon.notification.dtos.NotificationStatistic;
 import org.phong.horizon.notification.services.NotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,8 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/my")
-    public ResponseEntity<RestApiResponse<List<NotificationResponse>>> getMyNotifications(Pageable pageable,
-                                                                                          NotificationFilterCriteria filters) {
+    public ResponseEntity<RestApiResponse<List<NotificationResponse>>> getMyNotifications(@ParameterObject Pageable pageable,
+                                                                                          @ParameterObject NotificationFilterCriteria filters) {
         if (filters.getIsDeleted() == null) {
             filters.setIsDeleted(false);
         }

@@ -8,6 +8,7 @@ import org.phong.horizon.follow.dtos.FollowOverview;
 import org.phong.horizon.follow.services.FollowService;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,22 +23,22 @@ public class FollowController {
     private final FollowService followService;
 
     @GetMapping("/me/followers")
-    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getMyFollowers(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getMyFollowers(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(followService.getMyFollowers(pageable));
     }
 
     @GetMapping("/me/following")
-    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getMyFollowing(Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getMyFollowing(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(followService.getMyFollowing(pageable));
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getFollowersByUserId(@PathVariable UUID userId, Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getFollowersByUserId(@PathVariable UUID userId, @ParameterObject Pageable pageable) {
         return RestApiResponse.success(followService.getFollowersByUserId(userId, pageable));
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getFollowingByUserId(@PathVariable UUID userId, Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<FollowOneSideRespond>>> getFollowingByUserId(@PathVariable UUID userId, @ParameterObject Pageable pageable) {
         return RestApiResponse.success(followService.getFollowingByUserId(userId, pageable));
     }
 
