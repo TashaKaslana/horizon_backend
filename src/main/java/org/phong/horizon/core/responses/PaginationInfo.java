@@ -13,7 +13,7 @@ import org.springframework.data.domain.Page;
 public class PaginationInfo {
     private int currentPage;
     private int pageSize;
-    private long totalItems;
+    private int totalItems;
     private int totalPages;
     private boolean hasNext;
     private boolean hasPrevious;
@@ -21,7 +21,7 @@ public class PaginationInfo {
     public <T> PaginationInfo(Page<T> page) {
         this.currentPage = page.getNumber();
         this.pageSize = page.getSize();
-        this.totalItems = page.getTotalElements();
+        this.totalItems = Math.toIntExact(page.getTotalElements());
         this.totalPages = page.getTotalPages();
         this.hasNext = page.hasNext();
         this.hasPrevious = page.hasPrevious();

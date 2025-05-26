@@ -1,7 +1,5 @@
 package org.phong.horizon.user.subdomain.permission.dtos;
 
-import lombok.Builder;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
