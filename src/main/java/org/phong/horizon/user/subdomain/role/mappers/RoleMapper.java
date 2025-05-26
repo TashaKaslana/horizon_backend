@@ -69,15 +69,14 @@ public interface RoleMapper {
         // This is a simplified version. In a real scenario, you'd use the injected PermissionMapper.
         return value.stream()
                 .map(RolePermission::getPermission)
-                .map(permission -> {
-                    PermissionDto dto = new PermissionDto();
-                    dto.setId(permission.getId());
-                    dto.setName(permission.getName());
-                    dto.setSlug(permission.getSlug());
-                    dto.setDescription(permission.getDescription());
-                    dto.setModule(permission.getModule());
-                    return dto;
-                })
+                .map(permission -> new PermissionDto(
+                        permission.getCreatedAt(),
+                        permission.getId(),
+                        permission.getName(),
+                        permission.getSlug(),
+                        permission.getDescription(),
+                        permission.getModule()
+                ))
                 .collect(Collectors.toSet());
     }
 }
