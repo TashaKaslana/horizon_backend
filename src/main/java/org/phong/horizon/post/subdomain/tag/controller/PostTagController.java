@@ -51,5 +51,11 @@ public class PostTagController {
         TagResponse updatedTag = tagService.updateTag(tagId, updateTagRequest);
         return RestApiResponse.success(updatedTag);
     }
+
+    @DeleteMapping("/{tagId}")
+    public ResponseEntity<RestApiResponse<Void>> deleteTag(@PathVariable UUID tagId) {
+        tagService.deleteTag(tagId);
+        return RestApiResponse.noContent();
+    }
 }
 

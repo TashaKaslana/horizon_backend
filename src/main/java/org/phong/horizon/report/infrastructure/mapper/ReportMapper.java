@@ -24,11 +24,6 @@ import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
         unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE
 )
 public interface ReportMapper {
-
-    @Mapping(target = "postId", source = "post.id")
-    @Mapping(target = "commentId", source = "comment.id")
-    @Mapping(target = "reportedUserId", source = "reportedUser.id")
-    @Mapping(target = "reporterId", source = "reporter.id")
     ReportDto toDto(Report report);
 
     @Mapping(target = "status", constant = "PENDING")

@@ -110,5 +110,15 @@ public class TagService {
         log.info("Tag with id {} updated by user {}", updatedTag.getId(), currentUserId);
         return tagMapper.toTagResponse(updatedTag);
     }
+
+    @Transactional
+    public void deleteTag(UUID tagId) {
+        UUID currentUserId = authService.getUserIdFromContext();
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new TagNotFoundException("Tag not found with id: " + tagId));
+
+        tagRepository.delete(tag);
+        log.debug("Tag with id {} deleted by user {}", tag.getId(), currentUserId);
+    }
 }
 

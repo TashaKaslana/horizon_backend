@@ -82,7 +82,7 @@ public class UserController {
     }
 
     @PutMapping("me/update-image")
-    public ResponseEntity<RestApiResponse<Void>> updateUserAccount(@Valid @RequestBody UserImageUpdate request) {
+    public ResponseEntity<RestApiResponse<Void>> updateUserImage(@Valid @RequestBody UserImageUpdate request) {
         userService.updateCurrentUserImage(request);
         return RestApiResponse.success();
     }
