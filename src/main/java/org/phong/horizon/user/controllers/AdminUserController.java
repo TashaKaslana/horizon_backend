@@ -4,6 +4,7 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
+import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
@@ -37,6 +38,12 @@ public class AdminUserController {
     @GetMapping
     public ResponseEntity<RestApiResponse<List<UserSummaryRespond>>> getAllUsers(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(userService.getListUserSummary(pageable));
+    }
+
+    @GetMapping
+    @RequestMapping("/intro")
+    public ResponseEntity<RestApiResponse<List<UserIntroduction>>> getAllUserIntroductions(@ParameterObject Pageable pageable) {
+        return RestApiResponse.success(userService.getUserIntroductionList(pageable));
     }
 
     @GetMapping("/{id}")

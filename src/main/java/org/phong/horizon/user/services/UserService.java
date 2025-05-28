@@ -85,6 +85,12 @@ public class UserService {
     }
 
     @Transactional
+    public Page<UserIntroduction> getUserIntroductionList(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(userMapper::toDto5);
+    }
+
+    @Transactional
     public boolean isUserExistsWithAuth0Id(String auth0Id) {
         return userRepository.existsByAuth0Id(auth0Id);
     }
@@ -123,6 +129,9 @@ public class UserService {
         } else {
             user.setStatus(userCreateDto.status());
         }
+
+        user.setDisplayName(userCreateDto.username());
+
         User createdUser = userRepository.save(user);
 
         log.info("Created user: {}", createdUser);
