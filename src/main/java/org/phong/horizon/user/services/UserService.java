@@ -7,7 +7,6 @@ import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
-import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserImageUpdate;
 import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
@@ -107,7 +106,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserCreatedDto createUser(UserCreateDto userCreateDto) {
+    public UserRespondDto createUser(UserCreateDto userCreateDto) {
         boolean isAlreadyExist = userRepository.isAlreadyExist(
                 userCreateDto.auth0Id(), userCreateDto.username(), userCreateDto.email()
         );
@@ -132,7 +131,7 @@ public class UserService {
                 this, createdUser.getId(), createdUser.getUsername(), createdUser.getEmail()
         ));
 
-        return userMapper.toDto4(createdUser);
+        return userMapper.toDto(createdUser);
     }
 
     @Transactional
@@ -207,7 +206,7 @@ public class UserService {
 
     //TODO: finish
     @Transactional
-    public void updateCurrentUserImage(UserImageUpdate request) {
+    public UserRespondDto updateCurrentUserImage(UserImageUpdate request) {
         User user = findById(authService.getUserIdFromContext());
 //        User oldUser = userMapper.cloneUser(user);
 
@@ -215,7 +214,7 @@ public class UserService {
 //        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
 //        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
 
-        userRepository.save(updatedUser);
+        return userMapper.toDto(userRepository.save(updatedUser));
     }
 
 //    private void updateRoles(User user, List<String> roles) {
