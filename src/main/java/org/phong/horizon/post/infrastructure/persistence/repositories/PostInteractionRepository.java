@@ -5,6 +5,7 @@ import org.phong.horizon.post.infrastructure.persistence.entities.PostInteractio
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,4 +28,6 @@ public interface PostInteractionRepository extends JpaRepository<PostInteraction
 
     @Query("SELECT pi.post.id, COUNT(pi) FROM PostInteraction pi WHERE pi.post.id IN :postIds GROUP BY pi.post.id")
     List<Object[]> countPostInteractionByPostIds(List<UUID> postIds);
+
+    long countByCreatedAtAfter(Instant createdAtAfter);
 }

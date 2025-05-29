@@ -21,4 +21,6 @@ public interface ViewRepository extends JpaRepository<PostView, UUID> {
   long countAllByUserIdIs(UUID userId);
 
     long countAllByPostId(UUID postId);
+
+  double countByViewedAtAfter(LocalDateTime viewedAtAfter);
 }
