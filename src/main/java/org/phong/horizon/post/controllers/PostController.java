@@ -66,10 +66,10 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<RestApiResponse<Void>> updatePost(@PathVariable UUID postId,
-                                           @Valid @RequestBody UpdatePostRequest request) {
-        postService.updatePost(postId, request);
-        return RestApiResponse.noContent();
+    public ResponseEntity<RestApiResponse<PostResponse>> updatePost(@PathVariable UUID postId,
+                                                                    @Valid @RequestBody UpdatePostRequest request) {
+
+        return RestApiResponse.success(postService.updatePost(postId, request));
     }
 
     @DeleteMapping("/{postId}")

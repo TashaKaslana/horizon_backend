@@ -3,6 +3,7 @@ package org.phong.horizon.post.controllers;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.post.dtos.PostAdminViewDto;
 import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.core.responses.RestApiResponse;
@@ -27,6 +28,16 @@ public class AdminPostController {
     @GetMapping
     public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPostsForAdmin(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(postService.getAllPostsForAdmin(pageable));
+    }
+
+    @GetMapping("/all/aggregate")
+    public ResponseEntity<RestApiResponse<List<PostAdminViewDto>>> getAllPostForAdmin(@ParameterObject Pageable pageable) {
+        return RestApiResponse.success(postService.getPostsForAdmin(pageable));
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<RestApiResponse<PostAdminViewDto>> getPostByIdForAdmin(@PathVariable UUID postId) {
+        return RestApiResponse.success(postService.getPostByIdForAdmin(postId));
     }
 
     @DeleteMapping("/{postId}")

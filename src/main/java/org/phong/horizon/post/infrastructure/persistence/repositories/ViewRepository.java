@@ -19,4 +19,6 @@ public interface ViewRepository extends JpaRepository<PostView, UUID> {
   List<Object[]> countViewsByPostIds(@Param("postIds") List<UUID> postIds);
 
   long countAllByUserIdIs(UUID userId);
+
+    long countAllByPostId(UUID postId);
 }

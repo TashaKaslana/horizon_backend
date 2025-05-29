@@ -3,17 +3,18 @@ package org.phong.horizon.post.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.phong.horizon.post.enums.PostStatus;
 import org.phong.horizon.core.enums.Role;
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.dtos.CreatePostRequest;
+import org.phong.horizon.post.dtos.PostAdminViewDto;
 import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.enums.PostErrorEnums;
+import org.phong.horizon.post.enums.PostStatus;
 import org.phong.horizon.post.events.PostCreatedEvent;
 import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
@@ -109,10 +110,9 @@ public class PostService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public List<PostResponse> getAllPostsForAdmin() {
-        return postRepository.findAll().stream()
-                .map(postMapper::toDto2)
-                .collect(Collectors.toList());
+    public Page<PostResponse> getAllPostsForAdmin(Pageable pageable) {
+        return postRepository.findAll(pageable)
+                .map(postMapper::toDto2);
     }
 
     @Transactional(readOnly = true)
@@ -126,6 +126,11 @@ public class PostService {
                     .findAllByUser_IdAndVisibilityAndIdNot(pageable, userId, Visibility.PUBLIC, excludePostId)
                     .map(postMapper::toDto2);
         }
+    }
+
+    public Page<PostAdminViewDto> getPostsForAdmin(Pageable pageable) {
+        return postRepository.findAll(pageable)
+                .map(postMapper::toAdminViewDto);
     }
 
     public long getCountAllPostByUserId(UUID userId) {
@@ -169,7 +174,7 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(UUID id, UpdatePostRequest request) {
+    public PostResponse updatePost(UUID id, UpdatePostRequest request) {
         UUID currentUserId = authService.getUserIdFromContext();
         Post originalPost = findPostById(id);
         Post oldPost = postMapper.clonePost(originalPost);
@@ -202,6 +207,8 @@ public class PostService {
                 ObjectHelper.extractChangesWithCommonsLang(postMapper.toDto1(oldPost), postMapper.toDto1(savedPost)),
                 userAgent, clientIp
         ));
+
+        return postMapper.toDto2(savedPost);
     }
 
     @Transactional
@@ -250,4 +257,13 @@ public class PostService {
     public Post getRefById(UUID postId) {
         return postRepository.getReferenceById(postId);
     }
+
+    @Transactional
+    public PostAdminViewDto getPostByIdForAdmin(UUID postId) {
+        return postRepository.findById(postId).map(postMapper::toAdminViewDto).orElseThrow(
+                () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
+        );
+    }
 }
+
+

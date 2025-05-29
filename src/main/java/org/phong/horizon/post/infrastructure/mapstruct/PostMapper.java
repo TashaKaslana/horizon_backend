@@ -9,19 +9,21 @@ import org.mapstruct.Mappings;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.phong.horizon.post.dtos.CreatePostRequest;
+import org.phong.horizon.post.dtos.PostAdminViewDto;
 import org.phong.horizon.post.dtos.PostCloneDto;
 import org.phong.horizon.post.dtos.PostCreatedDto;
 import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.dtos.PostSummaryResponse;
 import org.phong.horizon.post.dtos.UpdatePostRequest;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
+import org.phong.horizon.post.utils.PostUtils;
 import org.phong.horizon.storage.infrastructure.mapper.AssetMapper;
 import org.phong.horizon.storage.service.CloudinaryUrlGenerator;
 
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = {CloudinaryUrlGenerator.class, AssetMapper.class}
+        uses = {CloudinaryUrlGenerator.class, AssetMapper.class, PostUtils.class}
 )
 public interface PostMapper {
     Post toEntity(UpdatePostRequest updatePostRequest);
@@ -57,9 +59,23 @@ public interface PostMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Post partialUpdate(CreatePostRequest createPostRequest, @MappingTarget Post post);
 
+    @Mappings({
+            @Mapping(target = "videoThumbnailUrl", source = "videoAsset", qualifiedByName = "videoThumbnailUrl"),
+    })
     @Mapping(source = "user.id", target = "userId")
     PostSummaryResponse toDto(Post post);
 
     PostCreatedDto postToPostCreatedDto(Post post);
+
+    Post toEntity(PostSummaryResponse postSummaryResponse);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Post partialUpdate(PostSummaryResponse postSummaryResponse, @MappingTarget Post post);
+
+    @Mappings({
+            @Mapping(target = "totalViews", source = "id", qualifiedByName = "postViewCount"),
+            @Mapping(target = "totalInteractions", source = "id", qualifiedByName = "postInteractionCount"),
+    })
+    PostAdminViewDto toAdminViewDto(Post post);
 }
 
