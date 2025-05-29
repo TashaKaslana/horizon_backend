@@ -40,8 +40,7 @@ public class AdminUserController {
         return RestApiResponse.success(userService.getListUserSummary(pageable));
     }
 
-    @GetMapping
-    @RequestMapping("/intro")
+    @GetMapping("/intro/all")
     public ResponseEntity<RestApiResponse<List<UserIntroduction>>> getAllUserIntroductions(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(userService.getUserIntroductionList(pageable));
     }

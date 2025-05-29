@@ -6,6 +6,8 @@ import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +25,8 @@ public class AdminPostController {
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPostsForAdmin() {
-        return RestApiResponse.success(postService.getAllPostsForAdmin());
+    public ResponseEntity<RestApiResponse<List<PostResponse>>> getAllPostsForAdmin(@ParameterObject Pageable pageable) {
+        return RestApiResponse.success(postService.getAllPostsForAdmin(pageable));
     }
 
     @DeleteMapping("/{postId}")

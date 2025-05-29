@@ -2,8 +2,8 @@ package org.phong.horizon.comment.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.phong.horizon.comment.dtos.CommentCreatedDto;
 import org.phong.horizon.comment.dtos.CommentRespond;
+import org.phong.horizon.comment.dtos.CommentResponseWithPostDetails;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.enums.CommentErrorEnums;
@@ -50,7 +50,7 @@ public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
     
     @Transactional
-    public CommentCreatedDto createComment(CreateCommentDto request) {
+    public CommentRespond createComment(CreateCommentDto request) {
         Comment comment = commentMapper.toEntity(request);
 
         Post post = postService.getRefById(request.postId());
@@ -80,7 +80,7 @@ public class CommentService {
                 currentUserId
         ));
 
-        return new CommentCreatedDto(createdComment.getId(), createdComment.getStatus());
+        return commentMapper.toDto(createdComment);
     }
 
     @Transactional(readOnly = true)
@@ -98,12 +98,19 @@ public class CommentService {
     }
 
     @Transactional
+    public Page<CommentResponseWithPostDetails> getAllCommentsWithPostDetailsByPostId(Pageable pageable) {
+        Page<Comment> comments = commentRepository.findAll(pageable);
+
+        return comments.map(commentMapper::toDto5);
+    }
+
+    @Transactional
     public long getCountCommentsByPostId(UUID postId) {
         return commentRepository.countAllByPost_Id(postId);
     }
 
     @Transactional
-    public void updateCommentContent(UUID commentId, UpdateCommentContentDto updateCommentContentDto) {
+    public CommentRespond updateCommentContent(UUID commentId, UpdateCommentContentDto updateCommentContentDto) {
         Comment original = findById(commentId);
         Comment oldComment = commentMapper.cloneComment(original);
 
@@ -114,7 +121,7 @@ public class CommentService {
 
         Comment newComment = commentMapper.partialUpdate(updateCommentContentDto, original);
 
-        commentRepository.save(newComment);
+        Comment updatedComment = commentRepository.save(newComment);
         log.info("Comment updated for commentId: {}", newComment.getId());
 
         String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
@@ -135,6 +142,8 @@ public class CommentService {
                 clientIp,
                 authService.getUserIdFromContext()
         ));
+
+        return commentMapper.toDto(updatedComment);
     }
 
     @Transactional
@@ -250,5 +259,10 @@ public class CommentService {
         }
 
         return commentMap;
+    }
+
+    @Transactional
+    public Page<CommentRespond> getAllComments(Pageable pageable) {
+        return commentRepository.findAll(pageable).map(commentMapper::toDto);
     }
 }
