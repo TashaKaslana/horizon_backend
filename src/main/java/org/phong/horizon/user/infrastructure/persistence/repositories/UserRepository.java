@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,4 +37,20 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByRoleId(UUID id);
 
     boolean existsByAuth0Id(String auth0Id);
+
+    // Analytics methods
+    long countByCreatedAtAfter(Instant date);
+
+    long countByCreatedAtBetween(Instant startDate, Instant endDate);
+
+    /**
+     * Returns daily user counts starting from a given date
+     * Using function('date', u.createdAt) for better database compatibility
+     */
+    @Query("SELECT function('date', u.createdAt) as date, COUNT(u.id) as count " +
+           "FROM User u " +
+           "WHERE u.createdAt >= :startDate " +
+           "GROUP BY function('date', u.createdAt)")
+    List<Object[]> countUsersPerDay(@Param("startDate") Instant startDate);
 }
+
