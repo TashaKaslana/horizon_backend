@@ -36,7 +36,6 @@ public class ModerationReportAnalyticsService {
 
         // 1. Pending Reports
         long pendingReports = reportRepository.countPendingReports();
-
         long thisWeekReports = reportRepository.countByCreatedAtBetween(weekAgoStart, todayStart);
         long lastWeekReports = reportRepository.countByCreatedAtBetween(previousWeekStart, previousWeekEnd);
         double pendingReportsTrend = calculateTrend(thisWeekReports, lastWeekReports);
