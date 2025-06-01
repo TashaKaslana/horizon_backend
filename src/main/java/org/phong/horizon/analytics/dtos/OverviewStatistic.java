@@ -13,9 +13,4 @@ public class OverviewStatistic {
     private double trend;
     private String message;
     private String description;
-
-    public static record DailyPostCountDto(
-            LocalDate date,
-            long count
-    ) {}
 }

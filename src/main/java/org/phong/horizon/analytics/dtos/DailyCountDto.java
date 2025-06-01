@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyUserCountDto {
+public class DailyCountDto {
     private LocalDate date;
     private long count;
 }

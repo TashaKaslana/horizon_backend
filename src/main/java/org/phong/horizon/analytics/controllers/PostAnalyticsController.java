@@ -1,6 +1,7 @@
 package org.phong.horizon.analytics.controllers;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.services.PostAnalyticsService;
 import org.phong.horizon.core.responses.RestApiResponse;
@@ -24,7 +25,7 @@ public class PostAnalyticsController {
     }
 
     @GetMapping("/daily-post-count")
-    public ResponseEntity<RestApiResponse<List<OverviewStatistic.DailyPostCountDto>>> getDailyPostCount(@RequestParam int days) {
+    public ResponseEntity<RestApiResponse<List<DailyCountDto>>> getDailyPostCount(@RequestParam int days) {
         return RestApiResponse.success(postAnalyticsService.getFilledDailyPostCounts(days));
     }
 }
