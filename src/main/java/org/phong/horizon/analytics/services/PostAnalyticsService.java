@@ -1,13 +1,12 @@
-package org.phong.horizon.post.services;
+package org.phong.horizon.analytics.services;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.core.dtos.OverviewStatistic;
-import org.phong.horizon.post.dtos.DailyPostCountDto;
+import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostInteractionRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.ViewRepository;
 import org.phong.horizon.report.enums.ModerationItemType;
-import org.phong.horizon.report.infrastructure.persistence.repositories.repositories.ReportRepository;
+import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +84,7 @@ public class PostAnalyticsService {
     }
 
     @Transactional
-    public List<DailyPostCountDto> getFilledDailyPostCounts(int days) {
+    public List<OverviewStatistic.DailyPostCountDto> getFilledDailyPostCounts(int days) {
         Instant from = Instant.now().minus(Duration.ofDays(days));
         List<Object[]> raw = postRepository.countPostsPerDay(from);
 
@@ -95,13 +94,13 @@ public class PostAnalyticsService {
                         row -> ((Number) row[1]).longValue()
                 ));
 
-        List<DailyPostCountDto> result = new ArrayList<>();
+        List<OverviewStatistic.DailyPostCountDto> result = new ArrayList<>();
         LocalDate start = LocalDate.now().minusDays(days);
         LocalDate end = LocalDate.now();
 
         for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
             long count = countMap.getOrDefault(date, 0L);
-            result.add(new DailyPostCountDto(date, count));
+            result.add(new OverviewStatistic.DailyPostCountDto(date, count));
         }
 
         return result;

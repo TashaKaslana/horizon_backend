@@ -3,7 +3,7 @@ package org.phong.horizon.comment.controllers;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.comment.dtos.DailyCommentCountDto;
 import org.phong.horizon.comment.services.CommentAnalyticsService;
-import org.phong.horizon.core.dtos.OverviewStatistic;
+import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

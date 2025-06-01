@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
@@ -44,16 +45,17 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     long countAllByUserId(UUID userId);
 
-    long countByCreatedAtAfter(Instant todayStart);
+    long countByCreatedAtAfter(Instant date);
 
-    long countByCreatedAtBetween(Instant yesterdayStart, Instant todayStart);
+    long countByCreatedAtBetween(Instant startDate, Instant endDate);
 
     @Query(value = """
                 SELECT DATE(created_at) AS date, COUNT(*) AS count
                 FROM posts
-                WHERE created_at >= :from
+                WHERE created_at >= :startDate
                 GROUP BY DATE(created_at)
                 ORDER BY DATE(created_at)
             """, nativeQuery = true)
-    List<Object[]> countPostsPerDay(Instant from);
+    List<Object[]> countPostsPerDay(@Param("startDate") Instant startDate);
 }
+

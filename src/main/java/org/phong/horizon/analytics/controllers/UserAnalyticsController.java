@@ -1,9 +1,9 @@
-package org.phong.horizon.user.controllers;
+package org.phong.horizon.analytics.controllers;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.core.dtos.OverviewStatistic;
-import org.phong.horizon.user.dtos.DailyUserCountDto;
-import org.phong.horizon.user.services.UserAnalyticsService;
+import org.phong.horizon.analytics.dtos.DailyUserCountDto;
+import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.analytics.services.UserAnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

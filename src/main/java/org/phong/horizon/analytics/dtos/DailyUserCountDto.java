@@ -1,4 +1,4 @@
-package org.phong.horizon.user.dtos;
+package org.phong.horizon.analytics.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

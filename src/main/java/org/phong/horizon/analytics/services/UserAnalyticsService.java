@@ -1,8 +1,8 @@
-package org.phong.horizon.user.services;
+package org.phong.horizon.analytics.services;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.core.dtos.OverviewStatistic;
-import org.phong.horizon.user.dtos.DailyUserCountDto;
+import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.analytics.dtos.DailyUserCountDto;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

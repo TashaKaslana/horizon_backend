@@ -14,7 +14,7 @@ import org.phong.horizon.report.events.ReportCreatedEvent;
 import org.phong.horizon.report.exceptions.InvalidReportInputException;
 import org.phong.horizon.report.exceptions.ReportNotFoundException;
 import org.phong.horizon.report.infrastructure.persistence.entities.Report;
-import org.phong.horizon.report.infrastructure.persistence.repositories.repositories.ReportRepository;
+import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
 import org.phong.horizon.report.infrastructure.mapper.ReportMapper;
 import org.phong.horizon.report.specifications.ReportSpecifications;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;

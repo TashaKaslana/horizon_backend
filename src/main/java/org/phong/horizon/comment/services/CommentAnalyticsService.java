@@ -3,7 +3,7 @@ package org.phong.horizon.comment.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.comment.dtos.DailyCommentCountDto;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentRepository;
-import org.phong.horizon.core.dtos.OverviewStatistic;
+import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

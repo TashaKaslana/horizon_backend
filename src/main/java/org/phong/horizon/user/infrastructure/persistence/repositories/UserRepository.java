@@ -52,5 +52,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
            "WHERE u.createdAt >= :startDate " +
            "GROUP BY function('date', u.createdAt)")
     List<Object[]> countUsersPerDay(@Param("startDate") Instant startDate);
-}
 
+    /**
+     * Count users who have been active since the given date
+     * Activity is determined by posts, comments, or logins after the date
+     */
+    @Query("SELECT COUNT(DISTINCT u.id) FROM User u " +
+           "WHERE u.lastLogin >= :since " +
+           "OR EXISTS (SELECT 1 FROM Post p WHERE p.user.id = u.id AND p.createdAt >= :since) " +
+           "OR EXISTS (SELECT 1 FROM Comment c WHERE c.user.id = u.id AND c.createdAt >= :since)")
+    long countActiveUsersSince(@Param("since") Instant since);
+}
