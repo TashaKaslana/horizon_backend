@@ -37,7 +37,8 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
     long countByCreatedAtBetween(Instant startDate, Instant endDate);
 
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.status = 'REPORTED'")
+    @Query("SELECT COUNT(c) FROM Comment c " +
+            "JOIN Report r ON r.comment.id = c.id and r.itemType = 'COMMENT' ")
     long countReportedComments();
 
     /**

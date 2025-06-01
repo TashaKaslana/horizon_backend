@@ -40,20 +40,6 @@ public interface AdminNotificationRepository extends JpaRepository<AdminNotifica
     }
 
     /**
-     * Count all notifications created between specified dates
-     */
-    default long countByTimeRange(OffsetDateTime from, OffsetDateTime to) {
-        return count(createdBetween(from, to));
-    }
-
-    /**
-     * Find notifications created between specified dates
-     */
-    default List<AdminNotification> findByTimeRange(OffsetDateTime from, OffsetDateTime to) {
-        return findAll(createdBetween(from, to));
-    }
-
-    /**
      * Count unread notifications created before a specific date
      */
     default long countUnreadAtDate(OffsetDateTime date) {

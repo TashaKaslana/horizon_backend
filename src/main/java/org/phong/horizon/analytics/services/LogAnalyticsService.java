@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ public class LogAnalyticsService {
         OffsetDateTime yesterdayStart = todayStart.minusDays(1);
         OffsetDateTime weekAgoStart = todayStart.minusDays(7);
         OffsetDateTime previousWeekStart = todayStart.minusDays(14);
-        OffsetDateTime previousWeekEnd = weekAgoStart;
 
         // 1. Error Logs Today
         long errorLogsToday = countBySeverityAndTimeRange(LogSeverity.ERROR, todayStart, now);
@@ -53,12 +53,12 @@ public class LogAnalyticsService {
 
         // 3. Error Logs (7d)
         long errorLogsWeek = countBySeverityAndTimeRange(LogSeverity.ERROR, weekAgoStart, now);
-        long errorLogsPrevWeek = countBySeverityAndTimeRange(LogSeverity.ERROR, previousWeekStart, previousWeekEnd);
+        long errorLogsPrevWeek = countBySeverityAndTimeRange(LogSeverity.ERROR, previousWeekStart, weekAgoStart);
         double errorLogsWeekTrend = calculateTrend(errorLogsWeek, errorLogsPrevWeek);
 
         // 4. Critical Logs (7d)
         long criticalLogsWeek = countBySeverityAndTimeRange(LogSeverity.CRITICAL, weekAgoStart, now);
-        long criticalLogsPrevWeek = countBySeverityAndTimeRange(LogSeverity.CRITICAL, previousWeekStart, previousWeekEnd);
+        long criticalLogsPrevWeek = countBySeverityAndTimeRange(LogSeverity.CRITICAL, previousWeekStart, weekAgoStart);
         double criticalLogsWeekTrend = calculateTrend(criticalLogsWeek, criticalLogsPrevWeek);
 
         return List.of(
@@ -100,15 +100,15 @@ public class LogAnalyticsService {
         Specification<LogEntry> spec = Specification.where(null);
 
         if (severity != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("severity"), severity));
+            spec = spec.and((root, _, cb) -> cb.equal(root.get("severity"), severity));
         }
 
         if (from != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("timestamp"), from));
+            spec = spec.and((root, _, cb) -> cb.greaterThanOrEqualTo(root.get("timestamp"), from));
         }
 
         if (to != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThan(root.get("timestamp"), to));
+            spec = spec.and((root, _, cb) -> cb.lessThan(root.get("timestamp"), to));
         }
 
         return logEntryRepository.count(spec);
@@ -144,7 +144,7 @@ public class LogAnalyticsService {
 
         // Sort by date (ascending order)
         return result.stream()
-            .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
+            .sorted(Comparator.comparing(DailyCountDto::getDate))
             .collect(Collectors.toList());
     }
 
@@ -158,7 +158,7 @@ public class LogAnalyticsService {
         OffsetDateTime startDate = endDate.minusDays(days);
 
         // Get all error and critical logs in date range
-        Specification<LogEntry> spec = (root, query, cb) ->
+        Specification<LogEntry> spec = (root, _, cb) ->
             cb.and(
                 cb.between(root.get("timestamp"), startDate, endDate),
                 cb.or(
@@ -180,7 +180,10 @@ public class LogAnalyticsService {
             ));
 
         // Convert to format needed for frontend charts
-        Map<String, List<DailyCountDto>> result = groupedBySeverityAndDay.entrySet().stream()
+        // Fill in all days including zeros
+        // Sort by date
+
+        return groupedBySeverityAndDay.entrySet().stream()
             .collect(Collectors.toMap(
                 entry -> entry.getKey().name(),
                 entry -> {
@@ -196,11 +199,9 @@ public class LogAnalyticsService {
 
                     // Sort by date
                     return dailyCounts.stream()
-                        .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
+                        .sorted(Comparator.comparing(DailyCountDto::getDate))
                         .collect(Collectors.toList());
                 }
             ));
-
-        return result;
     }
 }

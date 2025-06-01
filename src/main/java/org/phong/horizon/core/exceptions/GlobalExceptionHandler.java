@@ -178,15 +178,60 @@ public class GlobalExceptionHandler {
         return RestApiResponse.badRequest(apiError);
     }
 
+    // New handler for security vulnerabilities
+    @ExceptionHandler({SecurityException.class})
+    public ResponseEntity<RestApiResponse<Void>> handleSecurityException(
+            Exception ex, WebRequest request) {
+        log.error("SECURITY VULNERABILITY DETECTED: {}", ex.getMessage(), ex);
+
+        publishLogEvent(
+                LogSeverity.CRITICAL, // Mark security exceptions as CRITICAL
+                "Security vulnerability detected",
+                HttpRequestUtils.getRequestPath(request),
+                ex,
+                Map.of("securityThreat", "true", "threatTimestamp", System.currentTimeMillis())
+        );
+
+        // Don't reveal details of security issues in the response
+        return RestApiResponse.forbidden(HttpRequestUtils.getRequestPath(request),
+                "Access denied due to security policy");
+    }
+
+    // Updating DataIntegrityViolationException to CRITICAL when it appears to be an injection attack
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<RestApiResponse<Void>> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex, WebRequest request) {
-        log.warn("Data Integrity Violation: {}", ex.getMessage());
         String rootCauseMessage = ex.getRootCause() != null ? ex.getRootCause().getMessage() : "N/A";
+
+        // Check if this might be an SQL injection attempt
+        boolean potentialInjectionAttack = rootCauseMessage.toLowerCase().contains("syntax error") ||
+                                          rootCauseMessage.toLowerCase().contains("sql") &&
+                                          (rootCauseMessage.contains("'") || rootCauseMessage.contains("--"));
+
+        LogSeverity severity = potentialInjectionAttack ? LogSeverity.CRITICAL : LogSeverity.WARNING;
+
+        if (potentialInjectionAttack) {
+            log.error("POTENTIAL INJECTION ATTACK DETECTED: {}", ex.getMessage(), ex);
+        } else {
+            log.warn("Data Integrity Violation: {}", ex.getMessage());
+        }
+
         if (ex.getRootCause() != null) {
             log.warn("Root cause: {}", rootCauseMessage);
         }
-        publishLogEvent(LogSeverity.WARNING, "Data integrity violation", HttpRequestUtils.getRequestPath(request), ex, Map.of("rootCause", rootCauseMessage));
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("rootCause", rootCauseMessage);
+        if (potentialInjectionAttack) {
+            context.put("securityThreat", "potential-sql-injection");
+        }
+
+        publishLogEvent(severity,
+                        potentialInjectionAttack ? "Potential SQL injection detected" : "Data integrity violation",
+                        HttpRequestUtils.getRequestPath(request),
+                        ex,
+                        context);
+
         return RestApiResponse.conflict(
                 HttpRequestUtils.getRequestPath(request),
                 SystemError.DATA_INTEGRITY_VIOLATION.getErrorMessage()
@@ -278,20 +323,52 @@ public class GlobalExceptionHandler {
         return RestApiResponse.unauthorized(HttpRequestUtils.getRequestPath(request), SystemError.AUTHENTICATION_FAILED.getErrorMessage());
     }
 
-    // --- Generic Fallback Handler (Catches anything else) ---
+    // Update global exception handler to mark certain exceptions as CRITICAL
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RestApiResponse<Void>> handleGlobalException(
             Exception ex, WebRequest request) {
-        log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
+        // Determine if this is a critical exception
+        boolean isCriticalException = isSystemCriticalException(ex);
+        LogSeverity severity = isCriticalException ? LogSeverity.CRITICAL : LogSeverity.ERROR;
+
+        if (isCriticalException) {
+            log.error("CRITICAL SYSTEM EXCEPTION: {}", ex.getMessage(), ex);
+        } else {
+            log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
+        }
+
+        Map<String, Object> contextData = new HashMap<>();
+        if (isCriticalException) {
+            contextData.put("critical", true);
+            contextData.put("impactLevel", "system");
+        }
 
         publishLogEvent(
-                LogSeverity.ERROR,
-                "Unhandled exception occurred",
+                severity,
+                isCriticalException ? "Critical system exception detected" : "Unhandled exception occurred",
                 HttpRequestUtils.getRequestPath(request),
                 ex,
-                null
+                contextData
         );
 
-        return RestApiResponse.internalServerError(HttpRequestUtils.getRequestPath(request), SystemError.GENERIC_ERROR_MSG.getErrorMessage());
+        return RestApiResponse.internalServerError(HttpRequestUtils.getRequestPath(request),
+                SystemError.GENERIC_ERROR_MSG.getErrorMessage());
+    }
+
+    // Helper method to determine if an exception is critical
+    private boolean isSystemCriticalException(Throwable ex) {
+        String exceptionName = ex.getClass().getSimpleName().toLowerCase();
+        String message = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+
+        // Check for known critical exceptions that would severely impact system functionality
+        return ex instanceof OutOfMemoryError ||
+               exceptionName.contains("thread") && (exceptionName.contains("death") || exceptionName.contains("kill")) ||
+               exceptionName.contains("deadlock") ||
+               exceptionName.contains("memory") ||
+               (exceptionName.contains("database") && message.contains("connect")) ||
+               message.contains("cannot allocate") ||
+               message.contains("disk full") ||
+               message.contains("connection refused") ||
+               message.contains("too many open files");
     }
 }
