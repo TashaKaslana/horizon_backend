@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 public interface ReportRepository extends JpaRepository<Report, UUID>, JpaSpecificationExecutor<Report> {
@@ -35,5 +36,21 @@ public interface ReportRepository extends JpaRepository<Report, UUID>, JpaSpecif
     long countByCreatedAtBetweenAndStatus(OffsetDateTime createdAtAfter, OffsetDateTime createdAtBefore, ModerationStatus status);
 
     long countByCreatedAtBetweenAndStatusIn(OffsetDateTime createdAtAfter, OffsetDateTime createdAtBefore, Collection<ModerationStatus> statuses);
+
+    @Query("SELECT function('date', r.createdAt), count(*) " +
+            "FROM Report r " +
+            "WHERE r.createdAt BETWEEN :startOfDay AND :endOfDay AND r.status = 'PENDING' " +
+            "GROUP BY function('date', r.createdAt) " +
+            "ORDER BY function('date', r.createdAt) asc")
+    List<Object[]> countDailyPendingReports(OffsetDateTime startOfDay, OffsetDateTime endOfDay);
+
+    @Query("SELECT function('date', r.createdAt), count(*) " +
+            "FROM Report r " +
+            "WHERE r.createdAt BETWEEN :startOfDay AND :endOfDay " +
+            "AND r.status IN ('ACTIONTAKEN_CONTENTREMOVED', 'ACTIONTAKEN_USERWARNED', 'ACTIONTAKEN_USERBANNED', 'RESOLVED') " +
+            "GROUP BY function('date', r.createdAt) " +
+            "ORDER BY function('date', r.createdAt) asc")
+    List<Object[]> countDailyResolvedReports(OffsetDateTime startOfDay, OffsetDateTime endOfDay);
+
 }
 
