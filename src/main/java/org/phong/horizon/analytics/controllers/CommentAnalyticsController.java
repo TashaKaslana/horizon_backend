@@ -1,9 +1,9 @@
-package org.phong.horizon.comment.controllers;
+package org.phong.horizon.analytics.controllers;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.comment.dtos.DailyCommentCountDto;
-import org.phong.horizon.comment.services.CommentAnalyticsService;
+import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.analytics.services.CommentAnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +40,7 @@ public class CommentAnalyticsController {
      * @return List of daily comment counts
      */
     @GetMapping("/daily-counts")
-    public ResponseEntity<List<DailyCommentCountDto>> getDailyCommentCounts(
+    public ResponseEntity<List<DailyCountDto>> getDailyCommentCounts(
             @RequestParam(defaultValue = "30") int days) {
         return ResponseEntity.ok(commentAnalyticsService.getFilledDailyCommentCounts(days));
     }

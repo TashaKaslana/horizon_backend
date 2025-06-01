@@ -1,12 +1,14 @@
 package org.phong.horizon.report.infrastructure.persistence.repositories;
 
 import org.phong.horizon.report.enums.ModerationItemType;
+import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.infrastructure.persistence.entities.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 public interface ReportRepository extends JpaRepository<Report, UUID>, JpaSpecificationExecutor<Report> {
@@ -29,5 +31,9 @@ public interface ReportRepository extends JpaRepository<Report, UUID>, JpaSpecif
     default long countReportsCreatedBetween(OffsetDateTime start, OffsetDateTime end) {
         return countByCreatedAtBetween(start, end);
     }
+
+    long countByCreatedAtBetweenAndStatus(OffsetDateTime createdAtAfter, OffsetDateTime createdAtBefore, ModerationStatus status);
+
+    long countByCreatedAtBetweenAndStatusIn(OffsetDateTime createdAtAfter, OffsetDateTime createdAtBefore, Collection<ModerationStatus> statuses);
 }
 

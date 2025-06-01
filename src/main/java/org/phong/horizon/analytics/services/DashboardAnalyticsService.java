@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.phong.horizon.analytics.utils.AnalyticsHelper.calculateTrend;
+
 /**
  * Centralized service for dashboard analytics across all domains.
  * Aggregates data from multiple repositories to provide a unified dashboard view.
@@ -144,14 +146,6 @@ public class DashboardAnalyticsService {
         List<Object[]> raw = commentRepository.countCommentsPerDay(from);
 
         return convertToTimeSeriesData(raw, days);
-    }
-
-    /**
-     * Helper method to calculate percentage trend between current and previous values.
-     */
-    private double calculateTrend(long current, long previous) {
-        if (previous == 0) return current == 0 ? 0.0 : 100.0;
-        return ((double) (current - previous) / previous) * 100;
     }
 
     /**

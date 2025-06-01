@@ -1,7 +1,7 @@
 package org.phong.horizon.analytics.controllers;
 
 import lombok.AllArgsConstructor;
-import org.phong.horizon.analytics.dtos.DailyUserCountDto;
+import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.services.UserAnalyticsService;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +40,9 @@ public class UserAnalyticsController {
      * @return List of daily user counts
      */
     @GetMapping("/daily-counts")
-    public ResponseEntity<List<DailyUserCountDto>> getDailyUserCounts(
+    public ResponseEntity<List<DailyCountDto>> getDailyUserCounts(
             @RequestParam(defaultValue = "30") int days) {
         return ResponseEntity.ok(userAnalyticsService.getFilledDailyUserCounts(days));
     }
+
 }
