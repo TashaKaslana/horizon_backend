@@ -1,6 +1,16 @@
 package org.phong.horizon.analytics.dtos;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
-public record DailyPendingAndResolvedDto(LocalDate date, long pendingCount, long resolvedCount) {
+@AllArgsConstructor
+@Setter
+@Getter
+public final class DailyPendingAndResolvedDto {
+    private LocalDate date;
+    private long pendingCount;
+    private long resolvedCount;
 }

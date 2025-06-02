@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyPendingAndResolvedDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,19 @@ public class ModerationReportAnalyticsService {
     private final ReportRepository reportRepository;
 
     /**
-     * Get overview statistics for moderation reports dashboard
+     * Get overview statistics for all moderation reports
      */
     @Transactional
     public List<OverviewStatistic> getModerationOverviewStatistics() {
+        return getModerationOverviewStatistics(null);
+    }
+
+    /**
+     * Get overview statistics for moderation reports filtered by item type
+     * @param itemType The type of item to filter by (USER, POST, COMMENT), or null for all items
+     */
+    @Transactional
+    public List<OverviewStatistic> getModerationOverviewStatistics(ModerationItemType itemType) {
         ZoneId zone = ZoneOffset.UTC;
 
         // Calculate time periods
@@ -39,107 +49,175 @@ public class ModerationReportAnalyticsService {
         OffsetDateTime previousWeekEnd = todayStart.minusDays(7);
 
         // 1. Pending Reports
-        long pendingReports = reportRepository.countPendingReports();
-        long thisWeekReports = reportRepository.countByCreatedAtBetween(weekAgoStart, todayStart);
-        long lastWeekReports = reportRepository.countByCreatedAtBetween(previousWeekStart, previousWeekEnd);
+        long pendingReports = (itemType == null) ?
+                reportRepository.countPendingReports() :
+                reportRepository.countPendingReportsByItemType(itemType);
+
+        long thisWeekReports = (itemType == null) ?
+                reportRepository.countByCreatedAtBetween(weekAgoStart, todayStart) :
+                reportRepository.countByCreatedAtBetweenAndItemType(weekAgoStart, todayStart, itemType);
+
+        long lastWeekReports = (itemType == null) ?
+                reportRepository.countByCreatedAtBetween(previousWeekStart, previousWeekEnd) :
+                reportRepository.countByCreatedAtBetweenAndItemType(previousWeekStart, previousWeekEnd, itemType);
+
         double pendingReportsTrend = calculateTrend(thisWeekReports, lastWeekReports);
 
         // 2. Resolved Today
-        long resolvedToday = getResolvedCount(todayStart, todayStart.plusDays(1));
-        long resolvedYesterday = getResolvedCount(yesterdayStart, yesterdayStart.plusDays(1));
+        long resolvedToday = getResolvedCount(todayStart, todayStart.plusDays(1), itemType);
+        long resolvedYesterday = getResolvedCount(yesterdayStart, yesterdayStart.plusDays(1), itemType);
         double resolvedTrend = calculateTrend(resolvedToday, resolvedYesterday);
 
         // 3. Content Removed (Last 7 days)
-        long contentRemoved = getContentRemovedCount(weekAgoStart, todayStart);
-        long contentRemovedPreviousWeek = getContentRemovedCount(previousWeekStart, previousWeekEnd);
+        long contentRemoved = getContentRemovedCount(weekAgoStart, todayStart, itemType);
+        long contentRemovedPreviousWeek = getContentRemovedCount(previousWeekStart, previousWeekEnd, itemType);
         double contentRemovedTrend = calculateTrend(contentRemoved, contentRemovedPreviousWeek);
 
         // 4. Users Actioned (Last 7 days)
-        long usersActioned = getUsersActionedCount(weekAgoStart, todayStart);
-        long usersActionedPreviousWeek = getUsersActionedCount(previousWeekStart, previousWeekEnd);
+        long usersActioned = getUsersActionedCount(weekAgoStart, todayStart, itemType);
+        long usersActionedPreviousWeek = getUsersActionedCount(previousWeekStart, previousWeekEnd, itemType);
         double usersActionedTrend = calculateTrend(usersActioned, usersActionedPreviousWeek);
+
+        // Generate title prefix based on item type, if applicable
+        String titlePrefix = "";
+        if (itemType != null) {
+            titlePrefix = itemType.name().charAt(0) + itemType.name().substring(1).toLowerCase() + " ";
+        }
 
         return List.of(
                 new OverviewStatistic(
-                        "Pending Reports",
+                        titlePrefix + "Pending Reports",
                         String.valueOf(pendingReports),
                         pendingReportsTrend,
                         pendingReportsTrend < 0 ? "Fewer reports than last week" : "More reports than last week",
-                        "Reports requiring admin review"
+                        titlePrefix + "Reports requiring admin review"
                 ),
                 new OverviewStatistic(
-                        "Resolved Today",
+                        titlePrefix + "Resolved Today",
                         String.valueOf(resolvedToday),
                         resolvedTrend,
                         resolvedTrend > 0 ? "More resolutions than yesterday" : "Fewer resolutions than yesterday",
-                        "Reports actioned and resolved today"
+                        titlePrefix + "Reports actioned and resolved today"
                 ),
                 new OverviewStatistic(
-                        "Content Removed (7d)",
+                        titlePrefix + "Content Removed (7d)",
                         String.valueOf(contentRemoved),
                         contentRemovedTrend,
                         contentRemovedTrend > 0 ? "Increase in content takedowns" : "Decrease in content takedowns",
-                        "Posts/Comments removed in the last 7 days"
+                        titlePrefix + "Posts/Comments removed in the last 7 days"
                 ),
                 new OverviewStatistic(
-                        "Users Actioned (7d)",
+                        titlePrefix + "Users Actioned (7d)",
                         String.valueOf(usersActioned),
                         usersActionedTrend,
                         usersActionedTrend < 0 ? "Fewer user actions this week" : "More user actions this week",
-                        "Users warned or banned in the last 7 days"
+                        titlePrefix + "Users warned or banned in the last 7 days"
                 )
         );
     }
 
+    /**
+     * Get daily pending and resolved counts
+     * @param days Number of days to get data for
+     * @return List of daily counts
+     */
     public List<DailyPendingAndResolvedDto> getDailyPendingAndResolvedCounts(int days) {
+        return getDailyPendingAndResolvedCounts(days, null);
+    }
+
+    /**
+     * Get daily pending and resolved counts filtered by item type
+     * @param days Number of days to get data for
+     * @param itemType The type of item to filter by (USER, POST, COMMENT), or null for all items
+     * @return List of daily counts
+     */
+    public List<DailyPendingAndResolvedDto> getDailyPendingAndResolvedCounts(int days, ModerationItemType itemType) {
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        List<Object[]> pendingCount = reportRepository.countDailyPendingReports(now, now.minusDays(days));
-        List<Object[]> resolvedCount = reportRepository.countDailyResolvedReports(now, now.minusDays(days));
+        OffsetDateTime startDate = now.minusDays(days);
 
-        List<DailyPendingAndResolvedDto> dailies = new ArrayList<>();
+        // Get counts from repository based on itemType filter
+        List<Object[]> pendingCount;
+        List<Object[]> resolvedCount;
 
+        if (itemType == null) {
+            pendingCount = reportRepository.countDailyPendingReports(now, startDate);
+            resolvedCount = reportRepository.countDailyResolvedReports(now, startDate);
+        } else {
+            pendingCount = reportRepository.countDailyPendingReportsByItemType(now, startDate, itemType);
+            resolvedCount = reportRepository.countDailyResolvedReportsByItemType(now, startDate, itemType);
+        }
+
+        List<DailyPendingAndResolvedDto> dailies = new ArrayList<>(days);
         for (int i = 0; i < days; i++) {
             dailies.add(new DailyPendingAndResolvedDto(now.minusDays(i).toLocalDate(), 0, 0));
         }
 
-        for (int i = 0; i < days; i++) {
-            long pendingCountAtIndex = pendingCount.size() > i ? (long) pendingCount.get(i)[1] : 0;
-            long resolvedCountAtIndex = resolvedCount.size() > i ? (long) resolvedCount.get(i)[1] : 0;
-            dailies.add(
-                    new DailyPendingAndResolvedDto(now.minusDays(i).toLocalDate(),
-                            pendingCountAtIndex,
-                            resolvedCountAtIndex
-                    ));
+        for (Object[] entry : pendingCount) {
+            for (DailyPendingAndResolvedDto dto : dailies) {
+                if (dto.getDate().equals(((java.sql.Date) entry[0]).toLocalDate())) {
+                    dto.setPendingCount(((Number) entry[1]).longValue());
+                    break;
+                }
+            }
+        }
+
+        for (Object[] entry : resolvedCount) {
+            for (DailyPendingAndResolvedDto dto : dailies) {
+                if (dto.getDate().equals(((java.sql.Date) entry[0]).toLocalDate())) {
+                    dto.setResolvedCount(((Number) entry[1]).longValue());
+                    break;
+                }
+            }
         }
 
         return dailies;
     }
 
     /**
-     * Count reports resolved on a specific day
+     * Count reports resolved on a specific day with optional item type filter
      */
-    private long getResolvedCount(OffsetDateTime dayStart, OffsetDateTime dayEnd) {
-        return reportRepository.countByCreatedAtBetweenAndStatusIn(dayStart, dayEnd, List.of(
-                ModerationStatus.RESOLVED,
-                ModerationStatus.ACTIONTAKEN_CONTENTREMOVED,
-                ModerationStatus.ACTIONTAKEN_USERBANNED,
-                ModerationStatus.ACTIONTAKEN_USERWARNED
-        ));
+    private long getResolvedCount(OffsetDateTime dayStart, OffsetDateTime dayEnd, ModerationItemType itemType) {
+        if (itemType == null) {
+            return reportRepository.countByCreatedAtBetweenAndStatusIn(dayStart, dayEnd, List.of(
+                    ModerationStatus.RESOLVED,
+                    ModerationStatus.ACTIONTAKEN_CONTENTREMOVED,
+                    ModerationStatus.ACTIONTAKEN_USERBANNED,
+                    ModerationStatus.ACTIONTAKEN_USERWARNED
+            ));
+        } else {
+            return reportRepository.countByCreatedAtBetweenAndStatusInAndItemType(dayStart, dayEnd, List.of(
+                    ModerationStatus.RESOLVED,
+                    ModerationStatus.ACTIONTAKEN_CONTENTREMOVED,
+                    ModerationStatus.ACTIONTAKEN_USERBANNED,
+                    ModerationStatus.ACTIONTAKEN_USERWARNED
+            ), itemType);
+        }
     }
 
     /**
-     * Count content removed between dates
+     * Count content removed between dates with optional item type filter
      */
-    private long getContentRemovedCount(OffsetDateTime start, OffsetDateTime end) {
-        return reportRepository.countByCreatedAtBetweenAndStatus(start, end, ModerationStatus.ACTIONTAKEN_CONTENTREMOVED);
+    private long getContentRemovedCount(OffsetDateTime start, OffsetDateTime end, ModerationItemType itemType) {
+        if (itemType == null) {
+            return reportRepository.countByCreatedAtBetweenAndStatus(start, end, ModerationStatus.ACTIONTAKEN_CONTENTREMOVED);
+        } else {
+            return reportRepository.countByCreatedAtBetweenAndStatusAndItemType(start, end,
+                    ModerationStatus.ACTIONTAKEN_CONTENTREMOVED, itemType);
+        }
     }
 
     /**
-     * Count users warned or banned between dates
+     * Count users warned or banned between dates with optional item type filter
      */
-    private long getUsersActionedCount(OffsetDateTime start, OffsetDateTime end) {
-        return reportRepository.countByCreatedAtBetweenAndStatusIn(start, end, List.of(
-                ModerationStatus.ACTIONTAKEN_USERBANNED, ModerationStatus.ACTIONTAKEN_USERWARNED
-        ));
+    private long getUsersActionedCount(OffsetDateTime start, OffsetDateTime end, ModerationItemType itemType) {
+        if (itemType == null) {
+            return reportRepository.countByCreatedAtBetweenAndStatusIn(start, end, List.of(
+                    ModerationStatus.ACTIONTAKEN_USERBANNED, ModerationStatus.ACTIONTAKEN_USERWARNED
+            ));
+        } else {
+            return reportRepository.countByCreatedAtBetweenAndStatusInAndItemType(start, end, List.of(
+                    ModerationStatus.ACTIONTAKEN_USERBANNED, ModerationStatus.ACTIONTAKEN_USERWARNED
+            ), itemType);
+        }
     }
 }
