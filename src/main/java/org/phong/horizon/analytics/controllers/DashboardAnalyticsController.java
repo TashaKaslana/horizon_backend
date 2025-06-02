@@ -1,8 +1,8 @@
 package org.phong.horizon.analytics.controllers;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
-import org.phong.horizon.analytics.dtos.TimeSeriesDataPoint;
 import org.phong.horizon.analytics.services.DashboardAnalyticsService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +39,10 @@ public class DashboardAnalyticsController {
      * Get daily user registration counts.
      *
      * @param days Number of days to get data for (defaults to 30)
-     * @return List of time series data points for users per day
+     * @return List of daily user counts
      */
     @GetMapping("/users/daily")
-    public ResponseEntity<RestApiResponse<List<TimeSeriesDataPoint>>> getUsersPerDay(
+    public ResponseEntity<RestApiResponse<List<DailyCountDto>>> getUsersPerDay(
             @RequestParam(defaultValue = "30") int days) {
         return RestApiResponse.success(analyticsService.getUsersPerDay(days));
     }
@@ -51,10 +51,10 @@ public class DashboardAnalyticsController {
      * Get daily post creation counts.
      *
      * @param days Number of days to get data for (defaults to 30)
-     * @return List of time series data points for posts per day
+     * @return List of daily post counts
      */
     @GetMapping("/posts/daily")
-    public ResponseEntity<RestApiResponse<List<TimeSeriesDataPoint>>> getPostsPerDay(
+    public ResponseEntity<RestApiResponse<List<DailyCountDto>>> getPostsPerDay(
             @RequestParam(defaultValue = "30") int days) {
         return RestApiResponse.success(analyticsService.getPostsPerDay(days));
     }
@@ -63,10 +63,10 @@ public class DashboardAnalyticsController {
      * Get daily comment counts.
      *
      * @param days Number of days to get data for (defaults to 30)
-     * @return List of time series data points for comments per day
+     * @return List of daily comment counts
      */
     @GetMapping("/comments/daily")
-    public ResponseEntity<RestApiResponse<List<TimeSeriesDataPoint>>> getCommentsPerDay(
+    public ResponseEntity<RestApiResponse<List<DailyCountDto>>> getCommentsPerDay(
             @RequestParam(defaultValue = "30") int days) {
         return RestApiResponse.success(analyticsService.getCommentsPerDay(days));
     }
@@ -83,9 +83,9 @@ public class DashboardAnalyticsController {
 
         // Get all necessary data
         List<OverviewStatistic> overview = analyticsService.getDashboardOverview();
-        List<TimeSeriesDataPoint> usersDaily = analyticsService.getUsersPerDay(days);
-        List<TimeSeriesDataPoint> postsDaily = analyticsService.getPostsPerDay(days);
-        List<TimeSeriesDataPoint> commentsDaily = analyticsService.getCommentsPerDay(days);
+        List<DailyCountDto> usersDaily = analyticsService.getUsersPerDay(days);
+        List<DailyCountDto> postsDaily = analyticsService.getPostsPerDay(days);
+        List<DailyCountDto> commentsDaily = analyticsService.getCommentsPerDay(days);
 
         // Return all data in a single map
         return RestApiResponse.success(Map.of(
