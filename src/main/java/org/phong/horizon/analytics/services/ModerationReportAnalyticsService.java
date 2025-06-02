@@ -140,18 +140,22 @@ public class ModerationReportAnalyticsService {
         List<Object[]> resolvedCount;
 
         if (itemType == null) {
-            pendingCount = reportRepository.countDailyPendingReports(now, startDate);
-            resolvedCount = reportRepository.countDailyResolvedReports(now, startDate);
+            // Fix parameter order: startDate should be first parameter, now should be second
+            pendingCount = reportRepository.countDailyPendingReports(startDate, now);
+            resolvedCount = reportRepository.countDailyResolvedReports(startDate, now);
         } else {
-            pendingCount = reportRepository.countDailyPendingReportsByItemType(now, startDate, itemType);
-            resolvedCount = reportRepository.countDailyResolvedReportsByItemType(now, startDate, itemType);
+            // Fix parameter order: startDate should be first parameter, now should be second
+            pendingCount = reportRepository.countDailyPendingReportsByItemType(startDate, now, itemType);
+            resolvedCount = reportRepository.countDailyResolvedReportsByItemType(startDate, now, itemType);
         }
 
+        // Create a list filled with zero-value entries for all days
         List<DailyPendingAndResolvedDto> dailies = new ArrayList<>(days);
         for (int i = 0; i < days; i++) {
             dailies.add(new DailyPendingAndResolvedDto(now.minusDays(i).toLocalDate(), 0, 0));
         }
 
+        // Update the list with actual values from the database queries
         for (Object[] entry : pendingCount) {
             for (DailyPendingAndResolvedDto dto : dailies) {
                 if (dto.getDate().equals(((java.sql.Date) entry[0]).toLocalDate())) {
