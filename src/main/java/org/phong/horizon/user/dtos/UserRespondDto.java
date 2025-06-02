@@ -16,6 +16,6 @@ public record UserRespondDto(Instant createdAt, Instant updatedAt, UUID id, Stri
                              String lastName, String username, String email, String phoneNumber, LocalDate dateOfBirth,
                              String gender, String bio, String profileImage, String coverImage, String country,
                              String city, Instant deletedAt, String displayName,
-                             UserStatus status, RoleDto role, Instant lastLogin) implements Serializable {
+                             UserStatus status, RoleDto role, Instant lastLogin, Boolean isLogin) implements Serializable {
 }
 

@@ -25,5 +25,6 @@ public class ReportDto {
     private UserSummaryRespond reporter;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
+    private OffsetDateTime resolvedAt;
 }
 

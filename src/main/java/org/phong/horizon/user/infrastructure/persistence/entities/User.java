@@ -88,4 +88,7 @@ public class User extends BaseEntity {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false, length = 20)
     private UserStatus status = UserStatus.PENDING;
+
+    @Column(name = "is_login", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isLogin;
 }

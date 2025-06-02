@@ -11,5 +11,6 @@ import java.util.UUID;
 public record UserCloneDto(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id,
                            String auth0Id, String firstName, String lastName, String username, String email,
                            String phoneNumber, LocalDate dateOfBirth, String gender, String bio, String profileImage,
-                           String coverImage, String country, String city, Instant deletedAt, String displayName) implements Serializable {
+                           String coverImage, String country, String city, Instant deletedAt, String displayName,
+                           Boolean isLogin) implements Serializable {
 }

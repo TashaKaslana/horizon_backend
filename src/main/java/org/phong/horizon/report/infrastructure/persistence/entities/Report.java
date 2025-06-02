@@ -64,5 +64,7 @@ public class Report {
     @Column(name = "updated_at", insertable = false)
     @LastModifiedDate
     private OffsetDateTime updatedAt;
-}
 
+    @Column(name = "resolved_at")
+    private OffsetDateTime resolvedAt;
+}

@@ -137,7 +137,25 @@ public class ReportService {
                 .orElseThrow(() -> new ReportNotFoundException(reportId));
 
         report.setStatus(newStatus);
+
+        // Set resolvedAt timestamp when the report is resolved or action is taken
+        if (isResolutionStatus(newStatus)) {
+            report.setResolvedAt(java.time.OffsetDateTime.now());
+        }
+
         return reportMapper.toDto(report);
+    }
+
+    /**
+     * Checks if a given status represents a resolution or action taken
+     * @param status The status to check
+     * @return true if the status represents a resolved state
+     */
+    private boolean isResolutionStatus(ModerationStatus status) {
+        return status == ModerationStatus.RESOLVED ||
+               status == ModerationStatus.ACTIONTAKEN_CONTENTREMOVED ||
+               status == ModerationStatus.ACTIONTAKEN_USERBANNED ||
+               status == ModerationStatus.ACTIONTAKEN_USERWARNED;
     }
 
     @Transactional

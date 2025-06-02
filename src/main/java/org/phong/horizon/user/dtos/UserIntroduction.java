@@ -12,5 +12,5 @@ import java.util.UUID;
  */
 public record UserIntroduction(Instant createdAt, Instant updatedAt, UUID id, String displayName, String username,
                                String email, String bio, String profileImage,
-                               String coverImage, RoleDto role, UserStatus status, Instant lastLogin) implements Serializable {
+                               String coverImage, RoleDto role, UserStatus status, Instant lastLogin, Boolean isLogin) implements Serializable {
 }
