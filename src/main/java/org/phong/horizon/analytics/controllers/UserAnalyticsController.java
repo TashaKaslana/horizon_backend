@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.services.UserAnalyticsService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +30,8 @@ public class UserAnalyticsController {
      * @return List of overview statistics about users
      */
     @GetMapping("/overview")
-    public ResponseEntity<List<OverviewStatistic>> getUserAnalyticsOverview() {
-        return ResponseEntity.ok(userAnalyticsService.getUserAnalytics());
+    public ResponseEntity<RestApiResponse<List<OverviewStatistic>>> getUserAnalyticsOverview() {
+        return RestApiResponse.success(userAnalyticsService.getUserAnalytics());
     }
 
     /**
@@ -40,9 +41,8 @@ public class UserAnalyticsController {
      * @return List of daily user counts
      */
     @GetMapping("/daily-counts")
-    public ResponseEntity<List<DailyCountDto>> getDailyUserCounts(
+    public ResponseEntity<RestApiResponse<List<DailyCountDto>>> getDailyUserCounts(
             @RequestParam(defaultValue = "30") int days) {
-        return ResponseEntity.ok(userAnalyticsService.getFilledDailyUserCounts(days));
+        return RestApiResponse.success(userAnalyticsService.getFilledDailyUserCounts(days));
     }
-
 }

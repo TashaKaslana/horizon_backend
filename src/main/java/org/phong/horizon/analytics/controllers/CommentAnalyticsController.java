@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.services.CommentAnalyticsService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +30,8 @@ public class CommentAnalyticsController {
      * @return List of overview statistics about comments
      */
     @GetMapping("/overview")
-    public ResponseEntity<List<OverviewStatistic>> getCommentAnalyticsOverview() {
-        return ResponseEntity.ok(commentAnalyticsService.getCommentAnalytics());
+    public ResponseEntity<RestApiResponse<List<OverviewStatistic>>> getCommentAnalyticsOverview() {
+        return RestApiResponse.success(commentAnalyticsService.getCommentAnalytics());
     }
 
     /**
@@ -40,8 +41,8 @@ public class CommentAnalyticsController {
      * @return List of daily comment counts
      */
     @GetMapping("/daily-counts")
-    public ResponseEntity<List<DailyCountDto>> getDailyCommentCounts(
+    public ResponseEntity<RestApiResponse<List<DailyCountDto>>> getDailyCommentCounts(
             @RequestParam(defaultValue = "30") int days) {
-        return ResponseEntity.ok(commentAnalyticsService.getFilledDailyCommentCounts(days));
+        return RestApiResponse.success(commentAnalyticsService.getFilledDailyCommentCounts(days));
     }
 }

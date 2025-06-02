@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyPendingAndResolvedDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.services.ModerationReportAnalyticsService;
+import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +24,8 @@ public class ModerationReportAnalyticsController {
      * @return List of overview statistics for moderation cards
      */
     @GetMapping("/overview")
-    public ResponseEntity<List<OverviewStatistic>> getModerationOverview() {
-        return ResponseEntity.ok(moderationReportAnalyticsService.getModerationOverviewStatistics());
+    public ResponseEntity<RestApiResponse<List<OverviewStatistic>>> getModerationOverview() {
+        return RestApiResponse.success(moderationReportAnalyticsService.getModerationOverviewStatistics());
     }
 
     /**
@@ -32,7 +33,7 @@ public class ModerationReportAnalyticsController {
      * @return List of daily pending and resolved reports
      */
     @GetMapping("/daily-pending-resolved")
-    public ResponseEntity<List<DailyPendingAndResolvedDto>> getDailyPendingAndResolvedReports(@RequestParam int days) {
-        return ResponseEntity.ok(moderationReportAnalyticsService.getDailyPendingAndResolvedCounts(days));
+    public ResponseEntity<RestApiResponse<List<DailyPendingAndResolvedDto>>> getDailyPendingAndResolvedReports(@RequestParam int days) {
+        return RestApiResponse.success(moderationReportAnalyticsService.getDailyPendingAndResolvedCounts(days));
     }
 }
