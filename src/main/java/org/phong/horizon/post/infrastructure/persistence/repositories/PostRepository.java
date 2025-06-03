@@ -2,6 +2,7 @@ package org.phong.horizon.post.infrastructure.persistence.repositories;
 
 import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
+import org.phong.horizon.post.subdomain.category.entities.PostCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,5 +58,8 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
                 ORDER BY DATE(created_at)
             """, nativeQuery = true)
     List<Object[]> countPostsPerDay(@Param("startDate") Instant startDate);
+
+    @Query("SELECT COUNT(p) FROM Post p WHERE p.category = :category")
+    long countByCategory(@Param("category") PostCategory category);
 }
 

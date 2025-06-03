@@ -32,4 +32,8 @@ public class PostCategory extends BaseEntity {
     @NotNull
     @Column(name = "slug", nullable = false, unique = true)
     private String slug;
+
+    @Size(max = 500)
+    @Column(name = "description")
+    private String description;
 }

@@ -9,6 +9,7 @@ import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.subdomain.category.dtos.CreatePostCategoryRequest;
 import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
+import org.phong.horizon.post.subdomain.category.dtos.PostCategoryWithCountDto;
 import org.phong.horizon.post.subdomain.category.dtos.UpdatePostCategoryRequest;
 import org.phong.horizon.post.subdomain.category.entities.PostCategory;
 import org.phong.horizon.post.subdomain.category.services.PostCategoryService;
@@ -92,5 +93,29 @@ public class PostCategoryController {
     public ResponseEntity<RestApiResponse<Void>> deletePostCategory(@PathVariable UUID postCategoryId) {
         postCategoryService.deletePostCategory(postCategoryId);
         return RestApiResponse.noContent();
+    }
+
+    @GetMapping("/with-counts")
+    public ResponseEntity<RestApiResponse<List<PostCategoryWithCountDto>>> getCategoriesWithCounts(@ParameterObject Pageable pageable) {
+        Page<PostCategoryWithCountDto> categoriesWithCounts = postCategoryService.getCategoriesWithPostCount(pageable);
+        return RestApiResponse.success(categoriesWithCounts);
+    }
+
+    @GetMapping("/all-with-counts")
+    public ResponseEntity<RestApiResponse<List<PostCategoryWithCountDto>>> getAllCategoriesWithCounts() {
+        List<PostCategoryWithCountDto> categoriesWithCounts = postCategoryService.getAllCategoriesWithPostCount();
+        return RestApiResponse.success(categoriesWithCounts);
+    }
+
+    @GetMapping("/with-counts/id/{postCategoryId}")
+    public ResponseEntity<RestApiResponse<PostCategoryWithCountDto>> getCategoryWithCountById(@PathVariable UUID postCategoryId) {
+        PostCategoryWithCountDto categoryWithCount = postCategoryService.getCategoryWithCountById(postCategoryId);
+        return RestApiResponse.success(categoryWithCount);
+    }
+
+    @GetMapping("/with-counts/{postCategoryName}")
+    public ResponseEntity<RestApiResponse<PostCategoryWithCountDto>> getCategoryWithCountByName(@PathVariable String postCategoryName) {
+        PostCategoryWithCountDto categoryWithCount = postCategoryService.getCategoryWithCountByName(postCategoryName);
+        return RestApiResponse.success(categoryWithCount);
     }
 }
