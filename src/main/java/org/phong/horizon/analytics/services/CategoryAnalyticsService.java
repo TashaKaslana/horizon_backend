@@ -11,7 +11,6 @@ import org.phong.horizon.analytics.projections.TopCategoryUsageProjection;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
