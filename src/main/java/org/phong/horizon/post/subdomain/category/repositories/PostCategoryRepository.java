@@ -26,14 +26,16 @@ public interface PostCategoryRepository extends JpaRepository<PostCategory, UUID
      * Find the category with the most posts assigned to it
      */
     @Query(value = """
-    SELECT pc.* FROM post_categories pc
-    WHERE pc.id = (
-        SELECT p.id FROM posts p
-        GROUP BY p.id
-        ORDER BY COUNT(*) DESC
-        LIMIT 1
-    )
-    """, nativeQuery = true)
+                    SELECT pc.*
+                       FROM post_categories pc
+                       WHERE pc.id = (
+                           SELECT p.category_id
+                           FROM posts p
+                           GROUP BY p.category_id
+                           ORDER BY COUNT(*) DESC
+                           LIMIT 1
+                       )
+            """, nativeQuery = true)
     PostCategory findMostUsedCategory();
 
 

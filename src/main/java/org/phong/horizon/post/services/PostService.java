@@ -54,6 +54,7 @@ public class PostService {
     private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
     private final PostCategoryService postCategoryService;
+    private final org.phong.horizon.post.subdomain.tag.service.PostTagService postTagService;
 
     @PostAuthorize("hasRole('ADMIN') or " +
             "returnObject.visibility == T(org.phong.horizon.core.enums.Visibility).PUBLIC or " +
@@ -165,6 +166,12 @@ public class PostService {
 
         Post createdPost = postRepository.save(post);
 
+        // Add tags to the post
+        if (request.tags() != null && !request.tags().isEmpty()) {
+            postTagService.addPostTags(createdPost, request.tags());
+            log.info("Added {} tags to post {}", request.tags().size(), createdPost.getId());
+        }
+
         eventPublisher.publishEvent(new PostCreatedEvent(
                 this, createdPost.getId(), currentUserId, post.getCaption(), post.getDescription()
         ));
@@ -197,6 +204,13 @@ public class PostService {
         }
 
         Post savedPost = postRepository.save(updatedPost);
+
+        // Update post tags if they are provided in the request
+        if (request.tags() != null) {
+            postTagService.updatePostTags(savedPost, request.tags());
+            log.info("Updated tags for post {}", savedPost.getId());
+        }
+
         log.info("Updated post: {}", savedPost);
 
         String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
@@ -265,6 +279,4 @@ public class PostService {
         );
     }
 }
-
-
 

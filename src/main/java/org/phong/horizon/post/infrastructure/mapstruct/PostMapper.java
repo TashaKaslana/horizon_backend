@@ -23,7 +23,8 @@ import org.phong.horizon.storage.service.CloudinaryUrlGenerator;
 @Mapper(
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = {CloudinaryUrlGenerator.class, AssetMapper.class, PostUtils.class}
+        uses = {CloudinaryUrlGenerator.class, AssetMapper.class, PostUtils.class,
+                org.phong.horizon.post.subdomain.tag.service.PostTagService.class}
 )
 public interface PostMapper {
     Post toEntity(UpdatePostRequest updatePostRequest);
@@ -38,6 +39,7 @@ public interface PostMapper {
     @Mappings({
             @Mapping(target = "videoPlaybackUrl", source = "videoAsset", qualifiedByName = "videoPlaybackUrl"),
             @Mapping(target = "videoThumbnailUrl", source = "videoAsset", qualifiedByName = "videoThumbnailUrl"),
+            @Mapping(target = "tags", source = "id", qualifiedByName = "getTagNames")
     })
     PostResponse toDto2(Post post);
 
@@ -48,6 +50,7 @@ public interface PostMapper {
 
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "videoAsset.id", target = "videoAssetId")
+    @Mapping(target = "tags", source = "id", qualifiedByName = "getTagNames")
     PostCloneDto toDto1(Post post);
 
     @Mapping(source = "categoryName", target = "category.name")
@@ -61,6 +64,7 @@ public interface PostMapper {
 
     @Mappings({
             @Mapping(target = "videoThumbnailUrl", source = "videoAsset", qualifiedByName = "videoThumbnailUrl"),
+//            @Mapping(target = "tags", source = "id", qualifiedByName = "getTagNames")
     })
     @Mapping(source = "user.id", target = "userId")
     PostSummaryResponse toDto(Post post);
@@ -75,7 +79,7 @@ public interface PostMapper {
     @Mappings({
             @Mapping(target = "totalViews", source = "id", qualifiedByName = "postViewCount"),
             @Mapping(target = "totalInteractions", source = "id", qualifiedByName = "postInteractionCount"),
+            @Mapping(target = "tags", source = "id", qualifiedByName = "getTagNames")
     })
     PostAdminViewDto toAdminViewDto(Post post);
 }
-

@@ -7,6 +7,7 @@ import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.post.subdomain.tag.dto.CreateTagRequest;
 import org.phong.horizon.post.subdomain.tag.dto.TagResponse;
 import org.phong.horizon.post.subdomain.tag.dto.UpdateTagRequest;
+import org.phong.horizon.post.subdomain.tag.dto.TagWithCountDto;
 import org.phong.horizon.post.subdomain.tag.entity.Tag;
 import org.phong.horizon.post.subdomain.tag.exception.TagNotFoundException;
 import org.phong.horizon.post.subdomain.tag.exception.TagPropertyConflictException;
@@ -20,8 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,11 +38,6 @@ public class TagService {
     @Transactional
     public TagResponse createTag(CreateTagRequest createTagRequest) {
         UUID currentUserId = authService.getUserIdFromContext();
-
-        // Check for existing slug
-//        tagRepository.findBySlug(createTagRequest.getSlug()).ifPresent(_ -> {
-//            throw new TagPropertyConflictException("Slug already exists: " + createTagRequest.getSlug());
-//        });
 
         // Check for existing name
         tagRepository.findByName(createTagRequest.getName()).ifPresent(_ -> {
@@ -80,15 +78,6 @@ public class TagService {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new TagNotFoundException("Tag not found with id: " + tagId));
 
-        // Check for slug conflict if slug is being updated and is different from the current one
-//        if (StringUtils.hasText(updateTagRequest.getSlug()) && !Objects.equals(tag.getSlug(), updateTagRequest.getSlug())) {
-//            tagRepository.findBySlug(updateTagRequest.getSlug()).ifPresent(existingTag -> {
-//                if (!existingTag.getId().equals(tagId)) {
-//                    throw new TagPropertyConflictException("Slug already exists: " + updateTagRequest.getSlug());
-//                }
-//            });
-//        }
-
         // Check for name conflict if name is being updated and is different from the current one
         if (StringUtils.hasText(updateTagRequest.getName()) && !Objects.equals(tag.getName(), updateTagRequest.getName())) {
             tagRepository.findByName(updateTagRequest.getName()).ifPresent(existingTag -> {
@@ -120,5 +109,139 @@ public class TagService {
         tagRepository.delete(tag);
         log.debug("Tag with id {} deleted by user {}", tag.getId(), currentUserId);
     }
-}
 
+    /**
+     * Get a tag by name or create a new one if it doesn't exist
+     *
+     * @param tagName The tag name
+     * @return The existing or newly created tag entity
+     */
+    @Transactional
+    public Tag getOrCreateTag(String tagName) {
+        if (tagName == null || tagName.isBlank()) {
+            throw new IllegalArgumentException("Tag name cannot be null or blank");
+        }
+
+        // Normalize tag name (trim and convert to lowercase)
+        String normalizedTagName = tagName.trim().toLowerCase();
+
+        return tagRepository.findByName(normalizedTagName)
+                .orElseGet(() -> {
+                    // Create new tag if it doesn't exist
+                    log.debug("Creating new tag with name: {}", normalizedTagName);
+
+                    Slugify slugify = Slugify.builder().build();
+                    String baseSlug = slugify.slugify(normalizedTagName);
+                    String uniqueSlug = baseSlug + "-" + UUID.randomUUID().toString().substring(0, 8);
+
+                    Tag newTag = new Tag();
+                    newTag.setName(normalizedTagName);
+                    newTag.setSlug(uniqueSlug);
+                    return tagRepository.save(newTag);
+                });
+    }
+
+    /**
+     * Get a tag entity reference by ID without fully loading the entity
+     *
+     * @param tagId The tag ID
+     * @return The tag entity reference
+     */
+    @Transactional(readOnly = true)
+    public Tag getRefById(UUID tagId) {
+        return tagRepository.getReferenceById(tagId);
+    }
+
+    /**
+     * Find a tag by name
+     *
+     * @param tagName The tag name
+     * @return The tag entity if found, or null if not found
+     */
+    @Transactional(readOnly = true)
+    public Tag findByName(String tagName) {
+        return tagRepository.findByName(tagName).orElse(null);
+    }
+
+    /**
+     * Convert Tag entity to TagResponse
+     *
+     * @param tag The Tag entity to convert
+     * @return The TagResponse DTO
+     */
+    public TagResponse convertToResponse(Tag tag) {
+        return tagMapper.toTagResponse(tag);
+    }
+
+    /**
+     * Get all tags with their post counts
+     *
+     * @param pageable Pagination information
+     * @return Page of TagWithCountDto
+     */
+    @Transactional(readOnly = true)
+    public Page<TagWithCountDto> getTagsWithPostCount(Pageable pageable) {
+        return tagRepository.findAll(pageable)
+                .map(tag -> {
+                    long count = tagRepository.countPostsByTagId(tag.getId());
+                    return new TagWithCountDto(tag, count);
+                });
+    }
+
+    /**
+     * Get all tags with their post counts (no pagination)
+     *
+     * @return List of TagWithCountDto
+     */
+    @Transactional(readOnly = true)
+    public List<TagWithCountDto> getAllTagsWithPostCount() {
+        return tagRepository.findAll().stream()
+                .map(tag -> {
+                    long count = tagRepository.countPostsByTagId(tag.getId());
+                    return new TagWithCountDto(tag, count);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a tag with post count by ID
+     *
+     * @param tagId The tag ID
+     * @return TagWithCountDto
+     */
+    @Transactional(readOnly = true)
+    public TagWithCountDto getTagWithCountById(UUID tagId) {
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new TagNotFoundException("Tag not found with id: " + tagId));
+        long count = tagRepository.countPostsByTagId(tag.getId());
+        return new TagWithCountDto(tag, count);
+    }
+
+    /**
+     * Get a tag with post count by slug
+     *
+     * @param slug The tag slug
+     * @return TagWithCountDto
+     */
+    @Transactional(readOnly = true)
+    public TagWithCountDto getTagWithCountBySlug(String slug) {
+        Tag tag = tagRepository.findBySlug(slug)
+                .orElseThrow(() -> new TagNotFoundException("Tag not found with slug: " + slug));
+        long count = tagRepository.countPostsByTagId(tag.getId());
+        return new TagWithCountDto(tag, count);
+    }
+
+    /**
+     * Get a tag with post count by name
+     *
+     * @param name The tag name
+     * @return TagWithCountDto
+     */
+    @Transactional(readOnly = true)
+    public TagWithCountDto getTagWithCountByName(String name) {
+        Tag tag = tagRepository.findByName(name)
+                .orElseThrow(() -> new TagNotFoundException("Tag not found with name: " + name));
+        long count = tagRepository.countPostsByTagId(tag.getId());
+        return new TagWithCountDto(tag, count);
+    }
+}

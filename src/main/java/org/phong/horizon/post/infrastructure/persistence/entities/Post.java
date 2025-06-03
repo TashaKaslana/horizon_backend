@@ -25,15 +25,12 @@ import org.phong.horizon.post.subdomain.category.entities.PostCategory;
 import org.phong.horizon.storage.infrastructure.persistence.entities.Asset;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
 @Table(name = "posts", indexes = {
         @Index(name = "idx_posts_created_at", columnList = "created_at"),
         @Index(name = "idx_posts_user", columnList = "user_id"),
-        @Index(name = "idx_posts_tags", columnList = "tags"),
         @Index(name = "idx_post_category_id", columnList = "category_id")
 })
 @AttributeOverrides({
@@ -65,10 +62,6 @@ public class Post extends BaseEntity {
     @ColumnDefault("'PUBLIC'")
     private Visibility visibility;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "tags", columnDefinition = "jsonb")
-    private List<String> tags;
-
     @Column(name = "is_author_deleted")
     private Boolean isAuthorDeleted;
 
@@ -81,5 +74,4 @@ public class Post extends BaseEntity {
     @Column(name = "status", nullable = false, length = 20)
     private PostStatus status = PostStatus.DRAFT;
 }
-
 
