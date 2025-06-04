@@ -1,5 +1,7 @@
 package org.phong.horizon.admin.system.maintenance.controllers;
 
+import org.phong.horizon.admin.system.maintenance.dto.MaintenanceInfoDto;
+import org.phong.horizon.admin.system.maintenance.dto.MaintenanceRequestDto;
 import org.phong.horizon.admin.system.maintenance.services.MaintenanceService;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +18,12 @@ public class MaintenanceController {
     }
 
     @PostMapping("/enable")
-    public ResponseEntity<RestApiResponse<String>> enable() {
-        maintenanceService.setMaintenance(true);
+    public ResponseEntity<RestApiResponse<String>> enable(@RequestBody(required = false) MaintenanceRequestDto request) {
+        if (request != null) {
+            maintenanceService.setMaintenanceWithDetails(true, request.getMessage(), request.getCompletionDateTime());
+        } else {
+            maintenanceService.setMaintenance(true);
+        }
         return RestApiResponse.success("Maintenance mode enabled");
     }
 
@@ -28,7 +34,7 @@ public class MaintenanceController {
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<Boolean>> status() {
-        return RestApiResponse.success(maintenanceService.isMaintenance());
+    public ResponseEntity<RestApiResponse<MaintenanceInfoDto>> status() {
+        return RestApiResponse.success(maintenanceService.getMaintenanceInfo());
     }
 }
