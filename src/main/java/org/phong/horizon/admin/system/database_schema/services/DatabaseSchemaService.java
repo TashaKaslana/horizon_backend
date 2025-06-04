@@ -1,6 +1,7 @@
 package org.phong.horizon.admin.system.database_schema.services;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.admin.system.database_schema.dtos.DatabaseColumnDto;
 import org.phong.horizon.admin.system.database_schema.dtos.DatabaseRelationshipDto;
 import org.phong.horizon.admin.system.database_schema.dtos.DatabaseSchemaDto;
@@ -10,7 +11,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,12 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class DatabaseSchemaService {
     private final DataSource dataSource;
 
-    public DatabaseSchemaDto getFullSchema() throws SQLException {
+    public DatabaseSchemaDto getFullSchema()  {
         DatabaseSchemaDto schema = new DatabaseSchemaDto();
 
         try (Connection conn = dataSource.getConnection()) {
@@ -81,6 +82,8 @@ public class DatabaseSchemaService {
 
                 schema.getTables().put(tableName, columnDetails);
             }
+        } catch (Exception e) {
+            log.warn(e.getMessage());
         }
 
         return schema;

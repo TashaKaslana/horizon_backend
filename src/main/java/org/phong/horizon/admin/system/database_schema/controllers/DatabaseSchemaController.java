@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.SQLException;
-
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/admin/system/database-schema")
@@ -18,7 +16,7 @@ public class DatabaseSchemaController {
     private final DatabaseSchemaService databaseSchemaService;
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<DatabaseSchemaDto>> getDatabaseSchema() throws SQLException {
+    public ResponseEntity<RestApiResponse<DatabaseSchemaDto>> getDatabaseSchema() {
         return RestApiResponse.success(databaseSchemaService.getFullSchema());
     }
 }
