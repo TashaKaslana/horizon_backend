@@ -30,6 +30,9 @@ public class MaintenanceService {
 
         if (maintenance && current.getActivatedAt() == null) {
             current.setActivatedAt(formatDateTime(LocalDateTime.now()));
+        } else {
+            current.setActivatedAt(null);
+            current.setCompletionDateTime(null);
         }
 
         maintenanceInfo.set(current);
@@ -48,6 +51,10 @@ public class MaintenanceService {
         if (maintenance) {
             info.setActivatedAt(formatDateTime(LocalDateTime.now()));
             info.setCompletionDateTime(completionDateTime);
+        } else {
+            info.setActivatedAt(null);
+            info.setCompletionDateTime(null);
+            info.setMessage(DEFAULT_MESSAGE);
         }
 
         maintenanceInfo.set(info);

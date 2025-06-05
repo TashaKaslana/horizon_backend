@@ -18,23 +18,23 @@ public class MaintenanceController {
     }
 
     @PostMapping("/enable")
-    public ResponseEntity<RestApiResponse<String>> enable(@RequestBody(required = false) MaintenanceRequestDto request) {
+    public ResponseEntity<RestApiResponse<MaintenanceInfoDto>> enableMaintenance(@RequestBody(required = false) MaintenanceRequestDto request) {
         if (request != null) {
             maintenanceService.setMaintenanceWithDetails(true, request.getMessage(), request.getCompletionDateTime());
         } else {
             maintenanceService.setMaintenance(true);
         }
-        return RestApiResponse.success("Maintenance mode enabled");
+        return RestApiResponse.success(maintenanceService.getMaintenanceInfo(), "Maintenance mode enabled");
     }
 
     @PostMapping("/disable")
-    public ResponseEntity<RestApiResponse<String>> disable() {
+    public ResponseEntity<RestApiResponse<MaintenanceInfoDto>> disableMaintenance() {
         maintenanceService.setMaintenance(false);
-        return RestApiResponse.success("Maintenance mode disabled");
+        return RestApiResponse.success(maintenanceService.getMaintenanceInfo(), "Maintenance mode disabled");
     }
 
     @GetMapping
-    public ResponseEntity<RestApiResponse<MaintenanceInfoDto>> status() {
+    public ResponseEntity<RestApiResponse<MaintenanceInfoDto>> getStatusMaintenance() {
         return RestApiResponse.success(maintenanceService.getMaintenanceInfo());
     }
 }
