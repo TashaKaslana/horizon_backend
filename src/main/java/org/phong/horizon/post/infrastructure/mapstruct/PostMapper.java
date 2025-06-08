@@ -79,6 +79,8 @@ public interface PostMapper {
     @Mappings({
             @Mapping(target = "totalViews", source = "id", qualifiedByName = "postViewCount"),
             @Mapping(target = "totalInteractions", source = "id", qualifiedByName = "postInteractionCount"),
+            @Mapping(target = "videoPlaybackUrl", source = "videoAsset", qualifiedByName = "videoPlaybackUrl"),
+            @Mapping(target = "videoThumbnailUrl", source = "videoAsset", qualifiedByName = "videoThumbnailUrl"),
             @Mapping(target = "tags", source = "id", qualifiedByName = "getTagNames")
     })
     PostAdminViewDto toAdminViewDto(Post post);

@@ -45,7 +45,7 @@ public class TagAnalyticsService {
         // Most popular tags
         Tag mostUsedTag = tagRepository.findMostUsedTag();
         String mostUsedTagName = mostUsedTag != null ? mostUsedTag.getName() : "None";
-        long mostUsedTagCount = mostUsedTag != null ? tagRepository.countPostsByTag(mostUsedTag.getId()) : 0;
+        long mostUsedTagCount = mostUsedTag != null ? tagRepository.countPostsByTagId(mostUsedTag.getId()) : 0;
 
         // Unused tags count
         long unusedTags = tagRepository.countUnusedTags();

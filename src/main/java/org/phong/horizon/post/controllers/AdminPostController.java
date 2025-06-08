@@ -31,7 +31,7 @@ public class AdminPostController {
     }
 
     @GetMapping("/all/aggregate")
-    public ResponseEntity<RestApiResponse<List<PostAdminViewDto>>> getAllPostForAdmin(@ParameterObject Pageable pageable) {
+    public ResponseEntity<RestApiResponse<List<PostAdminViewDto>>> getAllPostWithDetailsForAdmin(@ParameterObject Pageable pageable) {
         return RestApiResponse.success(postService.getPostsForAdmin(pageable));
     }
 

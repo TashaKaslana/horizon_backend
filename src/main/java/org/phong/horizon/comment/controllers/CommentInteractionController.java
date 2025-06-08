@@ -43,10 +43,9 @@ public class CommentInteractionController {
             targetType = SystemCategory.COMMENT,
             targetIdExpression = "#commentId"
     )
-    public ResponseEntity<RestApiResponse<Void>> createInteraction(@PathVariable UUID commentId,
-                                                  @Valid @RequestBody CreateCommentInteraction request) {
-        interactionService.createInteraction(commentId, request);
-        return RestApiResponse.created();
+    public ResponseEntity<RestApiResponse<CommentInteractionRespond>> createInteraction(@PathVariable UUID commentId,
+                                                                                        @Valid @RequestBody CreateCommentInteraction request) {
+        return RestApiResponse.created(interactionService.createInteraction(commentId, request));
     }
 
     @DeleteMapping("/{interactionType}")

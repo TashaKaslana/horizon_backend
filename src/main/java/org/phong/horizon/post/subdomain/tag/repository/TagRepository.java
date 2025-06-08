@@ -26,24 +26,24 @@ public interface TagRepository extends JpaRepository<Tag, UUID>, JpaSpecificatio
      * Find the tag with the most posts assigned to it
      */
     @Query(value = "SELECT t.* FROM tags t " +
-           "LEFT JOIN (SELECT jsonb_array_elements_text(tags) AS tag_name, COUNT(*) AS post_count " +
-           "FROM posts GROUP BY tag_name) AS tag_counts " +
-           "ON t.name = tag_counts.tag_name " +
+           "LEFT JOIN (SELECT pt.tag_id, COUNT(*) AS post_count " +
+           "FROM post_tags pt GROUP BY pt.tag_id) AS tag_counts " +
+           "ON t.id = tag_counts.tag_id " +
            "ORDER BY COALESCE(tag_counts.post_count, 0) DESC LIMIT 1", nativeQuery = true)
     Tag findMostUsedTag();
 
     /**
      * Count posts associated with a specific tag name
      */
-    @Query(value = "SELECT COUNT(*) FROM posts " +
-           "WHERE tags @> CAST(:tagName AS jsonb)", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM post_tags pt " +
+           "JOIN tags t ON t.id = pt.tag_id " +
+           "WHERE t.name = :tagName", nativeQuery = true)
     long countPostsByTagName(@Param("tagName") String tagName);
 
     /**
      * Count posts associated with a specific tag by ID
      */
-    @Query(value = "SELECT COUNT(*) FROM posts p, tags t " +
-           "WHERE t.id = :tagId AND p.tags @> to_jsonb(t.name::text)::jsonb", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM post_tags pt WHERE pt.tag_id = :tagId", nativeQuery = true)
     long countPostsByTag(@Param("tagId") UUID tagId);
 
     /**
@@ -59,8 +59,7 @@ public interface TagRepository extends JpaRepository<Tag, UUID>, JpaSpecificatio
      * Count tags that don't have any posts
      */
     @Query(value = "SELECT COUNT(*) FROM tags t " +
-           "WHERE NOT EXISTS (SELECT 1 FROM posts p " +
-           "WHERE p.tags @> to_jsonb(t.name::text)::jsonb)", nativeQuery = true)
+           "WHERE NOT EXISTS (SELECT 1 FROM post_tags pt WHERE pt.tag_id = t.id)", nativeQuery = true)
     long countUnusedTags();
 
     /**
@@ -88,11 +87,11 @@ public interface TagRepository extends JpaRepository<Tag, UUID>, JpaSpecificatio
            "        COUNT(*) AS post_count, " +
            "        RANK() OVER (PARTITION BY DATE(p.created_at) ORDER BY COUNT(*) DESC) AS rank " +
            "    FROM " +
-           "        tags t, " +
-           "        posts p " +
+           "        tags t " +
+           "        JOIN post_tags pt ON t.id = pt.tag_id " +
+           "        JOIN posts p ON p.id = pt.post_id " +
            "    WHERE " +
-           "        p.tags @> to_jsonb(t.name::text)::jsonb " +
-           "        AND p.created_at >= :startDate " +
+           "        p.created_at >= :startDate " +
            "        AND p.created_at <= :endDate " +
            "    GROUP BY " +
            "        t.id, t.name, DATE(p.created_at) " +

@@ -129,6 +129,7 @@ public class PostService {
         }
     }
 
+    @Transactional
     public Page<PostAdminViewDto> getPostsForAdmin(Pageable pageable) {
         return postRepository.findAll(pageable)
                 .map(postMapper::toAdminViewDto);

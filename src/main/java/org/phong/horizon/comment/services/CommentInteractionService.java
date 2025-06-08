@@ -43,7 +43,7 @@ public class CommentInteractionService {
     }
 
     @Transactional
-    public void createInteraction(UUID commentId, CreateCommentInteraction request) {
+    public CommentInteractionRespond createInteraction(UUID commentId, CreateCommentInteraction request) {
         UUID currentUserId = authService.getUserIdFromContext();
         User currentUser = userService.getRefById(currentUserId);
         Comment comment = commentService.getRefById(commentId);
@@ -62,9 +62,10 @@ public class CommentInteractionService {
         interaction.setComment(comment);
         interaction.setInteractionType(request.interactionType());
 
-        repository.save(interaction);
-        log.info("Created interaction for comment {}, user {}, type {}",
+        CommentInteraction created = repository.save(interaction);
+        log.debug("Created interaction for comment {}, user {}, type {}",
                 commentId, currentUser.getId(), request.interactionType());
+        return mapper.toDto2(created);
     }
 
     @Transactional
