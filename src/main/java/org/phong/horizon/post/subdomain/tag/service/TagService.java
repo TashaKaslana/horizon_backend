@@ -1,9 +1,11 @@
 package org.phong.horizon.post.subdomain.tag.service;
 
 import com.github.slugify.Slugify;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.post.subdomain.tag.dto.BulkTagDeleteRequest;
 import org.phong.horizon.post.subdomain.tag.dto.CreateTagRequest;
 import org.phong.horizon.post.subdomain.tag.dto.TagResponse;
 import org.phong.horizon.post.subdomain.tag.dto.UpdateTagRequest;
@@ -243,5 +245,9 @@ public class TagService {
                 .orElseThrow(() -> new TagNotFoundException("Tag not found with name: " + name));
         long count = tagRepository.countPostsByTagId(tag.getId());
         return new TagWithCountDto(tag, count);
+    }
+
+    public void bulkDeleteTags(@Valid BulkTagDeleteRequest request) {
+        tagRepository.deleteAllById(request.tagIds());
     }
 }

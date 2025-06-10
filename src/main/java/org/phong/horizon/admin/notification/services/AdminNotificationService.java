@@ -1,8 +1,10 @@
 package org.phong.horizon.admin.notification.services;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
+import org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationDeleteRequest;
 import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.exceptions.NotificationNotFoundException;
 import org.phong.horizon.admin.notification.infrastructure.entities.AdminNotification;
@@ -74,6 +76,11 @@ public class AdminNotificationService {
             throw new NotificationNotFoundException(id.toString());
         }
         adminNotificationRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void bulkDeleteNotifications(@Valid BulkAdminNotificationDeleteRequest request) {
+        adminNotificationRepository.deleteAllById(request.notificationIds());
     }
 }
 

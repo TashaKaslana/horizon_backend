@@ -40,5 +40,10 @@ public class LogController {
         LogEntryDto log = logService.getLogEntryById(id);
         return RestApiResponse.success(log);
     }
-}
 
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteLogEntries(@Valid @RequestBody org.phong.horizon.admin.logentry.dtos.BulkLogDeleteRequest request) {
+        logService.bulkDeleteLogEntries(request);
+        return RestApiResponse.noContent();
+    }
+}

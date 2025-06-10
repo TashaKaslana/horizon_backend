@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.admin.logentry.dtos.CreateLogEntryRequest;
 import org.phong.horizon.admin.logentry.dtos.LogEntryDto;
 import org.phong.horizon.admin.logentry.dtos.LogSearchCriteriaDto;
+import org.phong.horizon.admin.logentry.dtos.BulkLogDeleteRequest;
 import org.phong.horizon.admin.logentry.exceptions.LogEntryNotFoundException;
 import org.phong.horizon.admin.logentry.infrastructure.entities.LogEntry;
 import org.phong.horizon.admin.logentry.infrastructure.mapstruct.LogMapper;
@@ -56,5 +57,9 @@ public class LogService {
                 .map(logMapper::toDto)
                 .orElseThrow(() -> new LogEntryNotFoundException("LogEntry not found with id: " + id));
     }
-}
 
+    @Transactional
+    public void bulkDeleteLogEntries(BulkLogDeleteRequest request) {
+        logEntryRepository.deleteAllById(request.logIds());
+    }
+}

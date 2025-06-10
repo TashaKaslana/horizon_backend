@@ -1,5 +1,6 @@
 package org.phong.horizon.admin.notification.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
@@ -59,5 +60,10 @@ public class AdminNotificationController {
         adminNotificationService.deleteNotification(id);
         return RestApiResponse.noContent();
     }
-}
 
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteNotifications(@Valid @RequestBody org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationDeleteRequest request) {
+        adminNotificationService.bulkDeleteNotifications(request);
+        return RestApiResponse.noContent();
+    }
+}

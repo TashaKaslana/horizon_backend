@@ -170,4 +170,13 @@ public class PostTagController {
         postTagService.updatePostTags(postId, List.of());
         return RestApiResponse.noContent();
     }
+
+    /**
+     * Bulk delete multiple tags by their IDs
+     */
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteTags(@Valid @RequestBody org.phong.horizon.post.subdomain.tag.dto.BulkTagDeleteRequest request) {
+        tagService.bulkDeleteTags(request);
+        return RestApiResponse.noContent();
+    }
 }
