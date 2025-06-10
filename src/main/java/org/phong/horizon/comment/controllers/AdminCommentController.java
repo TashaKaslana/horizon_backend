@@ -1,6 +1,7 @@
 package org.phong.horizon.comment.controllers;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.comment.dtos.BulkCommentDeleteRequest;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CommentResponseWithPostDetails;
 import org.phong.horizon.comment.services.CommentService;
@@ -43,6 +44,17 @@ public class AdminCommentController {
     )
     public ResponseEntity<RestApiResponse<Void>> deleteAllComments() {
         commentService.deleteAllComments();
+        return RestApiResponse.noContent();
+    }
+
+    @DeleteMapping("/bulk")
+    @LogActivity(
+            activityCode = ActivityTypeCode.COMMENT_DELETE,
+            description = "Admin delete multiple comments",
+            targetType = SystemCategory.COMMENT
+    )
+    public ResponseEntity<RestApiResponse<Void>> deleteMultipleComments(@ParameterObject BulkCommentDeleteRequest request) {
+        commentService.bulkDeleteComments(request);
         return RestApiResponse.noContent();
     }
 }

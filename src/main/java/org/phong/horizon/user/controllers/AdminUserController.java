@@ -3,6 +3,7 @@ package org.phong.horizon.user.controllers;
 import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.user.dtos.BulkUserDeleteRequest;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
@@ -80,6 +81,17 @@ public class AdminUserController {
     )
     public ResponseEntity<RestApiResponse<Void>> deleteAllUsers() {
         userService.deleteAllUsers();
+        return RestApiResponse.noContent();
+    }
+
+    @DeleteMapping("/bulk")
+    @LogActivity(
+            activityCode = ActivityTypeCode.USER_DELETE,
+            description = "Admin bulk delete users",
+            targetType = SystemCategory.USER
+    )
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteUsers(@RequestBody BulkUserDeleteRequest request) {
+        userService.bulkDeleteUsers(request);
         return RestApiResponse.noContent();
     }
 }

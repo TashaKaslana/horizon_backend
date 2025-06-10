@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
+import org.phong.horizon.user.dtos.BulkUserDeleteRequest;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserImageUpdate;
@@ -280,5 +281,10 @@ public class UserService {
     @Transactional
     public boolean existsById(UUID uuid) {
         return userRepository.existsById(uuid);
+    }
+
+    @Transactional
+    public void bulkDeleteUsers(BulkUserDeleteRequest request) {
+        userRepository.deleteAllById(request.userIds());
     }
 }

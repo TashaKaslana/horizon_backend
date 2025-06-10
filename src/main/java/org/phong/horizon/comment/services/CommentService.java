@@ -2,6 +2,7 @@ package org.phong.horizon.comment.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.comment.dtos.BulkCommentDeleteRequest;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CommentResponseWithPostDetails;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
@@ -265,4 +266,12 @@ public class CommentService {
     public Page<CommentRespond> getAllComments(Pageable pageable) {
         return commentRepository.findAll(pageable).map(commentMapper::toDto);
     }
+
+    @Transactional
+    public void bulkDeleteComments(BulkCommentDeleteRequest request) {
+        commentRepository.deleteAllById(request.commentIds());
+    }
 }
+
+
+

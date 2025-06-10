@@ -8,6 +8,7 @@ import org.phong.horizon.core.enums.Visibility;
 import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
+import org.phong.horizon.post.dtos.BulkPostDeleteRequest;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostAdminViewDto;
 import org.phong.horizon.post.dtos.PostCreatedDto;
@@ -279,5 +280,8 @@ public class PostService {
                 () -> new PostNotFoundException(PostErrorEnums.INVALID_POST_ID.getMessage())
         );
     }
-}
 
+    public void bulkDeletePosts(BulkPostDeleteRequest request) {
+        postRepository.deleteAllById(request.postIds());
+    }
+}
