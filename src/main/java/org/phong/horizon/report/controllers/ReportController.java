@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.report.dto.BulkReportDeleteRequest;
+import org.phong.horizon.report.dto.BulkReportUpdateRequest;
 import org.phong.horizon.report.dto.CreateReportRequest;
 import org.phong.horizon.report.dto.ReportDto;
 import org.phong.horizon.report.enums.ModerationItemType;
@@ -80,8 +82,13 @@ public class ReportController {
     }
 
     @DeleteMapping("/bulk-delete")
-    public ResponseEntity<RestApiResponse<Void>> bulkDeleteReports(@Valid @RequestBody org.phong.horizon.report.dto.BulkReportDeleteRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteReports(@Valid @RequestBody BulkReportDeleteRequest request) {
         reportService.bulkDeleteReports(request);
         return RestApiResponse.noContent();
+    }
+
+    @PutMapping("/bulk-update")
+    public ResponseEntity<RestApiResponse<List<ReportDto>>> bulkUpdateReports(@Valid @RequestBody BulkReportUpdateRequest request) {
+        return RestApiResponse.success(reportService.bulkUpdateReportStatus(request));
     }
 }

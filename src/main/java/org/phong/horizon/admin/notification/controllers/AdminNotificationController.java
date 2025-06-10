@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
+import org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationDeleteRequest;
+import org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationUpdateRequest;
 import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.services.AdminNotificationService;
 import org.phong.horizon.core.responses.RestApiResponse;
@@ -62,8 +64,18 @@ public class AdminNotificationController {
     }
 
     @DeleteMapping("/bulk-delete")
-    public ResponseEntity<RestApiResponse<Void>> bulkDeleteNotifications(@Valid @RequestBody org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationDeleteRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteNotifications(@Valid @RequestBody BulkAdminNotificationDeleteRequest request) {
         adminNotificationService.bulkDeleteNotifications(request);
         return RestApiResponse.noContent();
+    }
+
+    /**
+     * Bulk update notifications' read status
+     */
+    @PutMapping("/bulk-update")
+    public ResponseEntity<RestApiResponse<List<AdminNotificationDto>>> bulkUpdateNotifications(
+            @Valid @RequestBody BulkAdminNotificationUpdateRequest request) {
+        List<AdminNotificationDto> updatedNotifications = adminNotificationService.bulkUpdateNotifications(request);
+        return RestApiResponse.success(updatedNotifications);
     }
 }

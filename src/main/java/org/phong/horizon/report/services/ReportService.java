@@ -26,6 +26,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -164,8 +165,37 @@ public class ReportService {
         reportRepository.deleteById(reportId);
     }
 
+    /**
+     * Bulk delete reports by IDs
+     * @param request Bulk delete request containing report IDs to delete
+     */
     @Transactional
     public void bulkDeleteReports(org.phong.horizon.report.dto.BulkReportDeleteRequest request) {
         reportRepository.deleteAllById(request.reportIds());
+    }
+
+    /**
+     * Bulk update reports status
+     * @param request Bulk update request containing report IDs and the new status/notes
+     * @return List of updated report DTOs
+     */
+    @Transactional
+    public List<ReportDto> bulkUpdateReportStatus(org.phong.horizon.report.dto.BulkReportUpdateRequest request) {
+        List<Report> reports = reportRepository.findAllById(request.reportIds());
+
+        reports.forEach(report -> {
+            report.setStatus(request.status());
+            if (request.moderatorNotes() != null && !request.moderatorNotes().isBlank()) {
+                report.setModeratorNotes(request.moderatorNotes());
+            }
+
+            // Set resolvedAt timestamp when the report is resolved or action is taken
+            if (isResolutionStatus(request.status())) {
+                report.setResolvedAt(java.time.OffsetDateTime.now());
+            }
+        });
+
+        List<Report> updatedReports = reportRepository.saveAll(reports);
+        return updatedReports.stream().map(reportMapper::toDto).collect(java.util.stream.Collectors.toList());
     }
 }

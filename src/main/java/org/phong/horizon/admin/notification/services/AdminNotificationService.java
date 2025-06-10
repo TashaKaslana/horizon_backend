@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationDeleteRequest;
+import org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationUpdateRequest;
 import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.exceptions.NotificationNotFoundException;
 import org.phong.horizon.admin.notification.infrastructure.entities.AdminNotification;
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -82,5 +84,24 @@ public class AdminNotificationService {
     public void bulkDeleteNotifications(@Valid BulkAdminNotificationDeleteRequest request) {
         adminNotificationRepository.deleteAllById(request.notificationIds());
     }
-}
 
+    /**
+     * Bulk update notifications' read status
+     *
+     * @param request The bulk update request with notification IDs and new read status
+     * @return List of updated notification DTOs
+     */
+    @Transactional
+    public List<AdminNotificationDto> bulkUpdateNotifications(BulkAdminNotificationUpdateRequest request) {
+        List<AdminNotification> notifications = adminNotificationRepository.findAllById(request.notificationIds());
+
+        notifications.forEach(notification -> {
+            notification.setIsRead(request.isRead());
+        });
+
+        List<AdminNotification> updatedNotifications = adminNotificationRepository.saveAll(notifications);
+        return updatedNotifications.stream()
+            .map(adminNotificationMapper::toDto)
+            .collect(java.util.stream.Collectors.toList());
+    }
+}
