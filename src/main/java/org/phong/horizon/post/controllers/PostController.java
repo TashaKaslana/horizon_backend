@@ -83,4 +83,9 @@ public class PostController {
         postService.deletePost(postId);
         return RestApiResponse.noContent();
     }
+
+    @PutMapping("/bulk-update")
+    public ResponseEntity<RestApiResponse<List<PostResponse>>> bulkUpdatePosts(@Valid @RequestBody org.phong.horizon.post.dtos.BulkPostUpdateRequest request) {
+        return RestApiResponse.success(postService.bulkUpdatePosts(request));
+    }
 }

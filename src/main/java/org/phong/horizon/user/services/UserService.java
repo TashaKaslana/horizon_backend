@@ -6,6 +6,7 @@ import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.user.dtos.BulkUserDeleteRequest;
+import org.phong.horizon.user.dtos.BulkUserUpdateRequest;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserImageUpdate;
@@ -25,6 +26,8 @@ import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.phong.horizon.user.subdomain.role.entities.Role;
+import org.phong.horizon.user.subdomain.role.repositories.RoleRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +47,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final AuthService authService;
     private final ApplicationEventPublisher publisher;
 
@@ -281,6 +285,33 @@ public class UserService {
     @Transactional
     public boolean existsById(UUID uuid) {
         return userRepository.existsById(uuid);
+    }
+
+    @Transactional
+    public List<UserRespondDto> bulkUpdateUsers(BulkUserUpdateRequest req) {
+        List<User> users = userRepository.findAllById(req.ids());
+
+        Role role;
+        if (req.roleId() != null) {
+            role = roleRepository.getReferenceById(req.roleId());
+        } else {
+            role = null;
+        }
+
+        users.forEach(user -> {
+            if (req.status() != null) {
+                user.setStatus(req.status());
+            }
+            if (role != null) {
+                user.setRole(role);
+            }
+        });
+
+        List<User> updatedUsers = userRepository.saveAll(users);
+
+        return updatedUsers.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional

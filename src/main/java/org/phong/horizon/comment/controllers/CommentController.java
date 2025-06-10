@@ -76,4 +76,9 @@ public class CommentController {
         commentService.unpinComment(commentId);
         return RestApiResponse.noContent();
     }
+
+    @PutMapping("/bulk-update")
+    public ResponseEntity<RestApiResponse<List<CommentRespond>>> bulkUpdateComments(@Valid @RequestBody org.phong.horizon.comment.dtos.BulkCommentUpdateRequest request) {
+        return RestApiResponse.success(commentService.bulkUpdateComments(request));
+    }
 }

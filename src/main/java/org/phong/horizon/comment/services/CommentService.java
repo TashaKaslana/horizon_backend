@@ -3,6 +3,7 @@ package org.phong.horizon.comment.services;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.comment.dtos.BulkCommentDeleteRequest;
+import org.phong.horizon.comment.dtos.BulkCommentUpdateRequest;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CommentResponseWithPostDetails;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
@@ -271,7 +272,16 @@ public class CommentService {
     public void bulkDeleteComments(BulkCommentDeleteRequest request) {
         commentRepository.deleteAllById(request.commentIds());
     }
+
+    @Transactional
+    public List<CommentRespond> bulkUpdateComments(BulkCommentUpdateRequest req) {
+        List<Comment> comments = commentRepository.findAllById(req.ids());
+        comments.forEach(comment -> {
+            if (req.status() != null) {
+                comment.setStatus(req.status());
+            }
+        });
+        List<Comment> updatedComments = commentRepository.saveAll(comments);
+        return updatedComments.stream().map(commentMapper::toDto).collect(java.util.stream.Collectors.toList());
+    }
 }
-
-
-

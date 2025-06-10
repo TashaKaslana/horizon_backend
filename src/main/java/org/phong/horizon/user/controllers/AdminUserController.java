@@ -4,6 +4,7 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.user.dtos.BulkUserDeleteRequest;
+import org.phong.horizon.user.dtos.BulkUserUpdateRequest;
 import org.phong.horizon.user.dtos.UserAccountUpdate;
 import org.phong.horizon.user.dtos.UserIntroduction;
 import org.phong.horizon.user.dtos.UserRespondDto;
@@ -93,5 +94,10 @@ public class AdminUserController {
     public ResponseEntity<RestApiResponse<Void>> bulkDeleteUsers(@RequestBody BulkUserDeleteRequest request) {
         userService.bulkDeleteUsers(request);
         return RestApiResponse.noContent();
+    }
+
+    @GetMapping("bulk-update")
+    public ResponseEntity<RestApiResponse<List<UserRespondDto>>> bulkUpdateUsers(@RequestBody BulkUserUpdateRequest request) {
+        return RestApiResponse.success(userService.bulkUpdateUsers(request));
     }
 }

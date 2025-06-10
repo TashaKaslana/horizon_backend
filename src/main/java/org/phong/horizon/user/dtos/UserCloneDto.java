@@ -1,5 +1,7 @@
 package org.phong.horizon.user.dtos;
 
+import org.phong.horizon.user.enums.UserStatus;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -12,5 +14,5 @@ public record UserCloneDto(Instant createdAt, Instant updatedAt, UUID createdBy,
                            String auth0Id, String firstName, String lastName, String username, String email,
                            String phoneNumber, LocalDate dateOfBirth, String gender, String bio, String profileImage,
                            String coverImage, String country, String city, Instant deletedAt, String displayName,
-                           Boolean isLogin) implements Serializable {
+                           Boolean isLogin, UserStatus status) implements Serializable {
 }

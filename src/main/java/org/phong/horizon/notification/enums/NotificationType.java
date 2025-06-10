@@ -1,5 +1,8 @@
 package org.phong.horizon.notification.enums;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(name = "NotificationType", description = "Type of notification event")
 public enum NotificationType {
     LIKE_POST,
     NEW_FOLLOWER,

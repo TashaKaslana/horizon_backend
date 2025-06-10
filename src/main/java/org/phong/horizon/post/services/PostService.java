@@ -9,6 +9,7 @@ import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.dtos.BulkPostDeleteRequest;
+import org.phong.horizon.post.dtos.BulkPostUpdateRequest;
 import org.phong.horizon.post.dtos.CreatePostRequest;
 import org.phong.horizon.post.dtos.PostAdminViewDto;
 import org.phong.horizon.post.dtos.PostCreatedDto;
@@ -283,5 +284,25 @@ public class PostService {
 
     public void bulkDeletePosts(BulkPostDeleteRequest request) {
         postRepository.deleteAllById(request.postIds());
+    }
+
+    @Transactional
+    public List<PostResponse> bulkUpdatePosts(BulkPostUpdateRequest req) {
+        List<Post> posts = postRepository.findAllById(req.ids());
+
+        posts.forEach(post -> {
+            if (req.status() != null) {
+                post.setStatus(req.status());
+            }
+            if (req.visibility() != null) {
+                post.setVisibility(req.visibility());
+            }
+            if (req.categoryId() != null) {
+                post.setCategory(postCategoryService.getRefById(req.categoryId()));
+            }
+        });
+
+        List<Post> updatedPosts = postRepository.saveAll(posts);
+        return updatedPosts.stream().map(postMapper::toDto2).collect(java.util.stream.Collectors.toList());
     }
 }

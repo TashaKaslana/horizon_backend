@@ -9,6 +9,7 @@ import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.enums.PostErrorEnums;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
+import org.phong.horizon.post.subdomain.category.dtos.BulkPostCategoryDeleteRequest;
 import org.phong.horizon.post.subdomain.category.dtos.CreatePostCategoryRequest;
 import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
 import org.phong.horizon.post.subdomain.category.dtos.PostCategoryWithCountDto;
@@ -127,12 +128,19 @@ public class PostCategoryService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void bulkDeletePostCategories(BulkPostCategoryDeleteRequest request) {
+        postCategoryRepository.deleteAllById(request.postCategoryIds());
+    }
+
+    @Transactional
     public PostCategory getRefByName(String name) {
         return postCategoryRepository.getReferenceByName(name);
     }
 
     /**
      * Get all categories with their post counts
+     *
      * @param pageable Pagination information
      * @return Page of categories with post counts
      */
@@ -141,17 +149,18 @@ public class PostCategoryService {
         Page<PostCategory> categories = postCategoryRepository.findAll(pageable);
 
         List<PostCategoryWithCountDto> categoriesWithCounts = categories.getContent().stream()
-            .map(category -> {
-                long postCount = postRepository.countByCategory(category);
-                return new PostCategoryWithCountDto(category, postCount);
-            })
-            .collect(Collectors.toList());
+                .map(category -> {
+                    long postCount = postRepository.countByCategory(category);
+                    return new PostCategoryWithCountDto(category, postCount);
+                })
+                .collect(Collectors.toList());
 
         return new PageImpl<>(categoriesWithCounts, pageable, categories.getTotalElements());
     }
 
     /**
      * Get a specific category with its post count by ID
+     *
      * @param id Category ID
      * @return Category with post count
      */
@@ -164,6 +173,7 @@ public class PostCategoryService {
 
     /**
      * Get a specific category with its post count by name
+     *
      * @param name Category name
      * @return Category with post count
      */
@@ -176,6 +186,7 @@ public class PostCategoryService {
 
     /**
      * Get all categories with their post counts (non-paginated)
+     *
      * @return List of all categories with post counts
      */
     @Transactional(readOnly = true)
@@ -183,10 +194,15 @@ public class PostCategoryService {
         List<PostCategory> categories = postCategoryRepository.findAll();
 
         return categories.stream()
-            .map(category -> {
-                long postCount = postRepository.countByCategory(category);
-                return new PostCategoryWithCountDto(category, postCount);
-            })
-            .collect(Collectors.toList());
+                .map(category -> {
+                    long postCount = postRepository.countByCategory(category);
+                    return new PostCategoryWithCountDto(category, postCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PostCategory getRefById(UUID id) {
+        return postCategoryRepository.getReferenceById(id);
     }
 }

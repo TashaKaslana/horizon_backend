@@ -7,6 +7,7 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
+import org.phong.horizon.post.subdomain.category.dtos.BulkPostCategoryDeleteRequest;
 import org.phong.horizon.post.subdomain.category.dtos.CreatePostCategoryRequest;
 import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
 import org.phong.horizon.post.subdomain.category.dtos.PostCategoryWithCountDto;
@@ -117,5 +118,11 @@ public class PostCategoryController {
     public ResponseEntity<RestApiResponse<PostCategoryWithCountDto>> getCategoryWithCountByName(@PathVariable String postCategoryName) {
         PostCategoryWithCountDto categoryWithCount = postCategoryService.getCategoryWithCountByName(postCategoryName);
         return RestApiResponse.success(categoryWithCount);
+    }
+
+    @DeleteMapping("/bulk")
+    public ResponseEntity<RestApiResponse<Void>> deletePostCategories(@RequestBody BulkPostCategoryDeleteRequest request) {
+        postCategoryService.bulkDeletePostCategories(request);
+        return RestApiResponse.noContent();
     }
 }
