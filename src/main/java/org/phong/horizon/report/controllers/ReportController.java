@@ -78,4 +78,10 @@ public class ReportController {
         reportService.deleteReport(reportId);
         return RestApiResponse.noContent();
     }
+
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteReports(@Valid @RequestBody org.phong.horizon.report.dto.BulkReportDeleteRequest request) {
+        reportService.bulkDeleteReports(request);
+        return RestApiResponse.noContent();
+    }
 }

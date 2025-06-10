@@ -58,5 +58,10 @@ public class PermissionController {
         permissionService.deletePermission(id);
         return RestApiResponse.noContent();
     }
-}
 
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<RestApiResponse<Void>> bulkDeletePermissions(@Valid @RequestBody org.phong.horizon.user.subdomain.permission.dtos.BulkPermissionDeleteRequest request) {
+        permissionService.bulkDeletePermissions(request);
+        return RestApiResponse.noContent();
+    }
+}

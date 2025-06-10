@@ -1,6 +1,7 @@
 package org.phong.horizon.user.subdomain.permission.services;
 
 import lombok.AllArgsConstructor;
+import org.phong.horizon.user.subdomain.permission.dtos.BulkPermissionDeleteRequest;
 import org.phong.horizon.user.subdomain.permission.dtos.CreatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.dtos.PermissionDto;
 import org.phong.horizon.user.subdomain.permission.dtos.UpdatePermissionRequest;
@@ -128,6 +129,11 @@ public class PermissionService {
     public Permission findById(UUID id) {
         return permissionRepository.findById(id)
                 .orElseThrow(() -> new PermissionNotFoundException(PermissionExceptionMessage.PERMISSION_NOT_FOUND, id));
+    }
 
+    @Transactional
+    public void bulkDeletePermissions(BulkPermissionDeleteRequest request) {
+        permissionRepository.deleteAllById(request.permissionIds());
+        log.info("Successfully deleted {} permissions in bulk", request.permissionIds().size());
     }
 }

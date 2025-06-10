@@ -7,15 +7,15 @@ import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.report.dto.CreateReportRequest;
 import org.phong.horizon.report.dto.ReportDto;
-import org.phong.horizon.report.enums.ReportErrorCode;
-import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.enums.ModerationItemType;
+import org.phong.horizon.report.enums.ModerationStatus;
+import org.phong.horizon.report.enums.ReportErrorCode;
 import org.phong.horizon.report.events.ReportCreatedEvent;
 import org.phong.horizon.report.exceptions.InvalidReportInputException;
 import org.phong.horizon.report.exceptions.ReportNotFoundException;
+import org.phong.horizon.report.infrastructure.mapper.ReportMapper;
 import org.phong.horizon.report.infrastructure.persistence.entities.Report;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
-import org.phong.horizon.report.infrastructure.mapper.ReportMapper;
 import org.phong.horizon.report.specifications.ReportSpecifications;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
@@ -148,14 +148,12 @@ public class ReportService {
 
     /**
      * Checks if a given status represents a resolution or action taken
+     *
      * @param status The status to check
-     * @return true if the status represents a resolved state
+     * @return true if the status indicates resolution or action
      */
     private boolean isResolutionStatus(ModerationStatus status) {
-        return status == ModerationStatus.RESOLVED ||
-               status == ModerationStatus.ACTIONTAKEN_CONTENTREMOVED ||
-               status == ModerationStatus.ACTIONTAKEN_USERBANNED ||
-               status == ModerationStatus.ACTIONTAKEN_USERWARNED;
+        return status != ModerationStatus.REVIEWED_REJECTED;
     }
 
     @Transactional
@@ -164,5 +162,10 @@ public class ReportService {
             throw new ReportNotFoundException(reportId);
         }
         reportRepository.deleteById(reportId);
+    }
+
+    @Transactional
+    public void bulkDeleteReports(org.phong.horizon.report.dto.BulkReportDeleteRequest request) {
+        reportRepository.deleteAllById(request.reportIds());
     }
 }

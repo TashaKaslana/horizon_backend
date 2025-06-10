@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.user.subdomain.permission.entities.Permission;
 import org.phong.horizon.user.subdomain.permission.services.PermissionService;
 import org.phong.horizon.user.subdomain.role.dtos.AssignPermissionsToRoleRequest;
+import org.phong.horizon.user.subdomain.role.dtos.BulkRoleDeleteRequest;
 import org.phong.horizon.user.subdomain.role.dtos.CreateRoleRequest;
 import org.phong.horizon.user.subdomain.role.dtos.RoleDto;
 import org.phong.horizon.user.subdomain.role.dtos.UpdateRoleRequest;
@@ -166,7 +167,7 @@ public class RoleService {
 
         Set<RolePermission> newRolePermissions = new HashSet<>();
         for (Permission permission : permissionsToAssign) {
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(role.getId(), permission.getId())) {
+            if (rolePermissionRepository.notExistsByRoleIdAndPermissionId(role.getId(), permission.getId())) {
                 RolePermission rolePermission = new RolePermission();
                 rolePermission.setRole(role);
                 rolePermission.setPermission(permission);
@@ -206,7 +207,7 @@ public class RoleService {
 
         Set<RolePermission> newAssignments = new HashSet<>();
         for (UUID permissionId : newPermissionIds) {
-            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(roleId, permissionId)) {
+            if (rolePermissionRepository.notExistsByRoleIdAndPermissionId(roleId, permissionId)) {
                 Permission permission = permissionService.findById(permissionId);
                 RolePermission rolePermission = new RolePermission();
                 rolePermission.setRole(role);
@@ -223,5 +224,22 @@ public class RoleService {
              .orElseThrow(() -> new RoleNotFoundException(RoleExceptionMessage.ROLE_NOT_FOUND, roleId));
         return roleMapper.toDto(updatedRole);
     }
-}
 
+    @Transactional
+    public void bulkDeleteRoles(BulkRoleDeleteRequest request) {
+        log.info("Attempting to delete {} roles in bulk", request.roleIds().size());
+
+        // Check if any roles are assigned to users before deletion
+        for (UUID roleId : request.roleIds()) {
+            if (userRepository.existsByRoleId(roleId)) {
+                Role role = roleRepository.findById(roleId)
+                    .orElseThrow(() -> new RoleNotFoundException(RoleExceptionMessage.ROLE_NOT_FOUND, roleId));
+                throw new RoleManagementException(RoleExceptionMessage.CANNOT_DELETE_ROLE_HAS_USERS.format(role.getName()));
+            }
+        }
+        rolePermissionRepository.deleteByRoleIdIn(request.roleIds());
+
+        roleRepository.deleteAllById(request.roleIds());
+        log.info("Successfully deleted {} roles in bulk", request.roleIds().size());
+    }
+}

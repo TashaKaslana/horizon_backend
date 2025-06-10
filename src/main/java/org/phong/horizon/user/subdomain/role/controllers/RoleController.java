@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.core.responses.RestApiResponse;
 import org.phong.horizon.user.subdomain.role.dtos.AssignPermissionsToRoleRequest;
+import org.phong.horizon.user.subdomain.role.dtos.BulkRoleDeleteRequest;
 import org.phong.horizon.user.subdomain.role.dtos.CreateRoleRequest;
 import org.phong.horizon.user.subdomain.role.dtos.RoleDto;
 import org.phong.horizon.user.subdomain.role.dtos.UpdateRoleRequest;
@@ -72,5 +73,10 @@ public class RoleController {
         RoleDto updatedRole = roleService.assignPermissionsToRole(request);
         return RestApiResponse.success(updatedRole);
     }
-}
 
+    @DeleteMapping("/bulk-delete")
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteRoles(@Valid @RequestBody BulkRoleDeleteRequest request) {
+        roleService.bulkDeleteRoles(request);
+        return RestApiResponse.noContent();
+    }
+}
