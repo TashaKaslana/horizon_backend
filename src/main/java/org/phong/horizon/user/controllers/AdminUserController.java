@@ -96,7 +96,7 @@ public class AdminUserController {
         return RestApiResponse.noContent();
     }
 
-    @GetMapping("bulk-update")
+    @PutMapping("bulk-update")
     public ResponseEntity<RestApiResponse<List<UserRespondDto>>> bulkUpdateUsers(@RequestBody BulkUserUpdateRequest request) {
         return RestApiResponse.success(userService.bulkUpdateUsers(request));
     }

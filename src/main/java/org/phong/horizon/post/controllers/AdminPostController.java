@@ -4,6 +4,7 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.annotations.LogActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.post.dtos.BulkPostDeleteRequest;
+import org.phong.horizon.post.dtos.BulkPostUpdateRequest;
 import org.phong.horizon.post.dtos.PostAdminViewDto;
 import org.phong.horizon.post.dtos.PostResponse;
 import org.phong.horizon.post.services.PostService;
@@ -74,5 +75,15 @@ public class AdminPostController {
     public ResponseEntity<RestApiResponse<Void>> bulkDeletePosts(@RequestBody BulkPostDeleteRequest request) {
         postService.bulkDeletePosts(request);
         return RestApiResponse.noContent();
+    }
+
+    @PutMapping("/bulk")
+    @LogActivity(
+            activityCode = ActivityTypeCode.POST_UPDATE,
+            description = "Admin bulk update posts",
+            targetType = SystemCategory.POST
+    )
+    public ResponseEntity<RestApiResponse<List<PostResponse>>> bulkUpdatePosts(@RequestBody BulkPostUpdateRequest request) {
+        return RestApiResponse.success(postService.bulkUpdatePosts(request));
     }
 }
