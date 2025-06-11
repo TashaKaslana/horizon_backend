@@ -35,7 +35,7 @@ public interface RolePermissionRepository extends JpaRepository<RolePermission, 
     @Query("DELETE FROM RolePermission rp WHERE rp.role.id IN :roleIds")
     void deleteByRoleIdIn(@Param("roleIds") List<UUID> roleIds);
 
-    boolean notExistsByRoleIdAndPermissionId(UUID roleId, UUID permissionId);
+    boolean existsByRoleIdAndPermissionId(UUID roleId, UUID permissionId);
 
     @Modifying
     @Query("DELETE FROM RolePermission rp WHERE rp.role.id = :roleId AND rp.permission.id NOT IN :permissionIds")

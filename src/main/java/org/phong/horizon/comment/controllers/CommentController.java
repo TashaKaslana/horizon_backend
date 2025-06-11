@@ -1,6 +1,7 @@
 package org.phong.horizon.comment.controllers;
 
 import jakarta.validation.Valid;
+import org.phong.horizon.comment.dtos.BulkCommentUpdateRequest;
 import org.phong.horizon.comment.dtos.CommentRespond;
 import org.phong.horizon.comment.dtos.CreateCommentDto;
 import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
@@ -78,7 +79,7 @@ public class CommentController {
     }
 
     @PutMapping("/bulk-update")
-    public ResponseEntity<RestApiResponse<List<CommentRespond>>> bulkUpdateComments(@Valid @RequestBody org.phong.horizon.comment.dtos.BulkCommentUpdateRequest request) {
+    public ResponseEntity<RestApiResponse<List<CommentRespond>>> bulkUpdateComments(@Valid @RequestBody BulkCommentUpdateRequest request) {
         return RestApiResponse.success(commentService.bulkUpdateComments(request));
     }
 }

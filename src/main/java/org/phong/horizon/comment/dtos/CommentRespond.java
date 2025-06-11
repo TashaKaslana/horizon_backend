@@ -1,5 +1,6 @@
 package org.phong.horizon.comment.dtos;
 
+import org.phong.horizon.comment.enums.CommentStatus;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 
 import java.io.Serializable;
@@ -11,5 +12,5 @@ import java.util.UUID;
  */
 public record CommentRespond(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id,
                              String content, UUID parentCommentId, Boolean isAuthorDeleted, UserSummaryRespond user,
-                             UUID postId, Boolean isPinned) implements Serializable {
+                             UUID postId, Boolean isPinned, CommentStatus status) implements Serializable {
 }

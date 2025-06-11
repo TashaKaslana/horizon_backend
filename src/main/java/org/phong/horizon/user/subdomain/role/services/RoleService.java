@@ -167,7 +167,7 @@ public class RoleService {
 
         Set<RolePermission> newRolePermissions = new HashSet<>();
         for (Permission permission : permissionsToAssign) {
-            if (rolePermissionRepository.notExistsByRoleIdAndPermissionId(role.getId(), permission.getId())) {
+            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(role.getId(), permission.getId())) {
                 RolePermission rolePermission = new RolePermission();
                 rolePermission.setRole(role);
                 rolePermission.setPermission(permission);
@@ -207,7 +207,7 @@ public class RoleService {
 
         Set<RolePermission> newAssignments = new HashSet<>();
         for (UUID permissionId : newPermissionIds) {
-            if (rolePermissionRepository.notExistsByRoleIdAndPermissionId(roleId, permissionId)) {
+            if (!rolePermissionRepository.existsByRoleIdAndPermissionId(roleId, permissionId)) {
                 Permission permission = permissionService.findById(permissionId);
                 RolePermission rolePermission = new RolePermission();
                 rolePermission.setRole(role);
