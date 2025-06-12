@@ -3,6 +3,7 @@ package org.phong.horizon.user.subdomain.permission.controllers;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.phong.horizon.user.subdomain.permission.dtos.BulkPermissionDeleteRequest;
 import org.phong.horizon.user.subdomain.permission.dtos.CreatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.dtos.PermissionDto;
 import org.phong.horizon.user.subdomain.permission.dtos.UpdatePermissionRequest;
@@ -60,7 +61,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/bulk-delete")
-    public ResponseEntity<RestApiResponse<Void>> bulkDeletePermissions(@Valid @RequestBody org.phong.horizon.user.subdomain.permission.dtos.BulkPermissionDeleteRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> bulkDeletePermissions(@Valid @RequestBody BulkPermissionDeleteRequest request) {
         permissionService.bulkDeletePermissions(request);
         return RestApiResponse.noContent();
     }

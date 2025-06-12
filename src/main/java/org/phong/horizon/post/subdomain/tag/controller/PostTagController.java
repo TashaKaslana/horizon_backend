@@ -3,6 +3,7 @@ package org.phong.horizon.post.subdomain.tag.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.phong.horizon.core.responses.RestApiResponse;
+import org.phong.horizon.post.subdomain.tag.dto.BulkTagDeleteRequest;
 import org.phong.horizon.post.subdomain.tag.dto.CreateTagRequest;
 import org.phong.horizon.post.subdomain.tag.dto.TagResponse;
 import org.phong.horizon.post.subdomain.tag.dto.TagWithCountDto;
@@ -175,7 +176,7 @@ public class PostTagController {
      * Bulk delete multiple tags by their IDs
      */
     @DeleteMapping("/bulk-delete")
-    public ResponseEntity<RestApiResponse<Void>> bulkDeleteTags(@Valid @RequestBody org.phong.horizon.post.subdomain.tag.dto.BulkTagDeleteRequest request) {
+    public ResponseEntity<RestApiResponse<Void>> bulkDeleteTags(@Valid @RequestBody BulkTagDeleteRequest request) {
         tagService.bulkDeleteTags(request);
         return RestApiResponse.noContent();
     }
