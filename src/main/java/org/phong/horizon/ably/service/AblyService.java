@@ -4,7 +4,6 @@ import io.ably.lib.realtime.Channel;
 import io.ably.lib.types.AblyException;
 import io.ably.lib.types.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.ably.exception.AblyPublishException;
 import org.springframework.stereotype.Service;
@@ -34,23 +33,18 @@ public class AblyService {
      * @param clientId    The clientId of the user who initiated this event, or null for system events.
      */
     public void publishMessage(String channelName, String eventName, Object data, String clientId) {
-        log.debug("Publishing to '{}' with event '{}' for client '{}'", channelName, eventName, clientId);
-
         try {
             Channel channel = ablyRealtime.channels.get(channelName);
-
-            ObjectNode messageDataNode = objectMapper.valueToTree(data);
-
-            Message message = new Message(eventName, messageDataNode);
+            String messageDataJson = objectMapper.writeValueAsString(data);
+            Message message = new Message(eventName, messageDataJson);
             if (clientId != null) {
                 message.clientId = clientId;
             }
-
             channel.publish(message);
-            log.debug("Successfully published '{}'", eventName);
-
         } catch (AblyException e) {
             throw new AblyPublishException("Failed to publish to Ably", e);
+        } catch (Exception e) {
+            throw new AblyPublishException("Failed to serialize message data", e);
         }
     }
 }
