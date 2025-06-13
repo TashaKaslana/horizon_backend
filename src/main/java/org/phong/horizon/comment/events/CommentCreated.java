@@ -1,20 +1,20 @@
 package org.phong.horizon.comment.events;
 
 import lombok.Getter;
+import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
+import org.phong.horizon.comment.utils.CommentChannelNames;
 import org.springframework.context.ApplicationEvent;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * DTO for {@link Comment}
  */
 @Getter
-public final class CommentCreated extends ApplicationEvent implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 0L;
+public final class CommentCreated extends ApplicationEvent implements Serializable, AblyPublishableEvent {
     private final UUID id;
     private final UUID postId;
     private final UUID userId;
@@ -28,5 +28,26 @@ public final class CommentCreated extends ApplicationEvent implements Serializab
         this.userId = userId;
         this.content = content;
         this.currentUserId = currentUserId;
+    }
+
+    @Override
+    public String getChannelName() {
+        return CommentChannelNames.commentsUnderPost(postId);
+    }
+
+    @Override
+    public String getEventName() {
+        return "comment.created";
+    }
+
+    @Override
+    public Map<String, Object> getPayload() {
+        return Map.of(
+                "id", id,
+                "postId", postId,
+                "userId", userId,
+                "content", content,
+                "currentUserId", currentUserId
+        );
     }
 }
