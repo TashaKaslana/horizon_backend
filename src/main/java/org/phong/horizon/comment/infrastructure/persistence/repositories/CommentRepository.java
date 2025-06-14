@@ -23,6 +23,9 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Query("UPDATE Comment c SET c.isAuthorDeleted = false WHERE c.user.id = :id")
     void restoreAllByUser_Id(UUID id);
 
+    @Query("SELECT c.id FROM Comment c WHERE c.user.id = :id")
+    List<UUID> findIdsByUserId(UUID id);
+
     long countAllByPost_Id(UUID postId);
 
     @Modifying

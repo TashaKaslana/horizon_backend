@@ -7,6 +7,7 @@ import org.phong.horizon.follow.dtos.FollowOverview;
 import org.phong.horizon.follow.dtos.FollowRespond;
 import org.phong.horizon.follow.enums.FollowErrorEnums;
 import org.phong.horizon.follow.events.UserFollowedEvent;
+import org.phong.horizon.follow.events.UserUnFollowedEvent;
 import org.phong.horizon.follow.exceptions.FollowNotFoundException;
 import org.phong.horizon.follow.exceptions.FollowSelfException;
 import org.phong.horizon.follow.infrastructure.mapstruct.FollowMapper;
@@ -133,6 +134,14 @@ public class FollowService {
         followRepository.deleteById(
                 new FollowId(followerId, followingId)
         );
+
+        eventPublisher.publishEvent(new UserUnFollowedEvent(
+                this,
+                userService.findById(followerId).getUsername(),
+                userService.findById(followingId).getUsername(),
+                followerId,
+                followingId
+        ));
     }
 
     @Transactional

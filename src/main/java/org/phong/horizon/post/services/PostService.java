@@ -22,6 +22,7 @@ import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
 import org.phong.horizon.post.events.BulkPostsDeletedEvent;
 import org.phong.horizon.post.events.BulkPostsUpdatedEvent;
+import org.phong.horizon.post.events.BulkPostsRestoredEvent;
 import org.phong.horizon.post.exceptions.PostNotFoundException;
 import org.phong.horizon.post.exceptions.PostPermissionDenialException;
 import org.phong.horizon.post.exceptions.PostWithAssetNotFoundException;
@@ -232,12 +233,18 @@ public class PostService {
 
     @Transactional
     public void softDeletePostByUserId(UUID id) {
+        List<Post> posts = postRepository.findAllByUser_Id(id);
+        List<UUID> postIds = posts.stream().map(Post::getId).toList();
         postRepository.softDeleteAllPostByUserId(id);
+        eventPublisher.publishEvent(new BulkPostsDeletedEvent(this, postIds));
     }
 
     @Transactional
     public void restorePostByUserId(UUID id) {
+        List<Post> posts = postRepository.findAllByUser_Id(id);
+        List<UUID> postIds = posts.stream().map(Post::getId).toList();
         postRepository.restoreAllPostByUserId(id);
+        eventPublisher.publishEvent(new BulkPostsRestoredEvent(this, postIds));
     }
 
     @Transactional
