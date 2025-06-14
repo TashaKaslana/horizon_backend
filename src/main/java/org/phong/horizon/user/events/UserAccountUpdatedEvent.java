@@ -3,7 +3,9 @@ package org.phong.horizon.user.events;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.core.dtos.FieldValueChange;
+import org.phong.horizon.user.utils.UserChannelNames;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Map;
@@ -11,7 +13,7 @@ import java.util.UUID;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class UserAccountUpdatedEvent extends ApplicationEvent {
+public class UserAccountUpdatedEvent extends ApplicationEvent implements AblyPublishableEvent {
     UUID userId;
     String username;
     String email;
@@ -33,5 +35,15 @@ public class UserAccountUpdatedEvent extends ApplicationEvent {
         this.additionalInfo = additionalInfo;
         this.userAgent = userAgent;
         this.clientIp = clientIp;
+    }
+
+    @Override
+    public String getChannelName() {
+        return UserChannelNames.user(userId);
+    }
+
+    @Override
+    public String getEventName() {
+        return "user.account.updated";
     }
 }
