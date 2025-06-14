@@ -22,7 +22,7 @@ public class AblyEventListener {
     @TransactionalEventListener()
     public void handleAblyAppEvent(AblyPublishableEvent event) {
         log.debug("Handling AblyAppEvent for channel: {}, event: {}", event.getChannelName(), event.getEventName());
-        String clientIdForAbly = String.valueOf(authService.getUserIdFromContext());
+        String clientIdForAbly = authService.getAuth0Id();
 
         if (clientIdForAbly != null) {
             log.debug("--- AblyEventProcessor: Found authenticated user ID via AuthService: {}", clientIdForAbly);
