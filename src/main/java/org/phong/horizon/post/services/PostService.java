@@ -20,6 +20,9 @@ import org.phong.horizon.post.enums.PostStatus;
 import org.phong.horizon.post.events.PostCreatedEvent;
 import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
+import org.phong.horizon.post.events.BulkPostsDeletedEvent;
+import org.phong.horizon.post.events.BulkPostsUpdatedEvent;
+import org.phong.horizon.post.events.BulkPostsRestoredEvent;
 import org.phong.horizon.post.exceptions.PostNotFoundException;
 import org.phong.horizon.post.exceptions.PostPermissionDenialException;
 import org.phong.horizon.post.exceptions.PostWithAssetNotFoundException;
@@ -230,12 +233,18 @@ public class PostService {
 
     @Transactional
     public void softDeletePostByUserId(UUID id) {
+        List<Post> posts = postRepository.findAllByUser_Id(id);
+        List<UUID> postIds = posts.stream().map(Post::getId).toList();
         postRepository.softDeleteAllPostByUserId(id);
+        eventPublisher.publishEvent(new BulkPostsDeletedEvent(this, postIds));
     }
 
     @Transactional
     public void restorePostByUserId(UUID id) {
+        List<Post> posts = postRepository.findAllByUser_Id(id);
+        List<UUID> postIds = posts.stream().map(Post::getId).toList();
         postRepository.restoreAllPostByUserId(id);
+        eventPublisher.publishEvent(new BulkPostsRestoredEvent(this, postIds));
     }
 
     @Transactional
@@ -284,6 +293,7 @@ public class PostService {
 
     public void bulkDeletePosts(BulkPostDeleteRequest request) {
         postRepository.deleteAllById(request.postIds());
+        eventPublisher.publishEvent(new BulkPostsDeletedEvent(this, request.postIds()));
     }
 
     @Transactional
@@ -303,6 +313,7 @@ public class PostService {
         });
 
         List<Post> updatedPosts = postRepository.saveAll(posts);
+        eventPublisher.publishEvent(new BulkPostsUpdatedEvent(this, req.ids(), req.status(), req.visibility(), req.categoryId()));
         return updatedPosts.stream().map(postMapper::toDto2).collect(java.util.stream.Collectors.toList());
     }
 }

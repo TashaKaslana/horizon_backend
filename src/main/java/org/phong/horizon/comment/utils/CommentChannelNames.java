@@ -3,6 +3,9 @@ package org.phong.horizon.comment.utils;
 import java.util.UUID;
 
 public class CommentChannelNames {
+    public static String comments() {
+        return "comments";
+    }
     public static String comment(UUID commentId) {
         return "comment." + commentId;
     }

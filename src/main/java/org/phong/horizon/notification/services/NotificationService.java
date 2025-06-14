@@ -18,6 +18,9 @@ import org.phong.horizon.notification.infrastructure.persistence.entities.Notifi
 import org.phong.horizon.notification.infrastructure.persistence.projections.NotificationStatisticProjection;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
+import org.springframework.context.ApplicationEventPublisher;
+import org.phong.horizon.notification.events.NotificationUpdatedEvent;
+import org.phong.horizon.notification.events.NotificationDeletedEvent;
 import org.phong.horizon.notification.utils.NotificationTypeHelper;
 import org.phong.horizon.post.dtos.PostSummaryResponse;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
@@ -54,6 +57,7 @@ public class NotificationService {
     private final UserService userService;
     private final CommentService commentService;
     private final AuthService authService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<NotificationResponse> getMyNotifications(
@@ -191,8 +195,8 @@ public class NotificationService {
 
         notificationMapper.partialUpdate(request, notification);
         log.info("Updating notification with id {}", notificationId);
-
-        notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+        eventPublisher.publishEvent(new NotificationUpdatedEvent(this, notificationMapper.toDto2(saved)));
     }
 
     @Transactional
@@ -214,7 +218,8 @@ public class NotificationService {
         notification.setIsDeleted(true);
         notification.setDeletedAt(OffsetDateTime.now());
 
-        notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+        eventPublisher.publishEvent(new NotificationDeletedEvent(this, saved.getId(), saved.getRecipientUser().getId()));
     }
 
     @Transactional
