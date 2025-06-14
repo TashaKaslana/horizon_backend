@@ -2,6 +2,7 @@ package org.phong.horizon.historyactivity.listeners;
 
 import lombok.AllArgsConstructor;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
+import org.phong.horizon.historyactivity.events.HistoryPublishableEvent;
 import org.phong.horizon.historyactivity.services.ActivityLoggingService;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -19,5 +20,11 @@ public class HistoryActivityListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onCreateHistoryLog(CreateHistoryLogEvent event) {
         activityLoggingService.logActivity(event.getRequest());
+    }
+
+    @TransactionalEventListener
+    @Async("applicationTaskExecutor")
+    public void handleHistoryActivityEvent(HistoryPublishableEvent event) {
+        activityLoggingService.logActivity(event.getHistoryRequest());
     }
 }
