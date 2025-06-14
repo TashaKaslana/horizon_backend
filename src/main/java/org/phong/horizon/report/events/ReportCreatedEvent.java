@@ -1,13 +1,15 @@
 package org.phong.horizon.report.events;
 
 import lombok.Getter;
+import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.report.enums.ModerationItemType;
+import org.phong.horizon.report.utils.ReportChannelNames;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.UUID;
 
 @Getter
-public class ReportCreatedEvent extends ApplicationEvent {
+public class ReportCreatedEvent extends ApplicationEvent implements AblyPublishableEvent {
     private final UUID reportId;
     private final UUID reporterId;
     private final UUID reportedItemId; // ID of the post, comment, or user being reported
@@ -23,6 +25,16 @@ public class ReportCreatedEvent extends ApplicationEvent {
         this.itemType = itemType;
         this.actualReportedUserId = actualReportedUserId;
         this.reason = reason;
+    }
+
+    @Override
+    public String getChannelName() {
+        return ReportChannelNames.reports();
+    }
+
+    @Override
+    public String getEventName() {
+        return "report.created";
     }
 }
 
