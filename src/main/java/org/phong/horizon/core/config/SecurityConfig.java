@@ -49,7 +49,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/users/{id}",
                                 "/api/posts/users/{userId}/public",
-                                "/api/feed"
+                                "/api/feed",
+                                "/api/admin/system/maintenance"
                         ).permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
