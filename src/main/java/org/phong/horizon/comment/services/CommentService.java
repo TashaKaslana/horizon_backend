@@ -15,6 +15,8 @@ import org.phong.horizon.comment.events.CommentDeleted;
 import org.phong.horizon.comment.events.CommentPinned;
 import org.phong.horizon.comment.events.CommentUnPinned;
 import org.phong.horizon.comment.events.CommentUpdated;
+import org.phong.horizon.comment.events.BulkCommentsDeletedEvent;
+import org.phong.horizon.comment.events.BulkCommentsUpdatedEvent;
 import org.phong.horizon.comment.exceptions.CommentNotFoundException;
 import org.phong.horizon.comment.infrastructure.mapstruct.CommentMapper;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
@@ -277,6 +279,7 @@ public class CommentService {
     @Transactional
     public void bulkDeleteComments(BulkCommentDeleteRequest request) {
         commentRepository.deleteAllById(request.commentIds());
+        eventPublisher.publishEvent(new BulkCommentsDeletedEvent(this, request.commentIds()));
     }
 
     @Transactional
@@ -288,6 +291,7 @@ public class CommentService {
             }
         });
         List<Comment> updatedComments = commentRepository.saveAll(comments);
+        eventPublisher.publishEvent(new BulkCommentsUpdatedEvent(this, req.ids(), req.status()));
         return updatedComments.stream().map(commentMapper::toDto).collect(java.util.stream.Collectors.toList());
     }
 }

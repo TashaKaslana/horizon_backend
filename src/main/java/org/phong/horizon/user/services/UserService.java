@@ -21,6 +21,8 @@ import org.phong.horizon.user.events.UserCreatedEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
 import org.phong.horizon.user.events.UserInfoUpdatedEvent;
 import org.phong.horizon.user.events.UserRestoreEvent;
+import org.phong.horizon.user.events.BulkUsersDeletedEvent;
+import org.phong.horizon.user.events.BulkUsersUpdatedEvent;
 import org.phong.horizon.user.exceptions.UserAlreadyExistsException;
 import org.phong.horizon.user.exceptions.UserNotFoundException;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
@@ -308,6 +310,7 @@ public class UserService {
         });
 
         List<User> updatedUsers = userRepository.saveAll(users);
+        publisher.publishEvent(new BulkUsersUpdatedEvent(this, req.ids(), req.status(), req.roleId()));
 
         return updatedUsers.stream()
                 .map(userMapper::toDto)
@@ -317,5 +320,6 @@ public class UserService {
     @Transactional
     public void bulkDeleteUsers(BulkUserDeleteRequest request) {
         userRepository.deleteAllById(request.userIds());
+        publisher.publishEvent(new BulkUsersDeletedEvent(this, request.userIds()));
     }
 }
