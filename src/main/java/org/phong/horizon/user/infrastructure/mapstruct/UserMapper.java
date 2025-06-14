@@ -12,6 +12,7 @@ import org.phong.horizon.user.dtos.UserCreateDto;
 import org.phong.horizon.user.dtos.UserCreatedDto;
 import org.phong.horizon.user.dtos.UserImageUpdate;
 import org.phong.horizon.user.dtos.UserIntroduction;
+import org.phong.horizon.user.dtos.UserOverview;
 import org.phong.horizon.user.dtos.UserRespondDto;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.dtos.UserUpdateInfoDto;
@@ -75,4 +76,11 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User partialUpdate(UserImageUpdate request, @MappingTarget User user);
+
+    User toEntity(UserOverview userOverview);
+
+    UserOverview toDto6(User user);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User partialUpdate(UserOverview userOverview, @MappingTarget User user);
 }

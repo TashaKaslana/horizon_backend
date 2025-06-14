@@ -1,9 +1,12 @@
 package org.phong.horizon.comment.events;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.comment.utils.CommentChannelNames;
+import org.phong.horizon.core.annotations.ExcludeFromPayload;
 import org.phong.horizon.core.dtos.FieldValueChange;
+import org.phong.horizon.core.utils.ObjectConversion;
 import org.springframework.context.ApplicationEvent;
 
 import java.io.Serializable;
@@ -16,6 +19,8 @@ public final class CommentUpdated extends ApplicationEvent implements Serializab
     private final UUID postId;
     private final UUID userId;
     private final String content;
+
+    @ExcludeFromPayload
     private final Map<String, FieldValueChange> additionalInfo;
     private final String userAgent;
     private final String clientIp;
@@ -42,7 +47,7 @@ public final class CommentUpdated extends ApplicationEvent implements Serializab
 
     @Override
     public String getChannelName() {
-        return CommentChannelNames.comment(commentId);
+        return CommentChannelNames.commentsUnderPost(postId);
     }
 
     @Override
@@ -50,17 +55,9 @@ public final class CommentUpdated extends ApplicationEvent implements Serializab
         return "comment.updated";
     }
 
+    @JsonIgnore
     @Override
     public Map<String, Object> getPayload() {
-        return Map.of(
-            "commentId", commentId,
-            "postId", postId,
-            "userId", userId,
-            "content", content,
-            "additionalInfo", additionalInfo,
-            "userAgent", userAgent,
-            "clientIp", clientIp,
-            "currentUserId", currentUserId
-        );
+        return ObjectConversion.convertObjectToFilteredMap(this);
     }
 }

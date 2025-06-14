@@ -25,6 +25,7 @@ import org.phong.horizon.core.utils.HttpRequestUtils;
 import org.phong.horizon.core.utils.ObjectHelper;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,6 +45,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class CommentService {
+    private final UserMapper userMapper;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final UserService userService;
@@ -74,15 +76,19 @@ public class CommentService {
         Comment createdComment = commentRepository.save(comment);
         log.info("Comment created successfully, ID: {}", createdComment.getId());
 
+        CommentRespond createdCommentDto = commentMapper.toDto(createdComment);
+
         eventPublisher.publishEvent(new CommentCreated(this,
                 createdComment.getId(),
                 createdComment.getPost().getId(),
-                createdComment.getUser().getId(),
+                userMapper.toDto6(createdComment.getUser()),
                 createdComment.getContent(),
-                currentUserId
+                createdComment.getParentComment() != null ? createdComment.getParentComment().getId() : null,
+                currentUserId,
+                createdComment.getCreatedAt()
         ));
 
-        return commentMapper.toDto(createdComment);
+        return createdCommentDto;
     }
 
     @Transactional(readOnly = true)

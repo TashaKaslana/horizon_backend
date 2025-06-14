@@ -6,7 +6,6 @@ import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.comment.utils.CommentChannelNames;
 import org.springframework.context.ApplicationEvent;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -27,21 +26,11 @@ public class CommentPinned extends ApplicationEvent implements AblyPublishableEv
 
     @Override
     public String getChannelName() {
-        return CommentChannelNames.comment(commentId);
+        return CommentChannelNames.commentsUnderPost(postId);
     }
 
     @Override
     public String getEventName() {
         return "comment.pinned";
-    }
-
-    @Override
-    public Map<String, Object> getPayload() {
-        return Map.of(
-            "commentId", commentId,
-            "postId", postId,
-            "pinnerId", pinnerId,
-            "pinnedUserId", pinnedUserId
-        );
     }
 }

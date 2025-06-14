@@ -4,30 +4,36 @@ import lombok.Getter;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.utils.CommentChannelNames;
+import org.phong.horizon.user.dtos.UserOverview;
 import org.springframework.context.ApplicationEvent;
 
-import java.io.Serializable;
-import java.util.Map;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
  * DTO for {@link Comment}
  */
 @Getter
-public final class CommentCreated extends ApplicationEvent implements Serializable, AblyPublishableEvent {
+public final class CommentCreated extends ApplicationEvent implements AblyPublishableEvent {
     private final UUID id;
     private final UUID postId;
-    private final UUID userId;
+    private final UserOverview user;
     private final String content;
+    private final UUID parentCommentId;
+    private final Instant createdAt;
     private final UUID currentUserId;
 
-    public CommentCreated(Object source, UUID id, UUID postId, UUID userId, String content, UUID currentUserId) {
+    public CommentCreated(Object source, UUID id, UUID postId,
+                          UserOverview user, String content, UUID parentCommentId,
+                          UUID currentUserId, Instant createdAt) {
         super(source);
         this.id = id;
         this.postId = postId;
-        this.userId = userId;
+        this.user = user;
         this.content = content;
+        this.parentCommentId = parentCommentId;
         this.currentUserId = currentUserId;
+        this.createdAt = createdAt;
     }
 
     @Override
@@ -40,14 +46,20 @@ public final class CommentCreated extends ApplicationEvent implements Serializab
         return "comment.created";
     }
 
-    @Override
-    public Map<String, Object> getPayload() {
-        return Map.of(
-                "id", id,
-                "postId", postId,
-                "userId", userId,
-                "content", content,
-                "currentUserId", currentUserId
-        );
-    }
+//    @Override
+//    public Map<String, Object> getPayload() {
+//        return Map.of(
+//                "id", id,
+//                "postId", postId,
+//                "user", Map.of(
+//                        "id", user.id(),
+//                        "displayName", user.displayName(),
+//                        "username", user.username(),
+//                        "profileImage", user.profileImage()
+//                ),
+//                "content", content,
+//                "parentCommentId", parentCommentId,
+//                "createdAt", createdAt.toString()
+//        );
+//    }
 }
