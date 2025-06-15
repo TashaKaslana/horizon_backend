@@ -12,6 +12,10 @@ import org.phong.horizon.user.subdomain.role.dtos.UpdateRoleRequest;
 import org.phong.horizon.user.subdomain.role.entities.Role;
 import org.phong.horizon.user.subdomain.role.entities.RolePermission;
 import org.phong.horizon.user.subdomain.role.enums.RoleExceptionMessage;
+import org.phong.horizon.user.subdomain.role.events.BulkRolesDeletedEvent;
+import org.phong.horizon.user.subdomain.role.events.RoleCreatedEvent;
+import org.phong.horizon.user.subdomain.role.events.RoleDeletedEvent;
+import org.phong.horizon.user.subdomain.role.events.RoleUpdatedEvent;
 import org.phong.horizon.user.subdomain.role.exceptions.PermissionNotFoundForRoleException;
 import org.phong.horizon.user.subdomain.role.exceptions.RoleAlreadyExistsException;
 import org.phong.horizon.user.subdomain.role.exceptions.RoleManagementException;
@@ -19,7 +23,8 @@ import org.phong.horizon.user.subdomain.role.exceptions.RoleNotFoundException;
 import org.phong.horizon.user.subdomain.role.mappers.RoleMapper;
 import org.phong.horizon.user.subdomain.role.repositories.RolePermissionRepository;
 import org.phong.horizon.user.subdomain.role.repositories.RoleRepository;
-import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository; // For checking if role is in use
+import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +47,7 @@ public class RoleService {
     private final RolePermissionRepository rolePermissionRepository;
     private final RoleMapper roleMapper;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public RoleDto createRole(CreateRoleRequest request) {
@@ -65,7 +71,10 @@ public class RoleService {
             // Fetch again to get role with permissions for DTO mapping
             Role roleWithPermissions = roleRepository.findById(savedRole.getId())
                  .orElseThrow(() -> new RoleNotFoundException(RoleExceptionMessage.ROLE_NOT_FOUND, savedRole.getId()));
-            return roleMapper.toDto(roleWithPermissions);
+
+            RoleDto mapperDto = roleMapper.toDto(roleWithPermissions);
+            eventPublisher.publishEvent(new RoleCreatedEvent(this, mapperDto));
+            return mapperDto;
         } catch (DataIntegrityViolationException e) {
             log.error("Data integrity violation while creating role with slug: {}", request.getSlug(), e);
             throw new RoleManagementException("Could not create role due to data integrity violation (e.g., slug or name might already exist).", e);
@@ -110,7 +119,10 @@ public class RoleService {
         try {
             Role updatedRole = roleRepository.save(role);
             log.info("Successfully updated role with ID: {}", updatedRole.getId());
-            return roleMapper.toDto(updatedRole);
+
+            RoleDto mapperDto = roleMapper.toDto(updatedRole);
+            eventPublisher.publishEvent(new RoleUpdatedEvent(this, mapperDto));
+            return mapperDto;
         } catch (DataIntegrityViolationException e) {
             log.error("Data integrity violation while updating role with ID: {}", id, e);
             throw new RoleManagementException("Could not update role due to data integrity violation.", e);
@@ -132,6 +144,7 @@ public class RoleService {
         rolePermissionRepository.deleteByRoleId(id);
         roleRepository.delete(role);
         log.info("Successfully deleted role with ID: {}", id);
+        eventPublisher.publishEvent(new RoleDeletedEvent(this, role.getId()));
     }
 
     @Transactional
@@ -240,6 +253,7 @@ public class RoleService {
         rolePermissionRepository.deleteByRoleIdIn(request.roleIds());
 
         roleRepository.deleteAllById(request.roleIds());
+        eventPublisher.publishEvent(new BulkRolesDeletedEvent(this, request.roleIds()));
         log.info("Successfully deleted {} roles in bulk", request.roleIds().size());
     }
 }

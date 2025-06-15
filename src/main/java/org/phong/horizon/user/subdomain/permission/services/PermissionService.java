@@ -7,6 +7,10 @@ import org.phong.horizon.user.subdomain.permission.dtos.PermissionDto;
 import org.phong.horizon.user.subdomain.permission.dtos.UpdatePermissionRequest;
 import org.phong.horizon.user.subdomain.permission.entities.Permission;
 import org.phong.horizon.user.subdomain.permission.enums.PermissionExceptionMessage;
+import org.phong.horizon.user.subdomain.permission.events.BulkPermissionsDeletedEvent;
+import org.phong.horizon.user.subdomain.permission.events.PermissionCreatedEvent;
+import org.phong.horizon.user.subdomain.permission.events.PermissionDeletedEvent;
+import org.phong.horizon.user.subdomain.permission.events.PermissionUpdatedEvent;
 import org.phong.horizon.user.subdomain.permission.exceptions.PermissionAlreadyExistsException;
 import org.phong.horizon.user.subdomain.permission.exceptions.PermissionManagementException;
 import org.phong.horizon.user.subdomain.permission.exceptions.PermissionNotFoundException;
@@ -14,6 +18,7 @@ import org.phong.horizon.user.subdomain.permission.mapppers.PermissionMapper;
 import org.phong.horizon.user.subdomain.permission.repositories.PermissionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +38,7 @@ public class PermissionService {
 
     private final PermissionRepository permissionRepository;
     private final PermissionMapper permissionMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public PermissionDto createPermission(CreatePermissionRequest request) {
@@ -48,7 +54,12 @@ public class PermissionService {
         try {
             Permission savedPermission = permissionRepository.save(permission);
             log.info("Successfully created permission with ID: {} and slug: {}", savedPermission.getId(), savedPermission.getSlug());
-            return permissionMapper.toDto(savedPermission);
+
+            // Publish the permission created event
+            PermissionDto mapperDto = permissionMapper.toDto(savedPermission);
+            eventPublisher.publishEvent(new PermissionCreatedEvent(this, mapperDto));
+
+            return mapperDto;
         } catch (DataIntegrityViolationException e) {
             log.error("Data integrity violation while creating permission with slug: {}", request.getSlug(), e);
             // This generic exception can be a fallback or customized further
@@ -94,7 +105,10 @@ public class PermissionService {
         try {
             Permission updatedPermission = permissionRepository.save(permission);
             log.info("Successfully updated permission with ID: {}", updatedPermission.getId());
-            return permissionMapper.toDto(updatedPermission);
+
+            PermissionDto mapperDto = permissionMapper.toDto(updatedPermission);
+            eventPublisher.publishEvent(new PermissionUpdatedEvent(this, mapperDto));
+            return mapperDto;
         } catch (DataIntegrityViolationException e) {
             log.error("Data integrity violation while updating permission with ID: {}", id, e);
             throw new PermissionManagementException("Could not update permission due to data integrity violation.", e);
@@ -108,6 +122,10 @@ public class PermissionService {
             throw new PermissionNotFoundException(PermissionExceptionMessage.PERMISSION_NOT_FOUND, id);
         }
         permissionRepository.deleteById(id);
+
+        // Publish the permission deleted event
+        eventPublisher.publishEvent(new PermissionDeletedEvent(this, id));
+
         log.info("Successfully deleted permission with ID: {}", id);
     }
 
@@ -134,6 +152,10 @@ public class PermissionService {
     @Transactional
     public void bulkDeletePermissions(BulkPermissionDeleteRequest request) {
         permissionRepository.deleteAllById(request.permissionIds());
+
+        // Publish the bulk permissions deleted event
+        eventPublisher.publishEvent(new BulkPermissionsDeletedEvent(this, request.permissionIds()));
+
         log.info("Successfully deleted {} permissions in bulk", request.permissionIds().size());
     }
 }
