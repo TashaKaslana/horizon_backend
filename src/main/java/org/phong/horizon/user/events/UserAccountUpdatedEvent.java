@@ -6,6 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.core.dtos.FieldValueChange;
 import org.phong.horizon.user.utils.UserChannelNames;
+import org.phong.horizon.notification.dtos.CreateNotificationRequest;
+import org.phong.horizon.notification.enums.NotificationType;
+import org.phong.horizon.notification.events.NotificationPublishableEvent;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Map;
@@ -13,7 +16,7 @@ import java.util.UUID;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class UserAccountUpdatedEvent extends ApplicationEvent implements AblyPublishableEvent {
+public class UserAccountUpdatedEvent extends ApplicationEvent implements AblyPublishableEvent, NotificationPublishableEvent {
     UUID userId;
     String username;
     String email;
@@ -45,5 +48,15 @@ public class UserAccountUpdatedEvent extends ApplicationEvent implements AblyPub
     @Override
     public String getEventName() {
         return "user.account.updated";
+    }
+
+    @Override
+    public CreateNotificationRequest getNotificationRequest() {
+        return CreateNotificationRequest.builder()
+                .recipientUserId(userId)
+                .content("Your account information has been successfully updated.")
+                .extraData(Map.of("diffChange", additionalInfo))
+                .type(NotificationType.SYSTEM_MESSAGE)
+                .build();
     }
 }

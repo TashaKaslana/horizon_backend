@@ -4,13 +4,16 @@ import lombok.Getter;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.core.dtos.FieldValueChange;
 import org.phong.horizon.user.utils.UserChannelNames;
+import org.phong.horizon.notification.dtos.CreateNotificationRequest;
+import org.phong.horizon.notification.enums.NotificationType;
+import org.phong.horizon.notification.events.NotificationPublishableEvent;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class UserInfoUpdatedEvent extends ApplicationEvent implements AblyPublishableEvent {
+public class UserInfoUpdatedEvent extends ApplicationEvent implements AblyPublishableEvent, NotificationPublishableEvent {
     private final UUID userId;
     private final String username;
     private final String email;
@@ -40,5 +43,15 @@ public class UserInfoUpdatedEvent extends ApplicationEvent implements AblyPublis
     @Override
     public String getEventName() {
         return "user.info.updated";
+    }
+
+    @Override
+    public CreateNotificationRequest getNotificationRequest() {
+        return CreateNotificationRequest.builder()
+                .recipientUserId(userId)
+                .content("Your personal information has been successfully updated.")
+                .extraData(Map.of("diffChange", additionalInfo))
+                .type(NotificationType.SYSTEM_MESSAGE)
+                .build();
     }
 }

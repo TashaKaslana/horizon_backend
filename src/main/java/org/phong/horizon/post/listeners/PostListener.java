@@ -5,9 +5,6 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
-import org.phong.horizon.notification.dtos.CreateNotificationRequest;
-import org.phong.horizon.notification.enums.NotificationType;
-import org.phong.horizon.notification.events.CreateNotificationEvent;
 import org.phong.horizon.post.events.PostCreatedEvent;
 import org.phong.horizon.post.events.PostDeletedEvent;
 import org.phong.horizon.post.events.PostUpdatedEvent;
@@ -31,31 +28,7 @@ public class PostListener {
     @Async
     @TransactionalEventListener
     @EventListener
-    public void onPostCreated(PostCreatedEvent event) {
-        eventPublisher.publishEvent(new CreateNotificationEvent(
-                this,
-                event.getUserId(),
-                CreateNotificationRequest.builder()
-                        .recipientUserId(event.getUserId())
-                        .content("Your post has been successfully created.")
-                        .type(NotificationType.SYSTEM_MESSAGE)
-                        .build()
-        ));
-    }
-
-    @Async
-    @TransactionalEventListener
-    @EventListener
     public void onPostUpdated(PostUpdatedEvent event) {
-        eventPublisher.publishEvent(new CreateNotificationEvent(
-                this,
-                event.getUserId(),
-                CreateNotificationRequest.builder()
-                        .recipientUserId(event.getUserId())
-                        .content("Your post has been successfully updated.")
-                        .type(NotificationType.SYSTEM_MESSAGE)
-                        .build()
-        ));
 
         eventPublisher.publishEvent(new CreateHistoryLogEvent(
                 this,
@@ -76,15 +49,8 @@ public class PostListener {
     @TransactionalEventListener
     @EventListener
     public void onPostDeleted(PostDeletedEvent event) {
-        eventPublisher.publishEvent(new CreateNotificationEvent(
-                this,
-                event.getUserId(),
-                CreateNotificationRequest.builder()
-                        .recipientUserId(event.getUserId())
-                        .content("Your post has been successfully deleted.")
-                        .type(NotificationType.SYSTEM_MESSAGE)
-                        .build()
-        ));
+        // Notification for this event is handled directly by PostDeletedEvent
+        // via the NotificationPublishableEvent interface.
     }
 
     @EventListener
