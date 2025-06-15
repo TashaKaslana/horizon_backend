@@ -10,6 +10,7 @@ import io.ably.lib.types.Message;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.ably.exception.AblyPublishException;
+import org.phong.horizon.core.factories.GsonFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class AblyService {
     private final AblyRealtime ablyRealtime;
-    private final Gson gson;
+    private static final Gson gson = GsonFactory.create();
 
     /**
      * Publishes a message to a specific Ably channel.

@@ -1,28 +1,16 @@
 package org.phong.horizon.admin.notification.events;
 
 import lombok.Getter;
-import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
-import org.phong.horizon.admin.notification.utils.AdminNotificationChannelNames;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class CreateAdminNotificationEvent extends ApplicationEvent implements AblyPublishableEvent {
+public class CreateAdminNotificationEvent extends ApplicationEvent {
     private final CreateAdminNotification notification;
 
     public CreateAdminNotificationEvent(Object source, CreateAdminNotification notification) {
         super(source);
         this.notification = notification;
-    }
-
-    @Override
-    public String getChannelName() {
-        return AdminNotificationChannelNames.adminNotifications();
-    }
-
-    @Override
-    public String getEventName() {
-        return "admin.notification.created";
     }
 }
 
