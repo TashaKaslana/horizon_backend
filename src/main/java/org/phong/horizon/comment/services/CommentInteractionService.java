@@ -12,8 +12,11 @@ import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.infrastructure.persistence.entities.CommentInteraction;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentInteractionRepository;
 import org.phong.horizon.core.services.AuthService;
+import org.phong.horizon.comment.events.CommentInteractionCreated;
+import org.phong.horizon.comment.events.CommentInteractionDeleted;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,17 +32,20 @@ public class CommentInteractionService {
     private final AuthService authService;
     private final CommentInteractionMapper mapper;
     private final UserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public CommentInteractionService(CommentService commentService,
                                      CommentInteractionRepository repository,
                                      AuthService authService,
                                      CommentInteractionMapper commentInteractionMapper,
-                                     UserService userService) {
+                                     UserService userService,
+                                     ApplicationEventPublisher eventPublisher) {
         this.commentService = commentService;
         this.repository = repository;
         this.authService = authService;
         this.mapper = commentInteractionMapper;
         this.userService = userService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -65,6 +71,8 @@ public class CommentInteractionService {
         CommentInteraction created = repository.save(interaction);
         log.debug("Created interaction for comment {}, user {}, type {}",
                 commentId, currentUser.getId(), request.interactionType());
+        eventPublisher.publishEvent(new CommentInteractionCreated(this,
+                created.getId(), comment.getPost().getId(), currentUserId, request.interactionType()));
         return mapper.toDto2(created);
     }
 
@@ -88,6 +96,9 @@ public class CommentInteractionService {
         } else {
             log.info("Deleted interaction for comment {}, user {}, type {}",
                     commentId, currentUserId, interactionType);
+            eventPublisher.publishEvent(new CommentInteractionDeleted(this,
+                    commentId, commentService.getRefById(commentId).getPost().getId(),
+                    currentUserId, interactionType));
         }
     }
 
