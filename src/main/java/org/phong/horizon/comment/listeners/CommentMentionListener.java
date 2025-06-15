@@ -7,7 +7,7 @@ import org.phong.horizon.comment.events.CommentUpdated;
 import org.phong.horizon.comment.services.CommentMentionService;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.enums.NotificationType;
-import org.phong.horizon.notification.events.CreateNotificationEvent;
+import org.phong.horizon.notification.events.NotificationPublishableEvent;
 import org.phong.horizon.post.services.PostService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -43,17 +43,13 @@ public class CommentMentionListener {
         String postCaption = postService.getPostById(event.getPostId()).caption();
 
         for (var entry : event.getMapUsernameToUserId().entrySet()) {
-            CreateNotificationEvent notificationEvent = new CreateNotificationEvent(
-                    this,
-                    entry.getValue(),
-                    CreateNotificationRequest.builder()
-                            .recipientUserId(entry.getValue())
-                            .postId(event.getPostId())
-                            .commentId(event.getCommentId())
-                            .content(String.format("%s mentioned you in a comment on post: %s", event.getAuthorUsername(), postCaption))
-                            .type(NotificationType.MENTION_COMMENT)
-                            .build()
-            );
+            NotificationPublishableEvent notificationEvent = () -> CreateNotificationRequest.builder()
+                    .recipientUserId(entry.getValue())
+                    .postId(event.getPostId())
+                    .commentId(event.getCommentId())
+                    .content(String.format("%s mentioned you in a comment on post: %s", event.getAuthorUsername(), postCaption))
+                    .type(NotificationType.MENTION_COMMENT)
+                    .build();
 
             eventPublisher.publishEvent(notificationEvent);
         }

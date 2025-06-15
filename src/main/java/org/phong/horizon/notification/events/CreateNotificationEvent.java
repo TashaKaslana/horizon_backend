@@ -2,10 +2,12 @@ package org.phong.horizon.notification.events;
 
 import lombok.Getter;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
+import org.phong.horizon.core.utils.ObjectConversion;
 import org.phong.horizon.notification.dtos.CreateNotificationRequest;
 import org.phong.horizon.notification.utils.NotificationChannelNames;
 import org.springframework.context.ApplicationEvent;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -27,5 +29,10 @@ public class CreateNotificationEvent extends ApplicationEvent implements AblyPub
     @Override
     public String getEventName() {
         return "notification.created";
+    }
+
+    @Override
+    public Map<String, Object> getPayload() {
+        return ObjectConversion.convertObjectToMap(request);
     }
 }

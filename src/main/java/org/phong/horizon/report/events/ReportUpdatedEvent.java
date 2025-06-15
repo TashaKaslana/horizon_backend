@@ -17,7 +17,7 @@ public class ReportUpdatedEvent extends ApplicationEvent implements AblyPublisha
 
     @Override
     public String getChannelName() {
-        return ReportChannelNames.report(report.getId());
+        return ReportChannelNames.reports();
     }
 
     @Override

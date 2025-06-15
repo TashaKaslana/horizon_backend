@@ -18,7 +18,7 @@ public class ReportDeletedEvent extends ApplicationEvent implements AblyPublisha
 
     @Override
     public String getChannelName() {
-        return ReportChannelNames.report(reportId);
+        return ReportChannelNames.reports();
     }
 
     @Override

@@ -11,6 +11,8 @@ import org.phong.horizon.notification.dtos.NotificationStatistic;
 import org.phong.horizon.notification.dtos.UpdateNotificationDto;
 import org.phong.horizon.notification.enums.NotificationErrorEnum;
 import org.phong.horizon.notification.enums.NotificationType;
+import org.phong.horizon.notification.events.NotificationDeletedEvent;
+import org.phong.horizon.notification.events.NotificationUpdatedEvent;
 import org.phong.horizon.notification.exceptions.NotificationAccessDenialException;
 import org.phong.horizon.notification.exceptions.NotificationsNotFoundException;
 import org.phong.horizon.notification.infrastructure.mapstruct.NotificationMapper;
@@ -18,9 +20,6 @@ import org.phong.horizon.notification.infrastructure.persistence.entities.Notifi
 import org.phong.horizon.notification.infrastructure.persistence.projections.NotificationStatisticProjection;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
-import org.springframework.context.ApplicationEventPublisher;
-import org.phong.horizon.notification.events.NotificationUpdatedEvent;
-import org.phong.horizon.notification.events.NotificationDeletedEvent;
 import org.phong.horizon.notification.utils.NotificationTypeHelper;
 import org.phong.horizon.post.dtos.PostSummaryResponse;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
@@ -29,6 +28,7 @@ import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -73,7 +73,7 @@ public class NotificationService {
 
         Page<Notification> notifications = notificationRepository.findAll(specification, pageable);
 
-        return  notifications.map(notification -> {
+        return notifications.map(notification -> {
             String content = generateNotificationContent(notification);
 
             NotificationResponse response = notificationMapper.toDto2(notification);
@@ -122,10 +122,9 @@ public class NotificationService {
 
     //internal service, do not expose it to controller
     @Transactional
-    public void createEventNotification(UUID senderUserId, CreateNotificationRequest request) {
+    public UUID createEventNotification(UUID senderUserId, CreateNotificationRequest request) {
+        Notification notification = notificationMapper.toEntity(request);
         try {
-            Notification notification = notificationMapper.toEntity(request);
-
             processToAddNotificationsRelationship(request, notification);
 
             if (senderUserId != null) {
@@ -134,11 +133,11 @@ public class NotificationService {
                 log.warn("Creating notification of type {} without a sender user.", request.getType());
                 notification.setSenderUser(null);
             }
-
-            notificationRepository.save(notification);
         } catch (Exception e) {
             log.error("Error while creating notification of type {}", request.getType(), e);
         }
+
+        return notificationRepository.save(notification).getId();
     }
 
     @Transactional

@@ -36,7 +36,7 @@ public class NotificationListener {
     public void handleNotificationEvent(NotificationPublishableEvent event) {
         UUID senderUserId = authService.getUserIdFromContext();
 
-        notificationService.createEventNotification(senderUserId ,event.getNotificationRequest());
+        UUID notificationId = notificationService.createEventNotification(senderUserId ,event.getNotificationRequest());
 
         eventPublisher.publishEvent(new AblyPublishableEvent() {
             @Override
@@ -51,7 +51,10 @@ public class NotificationListener {
 
             @Override
             public Map<String, Object> getPayload() {
-                return ObjectConversion.convertObjectToFilteredMap(event.getNotificationRequest());
+                return Map.of(
+                        "notificationId", notificationId.toString(),
+                        "notification", ObjectConversion.convertObjectToMap(event.getNotificationRequest())
+                );
             }
         });
     }

@@ -5,11 +5,15 @@ import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.comment.services.CommentService;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.services.PostService;
+import org.phong.horizon.report.dto.BulkReportDeleteRequest;
+import org.phong.horizon.report.dto.BulkReportUpdateRequest;
 import org.phong.horizon.report.dto.CreateReportRequest;
 import org.phong.horizon.report.dto.ReportDto;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.enums.ReportErrorCode;
+import org.phong.horizon.report.events.BulkReportsDeletedEvent;
+import org.phong.horizon.report.events.BulkReportsUpdatedEvent;
 import org.phong.horizon.report.events.ReportCreatedEvent;
 import org.phong.horizon.report.events.ReportDeletedEvent;
 import org.phong.horizon.report.events.ReportUpdatedEvent;
@@ -28,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -175,8 +180,13 @@ public class ReportService {
      * @param request Bulk delete request containing report IDs to delete
      */
     @Transactional
-    public void bulkDeleteReports(org.phong.horizon.report.dto.BulkReportDeleteRequest request) {
+    public void bulkDeleteReports(BulkReportDeleteRequest request) {
         reportRepository.deleteAllById(request.reportIds());
+
+        eventPublisher.publishEvent(new BulkReportsDeletedEvent(
+            this,
+            request.reportIds()
+        ));
     }
 
     /**
@@ -185,7 +195,7 @@ public class ReportService {
      * @return List of updated report DTOs
      */
     @Transactional
-    public List<ReportDto> bulkUpdateReportStatus(org.phong.horizon.report.dto.BulkReportUpdateRequest request) {
+    public List<ReportDto> bulkUpdateReportStatus(BulkReportUpdateRequest request) {
         List<Report> reports = reportRepository.findAllById(request.reportIds());
 
         reports.forEach(report -> {
@@ -201,6 +211,15 @@ public class ReportService {
         });
 
         List<Report> updatedReports = reportRepository.saveAll(reports);
-        return updatedReports.stream().map(reportMapper::toDto).collect(java.util.stream.Collectors.toList());
+        List<ReportDto> reportDtos = updatedReports.stream().map(reportMapper::toDto).toList();
+
+        eventPublisher.publishEvent(new BulkReportsUpdatedEvent(
+            this,
+            new HashSet<>(request.reportIds()),
+            request.status(),
+            request.moderatorNotes()
+        ));
+
+        return reportDtos;
     }
 }
