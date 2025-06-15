@@ -12,5 +12,5 @@ import java.util.UUID;
  */
 public record CommentRespond(Instant createdAt, Instant updatedAt, UUID createdBy, UUID updatedBy, UUID id,
                              String content, UUID parentCommentId, Boolean isAuthorDeleted, UserSummaryRespond user,
-                             UUID postId, Boolean isPinned, CommentStatus status) implements Serializable {
+                             UUID postId, Boolean isPinned, CommentStatus status, long interactionCount) implements Serializable {
 }

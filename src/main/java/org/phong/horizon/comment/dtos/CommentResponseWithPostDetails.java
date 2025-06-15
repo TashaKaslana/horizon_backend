@@ -15,5 +15,5 @@ public record CommentResponseWithPostDetails(Instant createdAt, Instant updatedA
                                              UUID id, PostSummaryResponse post, UserSummaryRespond user, String content,
                                              UUID parentCommentId, UserSummaryRespond parentCommentUser,
                                              String parentCommentContent, Boolean isPinned, Boolean isAuthorDeleted,
-                                             CommentStatus status) implements Serializable {
+                                             CommentStatus status, long interactionCount) implements Serializable {
 }

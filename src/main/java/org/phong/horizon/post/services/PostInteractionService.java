@@ -10,11 +10,14 @@ import org.phong.horizon.post.enums.PostInteractionError;
 import org.phong.horizon.post.exceptions.PostInteractionAlreadyExistException;
 import org.phong.horizon.post.exceptions.PostInteractionNotFoundException;
 import org.phong.horizon.post.infrastructure.mapstruct.PostInteractionMapper;
+import org.phong.horizon.post.events.PostInteractionCreatedEvent;
+import org.phong.horizon.post.events.PostInteractionDeletedEvent;
 import org.phong.horizon.post.infrastructure.persistence.entities.Post;
 import org.phong.horizon.post.infrastructure.persistence.entities.PostInteraction;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostInteractionRepository;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,7 @@ public class PostInteractionService {
     private final UserService userService;
     private final PostInteractionRepository postInteractionRepository;
     private final PostInteractionMapper postInteractionMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createInteraction(UUID postId, CreatePostInteraction postInteraction) {
@@ -50,6 +54,8 @@ public class PostInteractionService {
         interaction.setInteraction(postInteraction.interactionType());
 
         postInteractionRepository.save(interaction);
+        eventPublisher.publishEvent(new PostInteractionCreatedEvent(this,
+                post.getId(), currentUserId, postInteraction.interactionType()));
     }
 
     @Transactional(readOnly = true)
@@ -66,6 +72,8 @@ public class PostInteractionService {
         );
 
         postInteractionRepository.delete(interaction);
+        eventPublisher.publishEvent(new PostInteractionDeletedEvent(this,
+                postId, currentUserId, interactionType));
     }
 
     @Transactional(readOnly = true)

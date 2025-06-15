@@ -17,8 +17,10 @@ import org.phong.horizon.comment.dtos.UpdateCommentContentDto;
 import org.phong.horizon.comment.infrastructure.persistence.entities.Comment;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
+import org.phong.horizon.comment.utils.CommentUtils;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PostMapper.class, UserMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {PostMapper.class, UserMapper.class, CommentUtils.class})
 public interface CommentMapper {
     @Mapping(source = "postId", target = "post.id")
     @Mapping(source = "parentCommentId", target = "parentComment.id")
@@ -26,6 +28,7 @@ public interface CommentMapper {
 
     @Mapping(source = "post.id", target = "postId")
     @Mapping(source = "parentComment.id", target = "parentCommentId")
+    @Mapping(target = "interactionCount", source = "id", qualifiedByName = "commentInteractionCount")
     CommentRespond toDto(Comment comment);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -59,6 +62,7 @@ public interface CommentMapper {
     Comment toEntity(CommentResponseWithPostDetails commentResponseWithPostDetails);
 
     @InheritInverseConfiguration(name = "toEntity")
+    @Mapping(target = "interactionCount", source = "id", qualifiedByName = "commentInteractionCount")
     CommentResponseWithPostDetails toDto5(Comment comment);
 
     @InheritConfiguration(name = "toEntity")
