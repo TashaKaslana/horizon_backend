@@ -11,11 +11,14 @@ import org.phong.horizon.post.subdomain.tag.dto.TagResponse;
 import org.phong.horizon.post.subdomain.tag.dto.UpdateTagRequest;
 import org.phong.horizon.post.subdomain.tag.dto.TagWithCountDto;
 import org.phong.horizon.post.subdomain.tag.entity.Tag;
+import org.phong.horizon.post.subdomain.tag.events.TagCreatedEvent;
+import org.phong.horizon.post.subdomain.tag.events.TagDeletedEvent;
 import org.phong.horizon.post.subdomain.tag.exception.TagNotFoundException;
 import org.phong.horizon.post.subdomain.tag.exception.TagPropertyConflictException;
 import org.phong.horizon.post.subdomain.tag.mapper.TagMapper;
 import org.phong.horizon.post.subdomain.tag.repository.TagRepository;
 import org.phong.horizon.post.subdomain.tag.specification.TagSpecification;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +39,7 @@ public class TagService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
     private final AuthService authService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public TagResponse createTag(CreateTagRequest createTagRequest) {
@@ -55,7 +59,11 @@ public class TagService {
 
         Tag savedTag = tagRepository.save(tag);
         log.info("Tag with id {} created by user {}", savedTag.getId(), currentUserId);
-        return tagMapper.toTagResponse(savedTag);
+
+        // Publish tag created event
+        TagResponse tagResponse = tagMapper.toTagResponse(savedTag);
+        eventPublisher.publishEvent(new TagCreatedEvent(this, tagResponse));
+        return tagResponse;
     }
 
     @Transactional(readOnly = true)
@@ -110,6 +118,9 @@ public class TagService {
 
         tagRepository.delete(tag);
         log.debug("Tag with id {} deleted by user {}", tag.getId(), currentUserId);
+
+        // Publish tag deleted event
+        eventPublisher.publishEvent(new TagDeletedEvent(this, tagId, tag.getName()));
     }
 
     /**

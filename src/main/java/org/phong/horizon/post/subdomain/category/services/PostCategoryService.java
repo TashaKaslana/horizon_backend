@@ -15,6 +15,9 @@ import org.phong.horizon.post.subdomain.category.dtos.PostCategorySummary;
 import org.phong.horizon.post.subdomain.category.dtos.PostCategoryWithCountDto;
 import org.phong.horizon.post.subdomain.category.dtos.UpdatePostCategoryRequest;
 import org.phong.horizon.post.subdomain.category.entities.PostCategory;
+import org.phong.horizon.post.subdomain.category.events.BulkPostCategoriesDeletedEvent;
+import org.phong.horizon.post.subdomain.category.events.PostCategoryCreatedEvent;
+import org.phong.horizon.post.subdomain.category.events.PostCategoryDeletedEvent;
 import org.phong.horizon.post.subdomain.category.events.PostCategoryUpdate;
 import org.phong.horizon.post.subdomain.category.exceptions.PostCategoryExistsException;
 import org.phong.horizon.post.subdomain.category.exceptions.PostCategoryNotFoundException;
@@ -83,7 +86,21 @@ public class PostCategoryService {
                 .slug(uniqueSlug)
                 .build();
 
-        return postCategoryRepository.save(postCategory);
+        PostCategory savedCategory = postCategoryRepository.save(postCategory);
+
+        // Publish event for category creation
+        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
+        eventPublisher.publishEvent(new PostCategoryCreatedEvent(
+                this,
+                mapper.toDto(savedCategory),
+                userAgent,
+                clientIp,
+                authService.getUserIdFromContext()
+        ));
+
+        return savedCategory;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -110,7 +127,9 @@ public class PostCategoryService {
 
         eventPublisher.publishEvent(new PostCategoryUpdate(
                 this,
+                savedPostCategory.getId(),
                 savedPostCategory.getName(),
+                savedPostCategory.getSlug(),
                 ObjectHelper.extractChangesWithCommonsLang(oldValue, savedPostCategory),
                 userAgent,
                 clientIp,
@@ -124,13 +143,32 @@ public class PostCategoryService {
     public void deletePostCategory(UUID postCategoryId) {
         PostCategory postCategory = getPostCategoryEntityById(postCategoryId);
 
+        String userAgent = Objects.requireNonNull(HttpRequestUtils.getCurrentHttpRequest()).getHeader("User-Agent");
+        String clientIp = HttpRequestUtils.getClientIpAddress(HttpRequestUtils.getCurrentHttpRequest());
+
+        // Delete the category
         postCategoryRepository.delete(postCategory);
+
+        // Publish event for category deletion
+        eventPublisher.publishEvent(new PostCategoryDeletedEvent(
+                this,
+                postCategoryId,
+                postCategory.getName(),
+                userAgent,
+                clientIp,
+                authService.getUserIdFromContext()
+        ));
     }
 
     @Transactional
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void bulkDeletePostCategories(BulkPostCategoryDeleteRequest request) {
         postCategoryRepository.deleteAllById(request.postCategoryIds());
+
+        eventPublisher.publishEvent(new BulkPostCategoriesDeletedEvent(
+                this,
+                request.postCategoryIds()
+        ));
     }
 
     @Transactional
