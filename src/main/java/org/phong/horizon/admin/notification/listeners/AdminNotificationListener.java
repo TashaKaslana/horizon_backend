@@ -22,12 +22,12 @@ public class AdminNotificationListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT) // Or another phase if more appropriate
     public void handleCreateAdminNotification(CreateAdminNotificationEvent event) {
         try {
-            log.debug("Handling CreateAdminNotificationEvent for relatedId: {}", event.getCreateAdminNotificationDto().relatedId());
-            adminNotificationService.createNotification(event.getCreateAdminNotificationDto());
-            log.debug("Admin notification created successfully for relatedId: {}", event.getCreateAdminNotificationDto().relatedId());
+            log.debug("Handling CreateAdminNotificationEvent for relatedId: {}", event.getNotification().relatedId());
+            adminNotificationService.createNotification(event.getNotification());
+            log.debug("Admin notification created successfully for relatedId: {}", event.getNotification().relatedId());
         } catch (Exception e) {
             log.error("Failed to create admin notification for relatedId: {}. Error: {}",
-                      event.getCreateAdminNotificationDto().relatedId(), e.getMessage(), e);
+                      event.getNotification().relatedId(), e.getMessage(), e);
         }
     }
 }

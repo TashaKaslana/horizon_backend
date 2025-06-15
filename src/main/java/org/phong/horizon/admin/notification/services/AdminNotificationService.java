@@ -2,6 +2,8 @@ package org.phong.horizon.admin.notification.services;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.phong.horizon.admin.notification.events.BulkDeletedAdminNotificationEvent;
+import org.phong.horizon.admin.notification.events.BulkUpdatedAdminNotificationEvent;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.AdminNotificationFilterDto;
 import org.phong.horizon.admin.notification.infrastructure.dtos.BulkAdminNotificationDeleteRequest;
@@ -12,6 +14,7 @@ import org.phong.horizon.admin.notification.infrastructure.entities.AdminNotific
 import org.phong.horizon.admin.notification.mappers.AdminNotificationMapper;
 import org.phong.horizon.admin.notification.infrastructure.repositories.AdminNotificationRepository;
 import org.phong.horizon.admin.notification.infrastructure.specifications.AdminNotificationSpecs;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +30,7 @@ public class AdminNotificationService {
 
     private final AdminNotificationRepository adminNotificationRepository;
     private final AdminNotificationMapper adminNotificationMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public Page<AdminNotificationDto> getAllNotifications(Pageable pageable, AdminNotificationFilterDto filterDto) {
@@ -61,7 +65,9 @@ public class AdminNotificationService {
         AdminNotification notification = adminNotificationRepository.findById(id)
                 .orElseThrow(() -> new NotificationNotFoundException(id.toString()));
         notification.setIsRead(true);
-        return adminNotificationMapper.toDto(adminNotificationRepository.save(notification));
+        AdminNotificationDto mapperDto = adminNotificationMapper.toDto(adminNotificationRepository.save(notification));
+        applicationEventPublisher.publishEvent(new BulkUpdatedAdminNotificationEvent(this, List.of(id), true));
+        return mapperDto;
     }
 
     @Transactional
@@ -69,7 +75,9 @@ public class AdminNotificationService {
         AdminNotification notification = adminNotificationRepository.findById(id)
                 .orElseThrow(() -> new NotificationNotFoundException(id.toString()));
         notification.setIsRead(false);
-        return adminNotificationMapper.toDto(adminNotificationRepository.save(notification));
+        AdminNotificationDto mapperDto = adminNotificationMapper.toDto(adminNotificationRepository.save(notification));
+        applicationEventPublisher.publishEvent(new BulkUpdatedAdminNotificationEvent(this, List.of(id), false));
+        return mapperDto;
     }
 
     @Transactional
@@ -78,11 +86,13 @@ public class AdminNotificationService {
             throw new NotificationNotFoundException(id.toString());
         }
         adminNotificationRepository.deleteById(id);
+        applicationEventPublisher.publishEvent(new BulkDeletedAdminNotificationEvent(this, List.of(id)));
     }
 
     @Transactional
     public void bulkDeleteNotifications(@Valid BulkAdminNotificationDeleteRequest request) {
         adminNotificationRepository.deleteAllById(request.notificationIds());
+        applicationEventPublisher.publishEvent(new BulkDeletedAdminNotificationEvent(this, request.notificationIds()));
     }
 
     /**
@@ -95,11 +105,10 @@ public class AdminNotificationService {
     public List<AdminNotificationDto> bulkUpdateNotifications(BulkAdminNotificationUpdateRequest request) {
         List<AdminNotification> notifications = adminNotificationRepository.findAllById(request.notificationIds());
 
-        notifications.forEach(notification -> {
-            notification.setIsRead(request.isRead());
-        });
+        notifications.forEach(notification -> notification.setIsRead(request.isRead()));
 
         List<AdminNotification> updatedNotifications = adminNotificationRepository.saveAll(notifications);
+        applicationEventPublisher.publishEvent(new BulkUpdatedAdminNotificationEvent(this, request.notificationIds(), request.isRead()));
         return updatedNotifications.stream()
             .map(adminNotificationMapper::toDto)
             .collect(java.util.stream.Collectors.toList());

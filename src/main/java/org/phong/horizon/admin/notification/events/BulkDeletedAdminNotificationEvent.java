@@ -2,17 +2,19 @@ package org.phong.horizon.admin.notification.events;
 
 import lombok.Getter;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
-import org.phong.horizon.admin.notification.infrastructure.dtos.CreateAdminNotification;
 import org.phong.horizon.admin.notification.utils.AdminNotificationChannelNames;
 import org.springframework.context.ApplicationEvent;
 
-@Getter
-public class CreateAdminNotificationEvent extends ApplicationEvent implements AblyPublishableEvent {
-    private final CreateAdminNotification notification;
+import java.util.List;
+import java.util.UUID;
 
-    public CreateAdminNotificationEvent(Object source, CreateAdminNotification notification) {
+@Getter
+public class BulkDeletedAdminNotificationEvent extends ApplicationEvent implements AblyPublishableEvent {
+    private final List<UUID> notificationIds;
+
+    public BulkDeletedAdminNotificationEvent(Object source, List<UUID> notificationIds) {
         super(source);
-        this.notification = notification;
+        this.notificationIds = notificationIds;
     }
 
     @Override
@@ -22,7 +24,6 @@ public class CreateAdminNotificationEvent extends ApplicationEvent implements Ab
 
     @Override
     public String getEventName() {
-        return "admin.notification.created";
+        return "admin.notification.bulk.deleted";
     }
 }
-
