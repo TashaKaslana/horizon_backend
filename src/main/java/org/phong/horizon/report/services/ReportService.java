@@ -11,6 +11,8 @@ import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.enums.ReportErrorCode;
 import org.phong.horizon.report.events.ReportCreatedEvent;
+import org.phong.horizon.report.events.ReportDeletedEvent;
+import org.phong.horizon.report.events.ReportUpdatedEvent;
 import org.phong.horizon.report.exceptions.InvalidReportInputException;
 import org.phong.horizon.report.exceptions.ReportNotFoundException;
 import org.phong.horizon.report.infrastructure.mapper.ReportMapper;
@@ -144,7 +146,9 @@ public class ReportService {
             report.setResolvedAt(java.time.OffsetDateTime.now());
         }
 
-        return reportMapper.toDto(report);
+        ReportDto dto = reportMapper.toDto(report);
+        eventPublisher.publishEvent(new ReportUpdatedEvent(this, dto));
+        return dto;
     }
 
     /**
@@ -163,6 +167,7 @@ public class ReportService {
             throw new ReportNotFoundException(reportId);
         }
         reportRepository.deleteById(reportId);
+        eventPublisher.publishEvent(new ReportDeletedEvent(this, reportId));
     }
 
     /**

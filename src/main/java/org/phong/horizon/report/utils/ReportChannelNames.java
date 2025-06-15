@@ -9,4 +9,11 @@ public final class ReportChannelNames {
     public static String reports() {
         return "reports";
     }
+
+    /**
+     * Channel for events related to a specific report
+     */
+    public static String report(java.util.UUID reportId) {
+        return "reports." + reportId;
+    }
 }
