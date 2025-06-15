@@ -2,6 +2,7 @@ package org.phong.horizon.follow.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.follow.dtos.FollowOneSideRespond;
 import org.phong.horizon.follow.dtos.FollowOverview;
 import org.phong.horizon.follow.dtos.FollowRespond;
@@ -15,7 +16,6 @@ import org.phong.horizon.follow.infrastructure.persistence.entities.Follow;
 import org.phong.horizon.follow.infrastructure.persistence.entities.FollowId;
 import org.phong.horizon.follow.infrastructure.persistence.projections.FollowOverviewProjection;
 import org.phong.horizon.follow.infrastructure.persistence.repositories.FollowRepository;
-import org.phong.horizon.core.services.AuthService;
 import org.phong.horizon.user.services.UserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -137,10 +137,10 @@ public class FollowService {
 
         eventPublisher.publishEvent(new UserUnFollowedEvent(
                 this,
-                userService.findById(followerId).getUsername(),
-                userService.findById(followingId).getUsername(),
                 followerId,
-                followingId
+                followingId,
+                userService.findById(followerId).getUsername(),
+                userService.findById(followingId).getUsername()
         ));
     }
 
