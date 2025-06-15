@@ -9,9 +9,6 @@ import org.phong.horizon.core.enums.SystemCategory;
 import org.phong.horizon.historyactivity.dtos.CreateHistoryActivity;
 import org.phong.horizon.historyactivity.enums.ActivityTypeCode;
 import org.phong.horizon.historyactivity.events.CreateHistoryLogEvent;
-import org.phong.horizon.notification.dtos.CreateNotificationRequest;
-import org.phong.horizon.notification.enums.NotificationType;
-import org.phong.horizon.notification.events.CreateNotificationEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
 import org.phong.horizon.user.events.UserRestoreEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -63,35 +60,6 @@ public class CommentListener {
         commentService.restoreCommentsByPostId(event.getUserId());
     }
 
-    @EventListener
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Async
-    public void onCommentPinned(CommentPinned event) {
-        eventPublisher.publishEvent(new CreateNotificationEvent(
-                this,
-                event.getPinnerId(),
-                CreateNotificationRequest.builder()
-                        .recipientUserId(event.getPinnedUserId())
-                        .content("Your post has been successfully updated.")
-                        .type(NotificationType.SYSTEM_MESSAGE)
-                        .build()
-        ));
-    }
-
-    @EventListener
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Async
-    public void onCommentUnPinned(CommentUnPinned event) {
-        eventPublisher.publishEvent(
-                new CreateNotificationEvent(
-                        this,
-                        event.getUnpinnerId(),
-                        CreateNotificationRequest.builder()
-                                .recipientUserId(event.getUnpinnedUserId())
-                                .content("Your post has been successfully updated.")
-                                .type(NotificationType.SYSTEM_MESSAGE)
-                                .build()
-                )
-        );
-    }
+    // Notification events are now handled directly by the CommentPinned and
+    // CommentUnPinned events via the NotificationPublishableEvent interface.
 }

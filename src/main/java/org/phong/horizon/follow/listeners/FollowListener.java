@@ -3,9 +3,6 @@ package org.phong.horizon.follow.listeners;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.follow.events.UserFollowedEvent;
 import org.phong.horizon.follow.services.FollowService;
-import org.phong.horizon.notification.dtos.CreateNotificationRequest;
-import org.phong.horizon.notification.enums.NotificationType;
-import org.phong.horizon.notification.events.CreateNotificationEvent;
 import org.phong.horizon.user.events.UserDeletedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -21,15 +18,7 @@ public class FollowListener {
 
     @EventListener
     public void onFollowCreated(UserFollowedEvent event) {
-        eventPublisher.publishEvent(new CreateNotificationEvent(
-                this,
-                event.getFollowerUserId(),
-                CreateNotificationRequest.builder()
-                        .recipientUserId(event.getFollowedUserId())
-                        .content("You have a new follower: " + event.getFollowerUsername())
-                        .type(NotificationType.NEW_FOLLOWER)
-                        .build()
-        ));
+        // Notification for this event is handled by UserFollowedEvent itself.
     }
 
     @EventListener

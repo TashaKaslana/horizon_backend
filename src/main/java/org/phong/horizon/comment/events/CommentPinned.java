@@ -4,13 +4,16 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.phong.horizon.ably.event.AblyPublishableEvent;
 import org.phong.horizon.comment.utils.CommentChannelNames;
+import org.phong.horizon.notification.dtos.CreateNotificationRequest;
+import org.phong.horizon.notification.enums.NotificationType;
+import org.phong.horizon.notification.events.NotificationPublishableEvent;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.UUID;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
-public class CommentPinned extends ApplicationEvent implements AblyPublishableEvent {
+public class CommentPinned extends ApplicationEvent implements AblyPublishableEvent, NotificationPublishableEvent {
     UUID commentId;
     UUID postId;
     UUID pinnerId;
@@ -32,5 +35,14 @@ public class CommentPinned extends ApplicationEvent implements AblyPublishableEv
     @Override
     public String getEventName() {
         return "comment.pinned";
+    }
+
+    @Override
+    public CreateNotificationRequest getNotificationRequest() {
+        return CreateNotificationRequest.builder()
+                .recipientUserId(pinnedUserId)
+                .content("Your post has been successfully updated.")
+                .type(NotificationType.SYSTEM_MESSAGE)
+                .build();
     }
 }
