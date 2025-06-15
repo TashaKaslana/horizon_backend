@@ -105,7 +105,7 @@ public class FollowService {
             return;
         }
 
-        followRepository.save(
+        Follow follow = followRepository.save(
                 Follow.builder()
                         .id(new FollowId(followerId, followingId))
                         .follower(userService.getRefById(followerId))
@@ -115,9 +115,7 @@ public class FollowService {
 
         eventPublisher.publishEvent(new UserFollowedEvent(
                 this,
-                userService.findById(followerId).getUsername(),
-                userService.findById(followingId).getUsername(),
-                followerId,
+                followMapper.mapToFollowerSide(follow),
                 followingId
         ));
     }
