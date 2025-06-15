@@ -72,7 +72,7 @@ public class CommentInteractionService {
         log.debug("Created interaction for comment {}, user {}, type {}",
                 commentId, currentUser.getId(), request.interactionType());
         eventPublisher.publishEvent(new CommentInteractionCreated(this,
-                created.getId(), comment.getPost().getId(), currentUserId, request.interactionType()));
+                comment.getId(), comment.getPost().getId(), currentUserId, request.interactionType()));
         return mapper.toDto2(created);
     }
 
