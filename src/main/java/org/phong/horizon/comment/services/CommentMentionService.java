@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CommentMentionService {
-    private static final Pattern pattern = Pattern.compile("@[\\w-]+");
+    private static final Pattern pattern = Pattern.compile("@[-\\w]+");
     private final CommentMentionRepository commentMentionRepository;
     private final UserService userService;
     private final AuthService authService;
@@ -89,6 +89,7 @@ public class CommentMentionService {
             Map<String, UUID> mapUsernameToUserId = userMap.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getId()));
 
+            log.debug("Publishing CommentMentionCreatedEvent for comment: {}", comment.getId());
             eventPublisher.publishEvent(new CommentMentionCreatedEvent(
                     this,
                     comment.getId(),
@@ -131,6 +132,8 @@ public class CommentMentionService {
         if (content == null || content.isEmpty()) {
             return Collections.emptyList();
         }
+
+        log.debug("Extracting mentions from content: {}", content);
 
         return pattern.matcher(content)
                 .results()
