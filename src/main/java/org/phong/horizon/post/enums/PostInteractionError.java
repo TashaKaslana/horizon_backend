@@ -4,17 +4,21 @@ import lombok.Getter;
 
 @Getter
 public enum PostInteractionError {
-    POST_INTERACTION_EXISTS("Post interaction already exists"),
-    POST_INTERACTION_NOT_FOUND("Post interaction not found"),
-    POST_INTERACTION_INVALID("Invalid post interaction"),
-    POST_INTERACTION_NOT_AUTHORIZED("User is not authorized to perform this action"),
-    POST_INTERACTION_TOO_LONG("Post interaction exceeds the maximum allowed length"),
-    POST_INTERACTION_ALREADY_DELETED("This post interaction has already been deleted"),
-    POST_INTERACTION_UNAUTHORIZED_ACCESS("Access to the post interaction is denied");
+    POST_INTERACTION_EXISTS("post_interaction.error.exists"),
+    POST_INTERACTION_NOT_FOUND("post_interaction.error.not_found"),
+    POST_INTERACTION_INVALID("post_interaction.error.invalid"),
+    POST_INTERACTION_NOT_AUTHORIZED("post_interaction.error.not_authorized"),
+    POST_INTERACTION_TOO_LONG("post_interaction.error.too_long"),
+    POST_INTERACTION_ALREADY_DELETED("post_interaction.error.already_deleted"),
+    POST_INTERACTION_UNAUTHORIZED_ACCESS("post_interaction.error.unauthorized_access");
 
-    private final String message;
+    private final String messageKey;
 
-    PostInteractionError(String message) {
-        this.message = message;
+    PostInteractionError(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 }

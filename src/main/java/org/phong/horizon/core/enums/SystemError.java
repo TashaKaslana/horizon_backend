@@ -5,21 +5,25 @@ import lombok.Getter;
 
 @Getter
 public enum SystemError {
-    VALIDATION_FAILED_MSG("Validation failed"),
-    MALFORMED_REQUEST_MSG("Malformed JSON request"),
-    METHOD_NOT_SUPPORTED_MSG("Method not supported"),
-    GENERIC_ERROR_MSG("An unexpected error occurred"),
-    MISSING_PARAMETER_MSG("Required parameter is missing"),
-    DATA_INTEGRITY_VIOLATION("Operation cannot be completed due to a data conflict (e.g., duplicate entry or invalid reference)."),
-    INVALID_ARGUMENT_TYPE_MSG("Invalid argument type"),
-    AUTHENTICATION_FAILED("Authentication failed"),
-    ACCESS_DENIED("Access denied"),
-    NOT_FOUND_ENDPOINT("Endpoint not found"),
+    VALIDATION_FAILED_MSG("system.validation_failed"),
+    MALFORMED_REQUEST_MSG("system.malformed_request"),
+    METHOD_NOT_SUPPORTED_MSG("system.method_not_supported"),
+    GENERIC_ERROR_MSG("system.generic_error"),
+    MISSING_PARAMETER_MSG("system.missing_parameter"),
+    DATA_INTEGRITY_VIOLATION("system.data_integrity_violation"),
+    INVALID_ARGUMENT_TYPE_MSG("system.invalid_argument_type"),
+    AUTHENTICATION_FAILED("system.authentication_failed"),
+    ACCESS_DENIED("system.access_denied"),
+    NOT_FOUND_ENDPOINT("system.not_found_endpoint"),
     ;
 
-    private final String errorMessage;
+    private final String messageKey;
 
-    SystemError(String errorMessage) {
-        this.errorMessage = errorMessage;
+    SystemError(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getErrorMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 }

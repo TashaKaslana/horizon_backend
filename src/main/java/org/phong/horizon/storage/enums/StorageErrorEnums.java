@@ -4,19 +4,23 @@ import lombok.Getter;
 
 @Getter
 public enum StorageErrorEnums {
-    MISSING_ASSET_PROPERTIES("Required upload data (publicId, secureUrl, resourceType) is missing."),
-    ASSET_ALREADY_EXISTS("Asset already exists: "),
-    ASSET_NOT_FOUND("Asset not found with ID: "),
-    CLOUDINARY_DELETION_FAILED("Failed to delete asset from Cloudinary for ID: "),
-    UNEXPECTED_CLOUDINARY_ERROR("Unexpected error during Cloudinary deletion for ID: "),
-    DB_DELETION_FAILED("Failed to delete asset record from database for ID: "),
-    INVALID_PUBLIC_ID("Public ID cannot be null or blank for Cloudinary deletion."),
-    CLOUDINARY_SIGNATURE_FAILED("Could not generate upload signature.");
+    MISSING_ASSET_PROPERTIES("storage.error.missing_asset_properties"),
+    ASSET_ALREADY_EXISTS("storage.error.asset_already_exists"),
+    ASSET_NOT_FOUND("storage.error.asset_not_found"),
+    CLOUDINARY_DELETION_FAILED("storage.error.cloudinary_deletion_failed"),
+    UNEXPECTED_CLOUDINARY_ERROR("storage.error.unexpected_cloudinary_error"),
+    DB_DELETION_FAILED("storage.error.db_deletion_failed"),
+    INVALID_PUBLIC_ID("storage.error.invalid_public_id"),
+    CLOUDINARY_SIGNATURE_FAILED("storage.error.cloudinary_signature_failed");
 
-    private final String message;
+    private final String messageKey;
 
-    StorageErrorEnums(String message) {
-        this.message = message;
+    StorageErrorEnums(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 
 }

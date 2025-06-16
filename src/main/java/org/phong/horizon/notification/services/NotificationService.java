@@ -28,6 +28,7 @@ import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
+import org.phong.horizon.core.config.LocalizationProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -168,20 +169,19 @@ public class NotificationService {
 
     private String generateNotificationContent(Notification notification) {
         UserSummaryRespond sender = userMapper.toDto3(notification.getSenderUser());
-        PostSummaryResponse post = postMapper.toDto(notification.getPost());
         NotificationType type = notification.getType();
 
         return switch (type) {
-            case LIKE_POST -> "@" + sender.username() + " liked your post.";
-            case COMMENT_POST -> "@" + sender.username() + " commented on your post.";
-            case LIKE_COMMENT -> "@" + sender.username() + " liked your comment.";
-            case REPLY_COMMENT -> "@" + sender.username() + " replied to your comment.";
-            case MENTION_COMMENT -> "@" + sender.username() + " mentioned you in a comment.";
-            case NEW_FOLLOWER -> "@" + sender.username() + " followed you.";
-            case UN_FOLLOWER -> "@" + sender.username() + " unfollowed you.";
-            case REPORT_COMMENT -> "Your comment was reported.";
-            case REPORT_POST -> "Your post was reported.";
-            case COMMENT_PINNED -> "Your comment was pinned.";
+            case LIKE_POST -> LocalizationProvider.getMessage("notification.content.like_post", "@" + sender.username());
+            case COMMENT_POST -> LocalizationProvider.getMessage("notification.content.comment_post", "@" + sender.username());
+            case LIKE_COMMENT -> LocalizationProvider.getMessage("notification.content.like_comment", "@" + sender.username());
+            case REPLY_COMMENT -> LocalizationProvider.getMessage("notification.content.reply_comment", "@" + sender.username());
+            case MENTION_COMMENT -> LocalizationProvider.getMessage("notification.content.mention_comment", "@" + sender.username());
+            case NEW_FOLLOWER -> LocalizationProvider.getMessage("notification.content.new_follower", "@" + sender.username());
+            case UN_FOLLOWER -> LocalizationProvider.getMessage("notification.content.un_follower", "@" + sender.username());
+            case REPORT_COMMENT -> LocalizationProvider.getMessage("notification.content.report_comment");
+            case REPORT_POST -> LocalizationProvider.getMessage("notification.content.report_post");
+            case COMMENT_PINNED -> LocalizationProvider.getMessage("notification.content.comment_pinned");
             case SYSTEM_MESSAGE -> notification.getContent();
         };
     }

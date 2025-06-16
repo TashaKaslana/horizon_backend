@@ -4,15 +4,19 @@ import lombok.Getter;
 
 @Getter
 public enum HistoryActivityBusinessError {
-    ACTIVITY_TYPE_NOT_FOUND("Activity type not found"),
-    ACTIVITY_TYPE_CODE_NOT_FOUND("Activity type code not found"),
-    ACTIVITY_TYPE_CODE_INVALID("Activity type code is invalid"),
-    ACTIVITY_TYPE_CODE_DUPLICATE("Activity type code is duplicate"),
-    ACTIVITY_TYPE_NAME_DUPLICATE("Activity type name is duplicate");
+    ACTIVITY_TYPE_NOT_FOUND("history_activity.error.type_not_found"),
+    ACTIVITY_TYPE_CODE_NOT_FOUND("history_activity.error.code_not_found"),
+    ACTIVITY_TYPE_CODE_INVALID("history_activity.error.code_invalid"),
+    ACTIVITY_TYPE_CODE_DUPLICATE("history_activity.error.code_duplicate"),
+    ACTIVITY_TYPE_NAME_DUPLICATE("history_activity.error.name_duplicate");
 
-    private final String message;
+    private final String messageKey;
 
-    HistoryActivityBusinessError( String message) {
-        this.message = message;
+    HistoryActivityBusinessError(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 }

@@ -5,37 +5,41 @@ import lombok.Getter;
 @Getter
 public enum PostErrorEnums {
     // Validation Errors
-    INVALID_POST_ID("POST_001", "Invalid post ID."),
-    INVALID_USER_ID("POST_002", "Invalid user ID."),
-    INVALID_VIDEO_URL("POST_003", "Video URL cannot be empty."),
-    INVALID_VISIBILITY("POST_004", "Visibility must be 'public', 'private', or 'friends'."),
-    INVALID_DURATION("POST_005", "Duration must be greater than 0."),
+    INVALID_POST_ID("POST_001", "post.error.invalid_post_id"),
+    INVALID_USER_ID("POST_002", "post.error.invalid_user_id"),
+    INVALID_VIDEO_URL("POST_003", "post.error.invalid_video_url"),
+    INVALID_VISIBILITY("POST_004", "post.error.invalid_visibility"),
+    INVALID_DURATION("POST_005", "post.error.invalid_duration"),
 
     // Permission Errors
-    POST_NOT_FOUND("POST_006", "Post not found."),
-    UNAUTHORIZED_POST_ACCESS("POST_007", "You do not have permission to access this post."),
-    UNAUTHORIZED_POST_UPDATE("POST_008", "You do not have permission to update this post."),
-    UNAUTHORIZED_POST_DELETE("POST_009", "You do not have permission to delete this post."),
+    POST_NOT_FOUND("POST_006", "post.error.post_not_found"),
+    UNAUTHORIZED_POST_ACCESS("POST_007", "post.error.unauthorized_access"),
+    UNAUTHORIZED_POST_UPDATE("POST_008", "post.error.unauthorized_update"),
+    UNAUTHORIZED_POST_DELETE("POST_009", "post.error.unauthorized_delete"),
 
     // Business Logic Errors
-    POST_CREATION_FAILED("POST_010", "Failed to create post. Please try again."),
-    POST_UPDATE_FAILED("POST_011", "Failed to update post. Please try again."),
-    POST_DELETION_FAILED("POST_012", "Failed to delete post. Please try again."),
-    TAG_LIMIT_EXCEEDED("POST_013", "You can only add up to 10 tags."),
-    POST_VIDEO_PROCESSING_ERROR("POST_014", "Error processing video. Please try again later."),
-    POST_ASSET_ALREADY_EXISTS("POST_015", "Post with asset already exists."),
-    POST_ASSET_NOT_FOUND("POST_016", "Post asset not found."),
+    POST_CREATION_FAILED("POST_010", "post.error.creation_failed"),
+    POST_UPDATE_FAILED("POST_011", "post.error.update_failed"),
+    POST_DELETION_FAILED("POST_012", "post.error.deletion_failed"),
+    TAG_LIMIT_EXCEEDED("POST_013", "post.error.tag_limit_exceeded"),
+    POST_VIDEO_PROCESSING_ERROR("POST_014", "post.error.video_processing_error"),
+    POST_ASSET_ALREADY_EXISTS("POST_015", "post.error.asset_already_exists"),
+    POST_ASSET_NOT_FOUND("POST_016", "post.error.asset_not_found"),
 
-    POST_CATEGORY_NOT_FOUND("POST_017", "Post category not found."),
-    POST_CATEGORY_EXISTS("POST_018", "Post category already exists."),;
+    POST_CATEGORY_NOT_FOUND("POST_017", "post.error.category_not_found"),
+    POST_CATEGORY_EXISTS("POST_018", "post.error.category_exists"),;
 
 
     private final String code;
-    private final String message;
+    private final String messageKey;
 
-    PostErrorEnums(String code, String message) {
+    PostErrorEnums(String code, String messageKey) {
         this.code = code;
-        this.message = message;
+        this.messageKey = messageKey;
+    }
+
+    public String getMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 }
 

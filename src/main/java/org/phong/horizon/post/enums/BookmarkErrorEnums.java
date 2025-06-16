@@ -4,16 +4,20 @@ import lombok.Getter;
 
 @Getter
 public enum BookmarkErrorEnums {
-    BOOKMARK_NOT_FOUND("Bookmark not found"),
-    BOOKMARK_EXISTS("Bookmark already exists"),
-    BOOKMARK_NOT_OWNED("Bookmark not owned by user"),
-    BOOKMARK_NOT_SAVED("Bookmark not saved"),
-    BOOKMARK_NOT_DELETED("Bookmark not deleted");
+    BOOKMARK_NOT_FOUND("bookmark.error.not_found"),
+    BOOKMARK_EXISTS("bookmark.error.exists"),
+    BOOKMARK_NOT_OWNED("bookmark.error.not_owned"),
+    BOOKMARK_NOT_SAVED("bookmark.error.not_saved"),
+    BOOKMARK_NOT_DELETED("bookmark.error.not_deleted");
 
-    private final String message;
+    private final String messageKey;
 
-    BookmarkErrorEnums(String message) {
-        this.message = message;
+    BookmarkErrorEnums(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 
 }

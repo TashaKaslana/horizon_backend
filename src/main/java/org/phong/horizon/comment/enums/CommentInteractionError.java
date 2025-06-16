@@ -4,17 +4,21 @@ import lombok.Getter;
 
 @Getter
 public enum CommentInteractionError {
-    COMMENT_INTERACTION_EXISTS("Comment interaction already exists"),
-    COMMENT_INTERACTION_NOT_FOUND("Comment interaction not found"),
-    COMMENT_INTERACTION_INVALID("Invalid comment interaction"),
-    COMMENT_INTERACTION_NOT_AUTHORIZED("User is not authorized to perform this action"),
-    COMMENT_INTERACTION_TOO_LONG("Comment interaction exceeds the maximum allowed length"),
-    COMMENT_INTERACTION_ALREADY_DELETED("This comment interaction has already been deleted"),
-    COMMENT_INTERACTION_UNAUTHORIZED_ACCESS("Access to the comment interaction is denied");
+    COMMENT_INTERACTION_EXISTS("comment_interaction.error.exists"),
+    COMMENT_INTERACTION_NOT_FOUND("comment_interaction.error.not_found"),
+    COMMENT_INTERACTION_INVALID("comment_interaction.error.invalid"),
+    COMMENT_INTERACTION_NOT_AUTHORIZED("comment_interaction.error.not_authorized"),
+    COMMENT_INTERACTION_TOO_LONG("comment_interaction.error.too_long"),
+    COMMENT_INTERACTION_ALREADY_DELETED("comment_interaction.error.already_deleted"),
+    COMMENT_INTERACTION_UNAUTHORIZED_ACCESS("comment_interaction.error.unauthorized_access");
 
-    private final String message;
+    private final String messageKey;
 
-    CommentInteractionError(String message) {
-        this.message = message;
+    CommentInteractionError(String messageKey) {
+        this.messageKey = messageKey;
+    }
+
+    public String getMessage(Object... args) {
+        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
     }
 }
