@@ -18,6 +18,6 @@ public class SystemStatusController {
 
     @GetMapping()
     public ResponseEntity<RestApiResponse<Map<String, Object>>> getSystemStatus() {
-        return RestApiResponse.success(systemStatusService.getSystemStatus());
+        return RestApiResponse.success(systemStatusService.getSystemStatus().toMap());
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.admin.system.database_schema.dtos.DatabaseColumnDto;
 import org.phong.horizon.admin.system.database_schema.dtos.DatabaseRelationshipDto;
 import org.phong.horizon.admin.system.database_schema.dtos.DatabaseSchemaDto;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
@@ -24,6 +25,7 @@ import java.util.Set;
 public class DatabaseSchemaService {
     private final DataSource dataSource;
 
+    @Cacheable("databaseSchema")
     public DatabaseSchemaDto getFullSchema() {
         DatabaseSchemaDto schema = new DatabaseSchemaDto();
         try {
