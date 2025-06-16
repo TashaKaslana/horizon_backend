@@ -7,6 +7,10 @@ import io.ably.lib.realtime.CompletionListener;
 import io.ably.lib.types.AblyException;
 import io.ably.lib.types.ErrorInfo;
 import io.ably.lib.types.Message;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.phong.horizon.ably.exception.AblyPublishException;
@@ -22,6 +26,7 @@ import java.util.Map;
 public class AblyService {
     private final AblyRealtime ablyRealtime;
     private static final Gson gson = GsonFactory.create();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * Publishes a message to a specific Ably channel.
@@ -61,5 +66,47 @@ public class AblyService {
         } catch (Exception e) {
             throw new AblyPublishException("Failed to serialize message data", e);
         }
+    }
+
+    /**
+     * Publish multiple messages to a single channel.
+     *
+     * @param channelName target channel
+     * @param messages    list of messages to publish
+     */
+    public void publishMessages(String channelName, List<Message> messages) {
+        try {
+            Channel channel = ablyRealtime.channels.get(channelName);
+            Message[] messageArray = messages.toArray(new Message[0]);
+            channel.publish(messageArray, new CompletionListener() {
+                @Override
+                public void onSuccess() {
+                    log.info("Messages published successfully to channel: {}", channelName);
+                }
+
+                @Override
+                public void onError(ErrorInfo reason) {
+                    log.error("Failed to publish messages to channel: {}. Error: {}", channelName, reason.message);
+                }
+            });
+        } catch (AblyException e) {
+            throw new AblyPublishException("Failed to publish to Ably", e);
+        }
+    }
+
+    /**
+     * Publish messages to multiple channels concurrently.
+     *
+     * @param channelMessages map of channel name to messages
+     */
+    public void publishToMultipleChannels(Map<String, List<Message>> channelMessages) {
+        CompletableFuture.allOf(
+                channelMessages.entrySet().stream()
+                        .map(entry -> CompletableFuture.runAsync(
+                                () -> publishMessages(entry.getKey(), entry.getValue()),
+                                executorService
+                        ))
+                        .toArray(CompletableFuture[]::new)
+        ).join();
     }
 }
