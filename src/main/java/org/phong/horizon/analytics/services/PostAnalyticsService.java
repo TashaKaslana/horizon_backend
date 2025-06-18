@@ -8,6 +8,7 @@ import org.phong.horizon.post.infrastructure.persistence.repositories.PostReposi
 import org.phong.horizon.post.infrastructure.persistence.repositories.ViewRepository;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class PostAnalyticsService {
     private final PostInteractionRepository postInteractionRepository;
 
     @Transactional
+    @Cacheable("post-overview")
     public List<OverviewStatistic> getPostAnalytics() {
         long totalPosts = postRepository.count();
 
@@ -85,6 +87,7 @@ public class PostAnalyticsService {
     }
 
     @Transactional
+    @Cacheable(value = "post-daily-counts", key = "#days")
     public List<DailyCountDto> getFilledDailyPostCounts(int days) {
         Instant from = Instant.now().minus(Duration.ofDays(days));
         List<Object[]> raw = postRepository.countPostsPerDay(from);

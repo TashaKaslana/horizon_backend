@@ -7,6 +7,7 @@ import org.phong.horizon.analytics.dtos.TopTagUsageDTO;
 import org.phong.horizon.analytics.projections.TopTagUsageProjection;
 import org.phong.horizon.post.subdomain.tag.entity.Tag;
 import org.phong.horizon.post.subdomain.tag.repository.TagRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class TagAnalyticsService {
      * Get overview statistics for tags
      */
     @Transactional(readOnly = true)
+    @Cacheable("tag-overview")
     public List<OverviewStatistic> getTagAnalytics() {
         ZoneId zone = ZoneOffset.UTC;
 
@@ -89,6 +91,7 @@ public class TagAnalyticsService {
      * @return List of daily tag counts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "tag-daily-counts", key = "#days")
     public List<DailyCountDto> getDailyTagCounts(int days) {
         Instant startDate = LocalDate.now().minusDays(days - 1).atStartOfDay(ZoneOffset.UTC).toInstant();
         List<Object[]> results = tagRepository.countTagsPerDay(startDate);

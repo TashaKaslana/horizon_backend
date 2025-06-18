@@ -8,6 +8,7 @@ import org.phong.horizon.post.subdomain.category.entities.PostCategory;
 import org.phong.horizon.post.subdomain.category.repositories.PostCategoryRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
 import org.phong.horizon.analytics.projections.TopCategoryUsageProjection;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class CategoryAnalyticsService {
      * Get overview statistics for categories
      */
     @Transactional(readOnly = true)
+    @Cacheable("category-overview")
     public List<OverviewStatistic> getCategoryAnalytics() {
         ZoneId zone = ZoneOffset.UTC;
 
@@ -104,6 +106,7 @@ public class CategoryAnalyticsService {
      * @return List of daily count DTOs with zeros for missing days
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "category-daily-counts", key = "#days")
     public List<DailyCountDto> getFilledDailyCategoryCounts(int days) {
         return getDailyCategoryCounts(days);
     }

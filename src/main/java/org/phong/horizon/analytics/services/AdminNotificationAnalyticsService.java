@@ -7,6 +7,7 @@ import org.phong.horizon.admin.notification.infrastructure.entities.AdminNotific
 import org.phong.horizon.admin.notification.infrastructure.repositories.AdminNotificationRepository;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class AdminNotificationAnalyticsService {
      * Get overview statistics for admin notifications
      */
     @Transactional
+    @Cacheable("admin-notification-overview")
     public List<OverviewStatistic> getAdminNotificationOverview() {
         ZoneId zone = ZoneOffset.UTC;
 

@@ -5,6 +5,7 @@ import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ public class DashboardAnalyticsService {
      * @return List of dashboard statistics for the main overview cards
      */
     @Transactional(readOnly = true)
+    @Cacheable("dashboard-overview")
     public List<OverviewStatistic> getDashboardOverview() {
         // Use UTC for consistent timezone handling
         ZoneId zone = ZoneOffset.UTC;
@@ -116,6 +118,7 @@ public class DashboardAnalyticsService {
      * @return List of daily user counts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "dashboard-users-daily", key = "#days")
     public List<DailyCountDto> getUsersPerDay(int days) {
         // Reuse the UserAnalyticsService to get daily counts
         return userAnalyticsService.getFilledDailyUserCounts(days);
@@ -127,6 +130,7 @@ public class DashboardAnalyticsService {
      * @return List of daily post counts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "dashboard-posts-daily", key = "#days")
     public List<DailyCountDto> getPostsPerDay(int days) {
         // Reuse the PostAnalyticsService to get daily counts
         return postAnalyticsService.getFilledDailyPostCounts(days);
@@ -138,6 +142,7 @@ public class DashboardAnalyticsService {
      * @return List of daily comment counts
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "dashboard-comments-daily", key = "#days")
     public List<DailyCountDto> getCommentsPerDay(int days) {
         // Reuse the CommentAnalyticsService to get daily counts
         return commentAnalyticsService.getFilledDailyCommentCounts(days);
