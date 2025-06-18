@@ -2,6 +2,7 @@ package org.phong.horizon.report.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.phong.horizon.core.services.LocalizationProvider;
 
 @Getter
 @RequiredArgsConstructor
@@ -17,7 +18,7 @@ public enum ReportErrorCode {
     private final String messageKey;
 
     public String getMessage(Object... args) {
-        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
+        return LocalizationProvider.getMessage(this.messageKey, args);
     }
 }
 

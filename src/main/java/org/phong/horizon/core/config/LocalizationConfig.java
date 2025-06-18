@@ -1,5 +1,6 @@
 package org.phong.horizon.core.config;
 
+import org.phong.horizon.core.services.CustomHeaderLocaleResolver;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,7 @@ public class LocalizationConfig {
 
     @Bean
     public LocaleResolver localeResolver() {
-        AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
+        CustomHeaderLocaleResolver resolver = new CustomHeaderLocaleResolver();
         resolver.setDefaultLocale(Locale.ENGLISH);
         return resolver;
     }

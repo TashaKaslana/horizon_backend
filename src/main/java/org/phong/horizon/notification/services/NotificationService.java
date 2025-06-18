@@ -21,15 +21,15 @@ import org.phong.horizon.notification.infrastructure.persistence.projections.Not
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationRepository;
 import org.phong.horizon.notification.infrastructure.persistence.repositories.NotificationSpecifications;
 import org.phong.horizon.notification.utils.NotificationTypeHelper;
-import org.phong.horizon.post.dtos.PostSummaryResponse;
 import org.phong.horizon.post.infrastructure.mapstruct.PostMapper;
 import org.phong.horizon.post.services.PostService;
 import org.phong.horizon.user.dtos.UserSummaryRespond;
 import org.phong.horizon.user.infrastructure.mapstruct.UserMapper;
 import org.phong.horizon.user.infrastructure.persistence.entities.User;
 import org.phong.horizon.user.services.UserService;
-import org.phong.horizon.core.config.LocalizationProvider;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

@@ -1,6 +1,7 @@
 package org.phong.horizon.comment.enums;
 
 import lombok.Getter;
+import org.phong.horizon.core.services.LocalizationProvider;
 
 @Getter
 public enum CommentErrorEnums {
@@ -25,7 +26,7 @@ public enum CommentErrorEnums {
     }
 
     public String getMessage(Object... args) {
-        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
+        return LocalizationProvider.getMessage(this.messageKey, args);
     }
 }
 

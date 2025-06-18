@@ -2,6 +2,7 @@ package org.phong.horizon.core.enums;
 
 
 import lombok.Getter;
+import org.phong.horizon.core.services.LocalizationProvider;
 
 @Getter
 public enum SystemError {
@@ -24,6 +25,6 @@ public enum SystemError {
     }
 
     public String getErrorMessage(Object... args) {
-        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
+        return LocalizationProvider.getMessage(this.messageKey, args);
     }
 }

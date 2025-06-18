@@ -1,6 +1,7 @@
 package org.phong.horizon.post.enums;
 
 import lombok.Getter;
+import org.phong.horizon.core.services.LocalizationProvider;
 
 @Getter
 public enum PostErrorEnums {
@@ -39,7 +40,7 @@ public enum PostErrorEnums {
     }
 
     public String getMessage(Object... args) {
-        return org.phong.horizon.core.config.LocalizationProvider.getMessage(this.messageKey, args);
+        return LocalizationProvider.getMessage(this.messageKey, args);
     }
 }
 
