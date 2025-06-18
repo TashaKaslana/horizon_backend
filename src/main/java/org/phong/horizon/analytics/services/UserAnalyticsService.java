@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class UserAnalyticsService {
     private final UserRepository userRepository;
 
     @Transactional
+    @Cacheable("user-overview")
     public List<OverviewStatistic> getUserAnalytics() {
         long totalUsers = userRepository.count();
 
@@ -76,6 +78,7 @@ public class UserAnalyticsService {
     }
 
     @Transactional
+    @Cacheable(value = "user-daily-counts", key = "#days")
     public List<DailyCountDto> getFilledDailyUserCounts(int days) {
         Instant from = Instant.now().minus(Duration.ofDays(days));
         List<Object[]> raw = userRepository.countUsersPerDay(from);

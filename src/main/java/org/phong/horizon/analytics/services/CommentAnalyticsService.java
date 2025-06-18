@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class CommentAnalyticsService {
     private final CommentRepository commentRepository;
 
     @Transactional
+    @Cacheable("comment-overview")
     public List<OverviewStatistic> getCommentAnalytics() {
         long totalComments = commentRepository.count();
 
@@ -82,6 +84,7 @@ public class CommentAnalyticsService {
     }
 
     @Transactional
+    @Cacheable(value = "comment-daily-counts", key = "#days")
     public List<DailyCountDto> getFilledDailyCommentCounts(int days) {
         Instant from = Instant.now().minus(Duration.ofDays(days));
         List<Object[]> raw = commentRepository.countCommentsPerDay(from);

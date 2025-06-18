@@ -6,6 +6,7 @@ import org.phong.horizon.admin.logentry.infrastructure.entities.LogEntry;
 import org.phong.horizon.admin.logentry.infrastructure.repositories.LogEntryRepository;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class LogAnalyticsService {
      * Get overview statistics for system logs
      */
     @Transactional
+    @Cacheable("log-overview")
     public List<OverviewStatistic> getLogOverviewStatistics() {
         ZoneId zone = ZoneOffset.UTC;
 

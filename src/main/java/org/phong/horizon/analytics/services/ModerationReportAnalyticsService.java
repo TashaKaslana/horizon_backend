@@ -6,6 +6,7 @@ import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class ModerationReportAnalyticsService {
      * Get overview statistics for all moderation reports
      */
     @Transactional
+    @Cacheable(value = "moderation-overview", key = "'all'")
     public List<OverviewStatistic> getModerationOverviewStatistics() {
         return getModerationOverviewStatistics(null);
     }
@@ -36,6 +38,7 @@ public class ModerationReportAnalyticsService {
      * @param itemType The type of item to filter by (USER, POST, COMMENT), or null for all items
      */
     @Transactional
+    @Cacheable(value = "moderation-overview", key = "#itemType == null ? 'all' : #itemType.name()")
     public List<OverviewStatistic> getModerationOverviewStatistics(ModerationItemType itemType) {
         ZoneId zone = ZoneOffset.UTC;
 
