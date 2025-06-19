@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.phong.horizon.comment.infrastructure.persistence.repositories.CommentRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -53,32 +54,34 @@ public class CommentAnalyticsService {
 
         return List.of(
                 new OverviewStatistic(
-                        "Total Comments",
+                        LocalizationProvider.getMessage("analytics.comment.total.title"),
                         String.valueOf(totalComments),
                         6.3,
-                        "Healthy engagement",
-                        "All-time total comments"
+                        LocalizationProvider.getMessage("analytics.comment.total.message"),
+                        LocalizationProvider.getMessage("analytics.comment.total.description")
                 ),
                 new OverviewStatistic(
-                        "Comments Today",
+                        LocalizationProvider.getMessage("analytics.comment.today.title"),
                         String.valueOf(commentsToday),
                         commentTrend,
-                        commentTrend > 0 ? "Up from yesterday" : "Down from yesterday",
-                        "Activity in the past 24h"
+                        commentTrend > 0
+                                ? LocalizationProvider.getMessage("analytics.comment.today.message.up")
+                                : LocalizationProvider.getMessage("analytics.comment.today.message.down"),
+                        LocalizationProvider.getMessage("analytics.comment.today.description")
                 ),
                 new OverviewStatistic(
-                        "Reported Comments",
+                        LocalizationProvider.getMessage("analytics.comment.reported.title"),
                         String.valueOf(reportedComments),
                         -4.2,
-                        "Moderation load easing",
-                        "Comments flagged for review"
+                        LocalizationProvider.getMessage("analytics.comment.reported.message"),
+                        LocalizationProvider.getMessage("analytics.comment.reported.description")
                 ),
                 new OverviewStatistic(
-                        "Avg. Comments/Post",
+                        LocalizationProvider.getMessage("analytics.comment.avg_per_post.title"),
                         String.valueOf(roundedAvgCommentsPerPost),
                         1.8,
-                        "Steady interactions",
-                        "Engagement over the past 7 days"
+                        LocalizationProvider.getMessage("analytics.comment.avg_per_post.message"),
+                        LocalizationProvider.getMessage("analytics.comment.avg_per_post.description")
                 )
         );
     }

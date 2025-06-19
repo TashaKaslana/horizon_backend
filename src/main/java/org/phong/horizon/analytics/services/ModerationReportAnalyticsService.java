@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyPendingAndResolvedDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.phong.horizon.report.enums.ModerationItemType;
 import org.phong.horizon.report.enums.ModerationStatus;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
@@ -89,32 +90,40 @@ public class ModerationReportAnalyticsService {
 
         return List.of(
                 new OverviewStatistic(
-                        titlePrefix + "Pending Reports",
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.pending.title"),
                         String.valueOf(pendingReports),
                         pendingReportsTrend,
-                        pendingReportsTrend < 0 ? "Fewer reports than last week" : "More reports than last week",
-                        titlePrefix + "Reports requiring admin review"
+                        pendingReportsTrend < 0
+                                ? LocalizationProvider.getMessage("analytics.moderation.pending.message.fewer")
+                                : LocalizationProvider.getMessage("analytics.moderation.pending.message.more"),
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.pending.description")
                 ),
                 new OverviewStatistic(
-                        titlePrefix + "Resolved Today",
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.resolved_today.title"),
                         String.valueOf(resolvedToday),
                         resolvedTrend,
-                        resolvedTrend > 0 ? "More resolutions than yesterday" : "Fewer resolutions than yesterday",
-                        titlePrefix + "Reports actioned and resolved today"
+                        resolvedTrend > 0
+                                ? LocalizationProvider.getMessage("analytics.moderation.resolved_today.message.more")
+                                : LocalizationProvider.getMessage("analytics.moderation.resolved_today.message.fewer"),
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.resolved_today.description")
                 ),
                 new OverviewStatistic(
-                        titlePrefix + "Content Removed (7d)",
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.content_removed.title"),
                         String.valueOf(contentRemoved),
                         contentRemovedTrend,
-                        contentRemovedTrend > 0 ? "Increase in content takedowns" : "Decrease in content takedowns",
-                        titlePrefix + "Posts/Comments removed in the last 7 days"
+                        contentRemovedTrend > 0
+                                ? LocalizationProvider.getMessage("analytics.moderation.content_removed.message.increase")
+                                : LocalizationProvider.getMessage("analytics.moderation.content_removed.message.decrease"),
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.content_removed.description")
                 ),
                 new OverviewStatistic(
-                        titlePrefix + "Users Actioned (7d)",
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.users_actioned.title"),
                         String.valueOf(usersActioned),
                         usersActionedTrend,
-                        usersActionedTrend < 0 ? "Fewer user actions this week" : "More user actions this week",
-                        titlePrefix + "Users warned or banned in the last 7 days"
+                        usersActionedTrend < 0
+                                ? LocalizationProvider.getMessage("analytics.moderation.users_actioned.message.fewer")
+                                : LocalizationProvider.getMessage("analytics.moderation.users_actioned.message.more"),
+                        titlePrefix + LocalizationProvider.getMessage("analytics.moderation.users_actioned.description")
                 )
         );
     }
