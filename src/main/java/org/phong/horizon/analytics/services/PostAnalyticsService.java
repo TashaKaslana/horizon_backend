@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostInteractionRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.PostRepository;
 import org.phong.horizon.post.infrastructure.persistence.repositories.ViewRepository;
@@ -56,32 +57,34 @@ public class PostAnalyticsService {
 
         return List.of(
                 new OverviewStatistic(
-                        "Total Posts",
+                        LocalizationProvider.getMessage("analytics.post.total.title"),
                         String.valueOf(totalPosts),
                         4.1,
-                        "Steady content growth",
-                        "Total posts uploaded to date"
+                        LocalizationProvider.getMessage("analytics.post.total.message"),
+                        LocalizationProvider.getMessage("analytics.post.total.description")
                 ),
                 new OverviewStatistic(
-                        "Posts Today",
+                        LocalizationProvider.getMessage("analytics.post.today.title"),
                         String.valueOf(postsToday),
                         postTrend,
-                        postTrend >= 0 ? "Slight increase from yesterday" : "Drop compared to yesterday",
-                        "Posts created in the last 24 hours"
+                        postTrend >= 0
+                                ? LocalizationProvider.getMessage("analytics.post.today.message.up")
+                                : LocalizationProvider.getMessage("analytics.post.today.message.down"),
+                        LocalizationProvider.getMessage("analytics.post.today.description")
                 ),
                 new OverviewStatistic(
-                        "Reported Posts",
+                        LocalizationProvider.getMessage("analytics.post.reported.title"),
                         String.valueOf(reportedPosts),
                         -8.4,
-                        "Fewer reports than last week",
-                        "Posts currently flagged by users"
+                        LocalizationProvider.getMessage("analytics.post.reported.message"),
+                        LocalizationProvider.getMessage("analytics.post.reported.description")
                 ),
                 new OverviewStatistic(
-                        "Avg. Engagement",
+                        LocalizationProvider.getMessage("analytics.post.avg_engagement.title"),
                         String.format("%.1f", avgEngagement),
                         5.9,
-                        "Up from last week",
-                        "Avg likes/comments per post (7d)"
+                        LocalizationProvider.getMessage("analytics.post.avg_engagement.message"),
+                        LocalizationProvider.getMessage("analytics.post.avg_engagement.description")
                 )
         );
     }

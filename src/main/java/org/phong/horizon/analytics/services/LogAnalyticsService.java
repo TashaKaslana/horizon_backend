@@ -6,6 +6,7 @@ import org.phong.horizon.admin.logentry.infrastructure.entities.LogEntry;
 import org.phong.horizon.admin.logentry.infrastructure.repositories.LogEntryRepository;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -65,32 +66,40 @@ public class LogAnalyticsService {
 
         return List.of(
             new OverviewStatistic(
-                "Error Logs Today",
+                LocalizationProvider.getMessage("analytics.log.errors_today.title"),
                 String.valueOf(errorLogsToday),
                 errorLogsTrend,
-                errorLogsTrend > 0 ? "More errors than yesterday" : "Fewer errors than yesterday",
-                "Error-level logs recorded today"
+                errorLogsTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.log.errors_today.message.more")
+                        : LocalizationProvider.getMessage("analytics.log.errors_today.message.fewer"),
+                LocalizationProvider.getMessage("analytics.log.errors_today.description")
             ),
             new OverviewStatistic(
-                "Critical Logs Today",
+                LocalizationProvider.getMessage("analytics.log.critical_today.title"),
                 String.valueOf(criticalLogsToday),
                 criticalLogsTrend,
-                criticalLogsTrend > 0 ? "More critical issues than yesterday" : "Fewer critical issues than yesterday",
-                "Critical-level logs recorded today"
+                criticalLogsTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.log.critical_today.message.more")
+                        : LocalizationProvider.getMessage("analytics.log.critical_today.message.fewer"),
+                LocalizationProvider.getMessage("analytics.log.critical_today.description")
             ),
             new OverviewStatistic(
-                "Error Logs (7d)",
+                LocalizationProvider.getMessage("analytics.log.errors_week.title"),
                 String.valueOf(errorLogsWeek),
                 errorLogsWeekTrend,
-                errorLogsWeekTrend > 0 ? "Increase from previous week" : "Decrease from previous week",
-                "Total error logs in the last 7 days"
+                errorLogsWeekTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.log.errors_week.message.increase")
+                        : LocalizationProvider.getMessage("analytics.log.errors_week.message.decrease"),
+                LocalizationProvider.getMessage("analytics.log.errors_week.description")
             ),
             new OverviewStatistic(
-                "Critical Logs (7d)",
+                LocalizationProvider.getMessage("analytics.log.critical_week.title"),
                 String.valueOf(criticalLogsWeek),
                 criticalLogsWeekTrend,
-                criticalLogsWeekTrend > 0 ? "Increase from previous week" : "Decrease from previous week",
-                "Total critical logs in the last 7 days"
+                criticalLogsWeekTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.log.critical_week.message.increase")
+                        : LocalizationProvider.getMessage("analytics.log.critical_week.message.decrease"),
+                LocalizationProvider.getMessage("analytics.log.critical_week.description")
             )
         );
     }

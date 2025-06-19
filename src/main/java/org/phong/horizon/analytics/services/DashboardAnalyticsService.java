@@ -5,6 +5,7 @@ import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.report.infrastructure.persistence.repositories.ReportRepository;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,32 +83,38 @@ public class DashboardAnalyticsService {
 
         return List.of(
             new OverviewStatistic(
-                "Total Users",
+                LocalizationProvider.getMessage("analytics.dashboard.total_users.title"),
                 String.valueOf(totalUsers),
                 userTrend,
-                userTrend > 0 ? "Up " + formatTrend(userTrend) + "% this month" : "Down " + formatTrend(-userTrend) + "% this month",
-                "User growth over the last 30 days"
+                userTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.dashboard.total_users.message.up", formatTrend(userTrend))
+                        : LocalizationProvider.getMessage("analytics.dashboard.total_users.message.down", formatTrend(-userTrend)),
+                LocalizationProvider.getMessage("analytics.dashboard.total_users.description")
             ),
             new OverviewStatistic(
-                "Total Posts",
+                LocalizationProvider.getMessage("analytics.dashboard.total_posts.title"),
                 String.valueOf(totalPosts),
                 postTrend,
-                "Steady content creation",
-                "Posts uploaded in the last 30 days"
+                LocalizationProvider.getMessage("analytics.dashboard.total_posts.message"),
+                LocalizationProvider.getMessage("analytics.dashboard.total_posts.description")
             ),
             new OverviewStatistic(
-                "Active Users",
+                LocalizationProvider.getMessage("analytics.dashboard.active_users.title"),
                 String.valueOf(activeUsers),
                 activeUsersTrend,
-                activeUsersTrend > 8 ? "High engagement this week" : "Normal engagement levels",
-                "Users active in the last 7 days"
+                activeUsersTrend > 8
+                        ? LocalizationProvider.getMessage("analytics.dashboard.active_users.message.high")
+                        : LocalizationProvider.getMessage("analytics.dashboard.active_users.message.normal"),
+                LocalizationProvider.getMessage("analytics.dashboard.active_users.description")
             ),
             new OverviewStatistic(
-                "Pending Reports",
+                LocalizationProvider.getMessage("analytics.dashboard.pending_reports.title"),
                 String.valueOf(pendingReports),
                 reportsTrend,
-                reportsTrend > 0 ? "Fewer reports than last week" : "More reports than last week",
-                "Reports requiring admin review"
+                reportsTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.dashboard.pending_reports.message.fewer")
+                        : LocalizationProvider.getMessage("analytics.dashboard.pending_reports.message.more"),
+                LocalizationProvider.getMessage("analytics.dashboard.pending_reports.description")
             )
         );
     }

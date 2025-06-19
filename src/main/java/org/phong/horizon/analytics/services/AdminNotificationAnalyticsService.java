@@ -7,6 +7,7 @@ import org.phong.horizon.admin.notification.infrastructure.entities.AdminNotific
 import org.phong.horizon.admin.notification.infrastructure.repositories.AdminNotificationRepository;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,32 +66,40 @@ public class AdminNotificationAnalyticsService {
 
         return List.of(
             new OverviewStatistic(
-                "Unread Notifications",
+                LocalizationProvider.getMessage("analytics.admin_notifications.unread.title"),
                 String.valueOf(unreadNotifications),
                 unreadTrend,
-                unreadTrend > 0 ? "More unread items than yesterday" : "Fewer unread items than yesterday",
-                "Notifications requiring admin attention"
+                unreadTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.admin_notifications.unread.message.more")
+                        : LocalizationProvider.getMessage("analytics.admin_notifications.unread.message.fewer"),
+                LocalizationProvider.getMessage("analytics.admin_notifications.unread.description")
             ),
             new OverviewStatistic(
-                "Critical Alerts",
+                LocalizationProvider.getMessage("analytics.admin_notifications.critical.title"),
                 String.valueOf(criticalAlerts),
                 criticalTrend,
-                criticalTrend > 0 ? "Increase in critical alerts" : "Decrease in critical alerts",
-                "High priority notifications needing action"
+                criticalTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.admin_notifications.critical.message.more")
+                        : LocalizationProvider.getMessage("analytics.admin_notifications.critical.message.fewer"),
+                LocalizationProvider.getMessage("analytics.admin_notifications.critical.description")
             ),
             new OverviewStatistic(
-                "System Issues (7d)",
+                LocalizationProvider.getMessage("analytics.admin_notifications.system_issues.title"),
                 String.valueOf(systemIssues),
                 systemIssuesTrend,
-                systemIssuesTrend > 0 ? "More system issues than last week" : "Fewer system issues than last week",
-                "Errors and warnings from system in last 7 days"
+                systemIssuesTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.admin_notifications.system_issues.message.more")
+                        : LocalizationProvider.getMessage("analytics.admin_notifications.system_issues.message.fewer"),
+                LocalizationProvider.getMessage("analytics.admin_notifications.system_issues.description")
             ),
             new OverviewStatistic(
-                "New Reports (24h)",
+                LocalizationProvider.getMessage("analytics.admin_notifications.new_reports.title"),
                 String.valueOf(newReports),
                 newReportsTrend,
-                newReportsTrend > 0 ? "Increase in reports from previous day" : "Decrease in reports from previous day",
-                "User reports received in the last 24 hours"
+                newReportsTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.admin_notifications.new_reports.message.increase")
+                        : LocalizationProvider.getMessage("analytics.admin_notifications.new_reports.message.decrease"),
+                LocalizationProvider.getMessage("analytics.admin_notifications.new_reports.description")
             )
         );
     }
