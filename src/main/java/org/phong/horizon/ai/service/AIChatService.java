@@ -28,11 +28,45 @@ import java.util.List;
 @AllArgsConstructor
 public class AIChatService {
 
+    public static List<String> supportedModels = List.of(
+            "google/gemini-2.0-flash-exp:free",
+            "meta-llama/llama-4-maverick:free",
+            "deepseek/deepseek-r1-0528-qwen3-8b:free"
+    );
     private final ChatModel chatModel;
     private final ObjectMapper objectMapper;
     private final AIFunctions aiFunctions;
 
-    public AIChatResponse processChat(String message) {
+    private static String getString(String outputText) {
+        String cleaned = outputText.trim();
+
+        // Handle prefix like "json\n"
+        if (cleaned.toLowerCase().startsWith("json")) {
+            cleaned = cleaned.substring(4).trim();
+        }
+
+        // Remove markdown formatting if any
+        if (cleaned.startsWith("```json")) {
+            cleaned = cleaned.replace("```json", "").replace("```", "").trim();
+        }
+
+        // Unescape if AI double-encoded
+        if (cleaned.startsWith("\"{")) {
+            cleaned = cleaned.substring(1, cleaned.length() - 1).replace("\\\"", "\"");
+        }
+        return cleaned;
+    }
+
+    public List<String> getSupportedModels() {
+        return supportedModels;
+    }
+
+    public AIChatResponse processChat(String message, String model) {
+//        if (!isModelSupported(model)) {
+//            throw new IllegalArgumentException("Unsupported AI model: " + model + ". Supported models are: " +
+//                    String.join(", ", supportedModels));
+//        }
+
         try {
             String template = loadPromptTemplate();
 
@@ -58,12 +92,17 @@ public class AIChatService {
 
             ChatResponse chatResponse = chatModel.call(prompt);
 
-            while (chatResponse.hasToolCalls()) {
+            if (chatResponse.hasToolCalls()) {
                 ToolExecutionResult result = toolCallingManager.executeToolCalls(prompt, chatResponse);
                 prompt = new Prompt(result.conversationHistory(), chatOptions);
                 chatResponse = chatModel.call(prompt);
+            } else {
+                log.warn("⚠️ AI suggested an action '{}' but did NOT trigger a tool call!", chatResponse);
             }
 
+            if (chatResponse.getResult() == null || chatResponse.getResult().getOutput() == null) {
+                throw new AICommunicationException("Model did not return a response.", null);
+            }
             String outputText = chatResponse.getResult().getOutput().getText();
             log.warn("AI returned outputText: {}", outputText);
 
@@ -84,24 +123,23 @@ public class AIChatService {
         }
     }
 
-    private static String getString(String outputText) {
-        String cleaned = outputText.trim();
-
-        // Handle prefix like "json\n"
-        if (cleaned.toLowerCase().startsWith("json")) {
-            cleaned = cleaned.substring(4).trim();
+    /**
+     * Checks if the provided model is in the list of supported models
+     *
+     * @param model The model to validate
+     * @return true if the model is supported, false otherwise
+     */
+    private boolean isModelSupported(String model) {
+        if (model == null || model.isEmpty()) {
+            return false;
         }
 
-        // Remove markdown formatting if any
-        if (cleaned.startsWith("```json")) {
-            cleaned = cleaned.replace("```json", "").replace("```", "").trim();
+        for (String supportedModel : supportedModels) {
+            if (supportedModel.equals(model)) {
+                return true;
+            }
         }
-
-        // Unescape if AI double-encoded
-        if (cleaned.startsWith("\"{")) {
-            cleaned = cleaned.substring(1, cleaned.length() - 1).replace("\\\"", "\"");
-        }
-        return cleaned;
+        return false;
     }
 
     private String loadPromptTemplate() throws IOException {
