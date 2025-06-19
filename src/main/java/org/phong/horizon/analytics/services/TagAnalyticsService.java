@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.phong.horizon.analytics.dtos.TopTagUsageDTO;
 import org.phong.horizon.analytics.projections.TopTagUsageProjection;
 import org.phong.horizon.post.subdomain.tag.entity.Tag;
@@ -54,32 +55,38 @@ public class TagAnalyticsService {
 
         return List.of(
             new OverviewStatistic(
-                "Total Tags",
+                LocalizationProvider.getMessage("analytics.tag.total.title"),
                 String.valueOf(totalTags),
                 tagTrend,
-                tagTrend > 0 ? "Growing" : "Stable",
-                "Total number of tags in the system"
+                tagTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.tag.total.message.growing")
+                        : LocalizationProvider.getMessage("analytics.tag.total.message.stable"),
+                LocalizationProvider.getMessage("analytics.tag.total.description")
             ),
             new OverviewStatistic(
-                "Most Popular Tag",
+                LocalizationProvider.getMessage("analytics.tag.most_popular.title"),
                 mostUsedTagName,
                 0.0,
-                String.format("Used in %d posts", mostUsedTagCount),
-                "Tag with the most posts assigned"
+                LocalizationProvider.getMessage("analytics.tag.most_popular.message", mostUsedTagCount),
+                LocalizationProvider.getMessage("analytics.tag.most_popular.description")
             ),
             new OverviewStatistic(
-                "Unused Tags",
+                LocalizationProvider.getMessage("analytics.tag.unused.title"),
                 String.valueOf(unusedTags),
                 0.0,
-                unusedTags > 0 ? "Candidates for cleanup" : "All tags in use",
-                "Tags not used in any posts"
+                unusedTags > 0
+                        ? LocalizationProvider.getMessage("analytics.tag.unused.message.cleanup")
+                        : LocalizationProvider.getMessage("analytics.tag.unused.message.in_use"),
+                LocalizationProvider.getMessage("analytics.tag.unused.description")
             ),
             new OverviewStatistic(
-                "New Tags Today",
+                LocalizationProvider.getMessage("analytics.tag.new_today.title"),
                 String.valueOf(tagsToday),
                 tagTrend,
-                tagsToday > 0 ? "Active tag creation" : "No new tags today",
-                "Tags created in the last 24 hours"
+                tagsToday > 0
+                        ? LocalizationProvider.getMessage("analytics.tag.new_today.message.active")
+                        : LocalizationProvider.getMessage("analytics.tag.new_today.message.none"),
+                LocalizationProvider.getMessage("analytics.tag.new_today.description")
             )
         );
     }

@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.phong.horizon.analytics.dtos.TopCategoryUsageDTO;
 import org.phong.horizon.post.subdomain.category.entities.PostCategory;
 import org.phong.horizon.post.subdomain.category.repositories.PostCategoryRepository;
@@ -56,32 +57,38 @@ public class CategoryAnalyticsService {
 
         return List.of(
             new OverviewStatistic(
-                "Total Categories",
+                LocalizationProvider.getMessage("analytics.category.total.title"),
                 String.valueOf(totalCategories),
                 categoryTrend,
-                categoryTrend > 0 ? "Growing" : "Stable",
-                "Total number of categories in the system"
+                categoryTrend > 0
+                        ? LocalizationProvider.getMessage("analytics.category.total.message.growing")
+                        : LocalizationProvider.getMessage("analytics.category.total.message.stable"),
+                LocalizationProvider.getMessage("analytics.category.total.description")
             ),
             new OverviewStatistic(
-                "Most Used Category",
+                LocalizationProvider.getMessage("analytics.category.most_used.title"),
                 mostUsedCategoryName,
                 0.0,
-                String.format("Used in %d posts", mostUsedCategoryCount),
-                "Category with the most posts assigned"
+                LocalizationProvider.getMessage("analytics.category.most_used.message", mostUsedCategoryCount),
+                LocalizationProvider.getMessage("analytics.category.most_used.description")
             ),
             new OverviewStatistic(
-                "Unused Categories",
+                LocalizationProvider.getMessage("analytics.category.unused.title"),
                 String.valueOf(unusedCategories),
                 0.0,
-                unusedCategories > 0 ? "Candidates for cleanup" : "All categories in use",
-                "Categories without any posts"
+                unusedCategories > 0
+                        ? LocalizationProvider.getMessage("analytics.category.unused.message.cleanup")
+                        : LocalizationProvider.getMessage("analytics.category.unused.message.in_use"),
+                LocalizationProvider.getMessage("analytics.category.unused.description")
             ),
             new OverviewStatistic(
-                "New Categories Today",
+                LocalizationProvider.getMessage("analytics.category.new_today.title"),
                 String.valueOf(categoriesToday),
                 categoryTrend,
-                categoriesToday > 0 ? "Active category creation" : "No new categories today",
-                "Categories created in the last 24 hours"
+                categoriesToday > 0
+                        ? LocalizationProvider.getMessage("analytics.category.new_today.message.active")
+                        : LocalizationProvider.getMessage("analytics.category.new_today.message.none"),
+                LocalizationProvider.getMessage("analytics.category.new_today.description")
             )
         );
     }

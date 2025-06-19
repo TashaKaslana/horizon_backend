@@ -3,6 +3,7 @@ package org.phong.horizon.analytics.services;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.analytics.dtos.OverviewStatistic;
 import org.phong.horizon.analytics.dtos.DailyCountDto;
+import org.phong.horizon.core.services.LocalizationProvider;
 import org.phong.horizon.user.infrastructure.persistence.repositories.UserRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -47,32 +48,32 @@ public class UserAnalyticsService {
 
         return List.of(
                 new OverviewStatistic(
-                        "Total Users",
+                        LocalizationProvider.getMessage("analytics.user.total.title"),
                         String.valueOf(totalUsers),
                         userTrend,
-                        "Up 6.8% from last month",
-                        "Total registered users"
+                        LocalizationProvider.getMessage("analytics.user.total.message"),
+                        LocalizationProvider.getMessage("analytics.user.total.description")
                 ),
                 new OverviewStatistic(
-                        "New Users (30d)",
+                        LocalizationProvider.getMessage("analytics.user.new_30d.title"),
                         String.valueOf(newUsers30d),
                         2.3,
-                        "Steady onboarding rate",
-                        "Users signed up in the last 30 days"
+                        LocalizationProvider.getMessage("analytics.user.new_30d.message"),
+                        LocalizationProvider.getMessage("analytics.user.new_30d.description")
                 ),
                 new OverviewStatistic(
-                        "Banned Users",
+                        LocalizationProvider.getMessage("analytics.user.banned.title"),
                         String.valueOf(bannedUsers),
                         -5.0,
-                        "Decrease in bans",
-                        "Currently banned accounts"
+                        LocalizationProvider.getMessage("analytics.user.banned.message"),
+                        LocalizationProvider.getMessage("analytics.user.banned.description")
                 ),
                 new OverviewStatistic(
-                        "Verified Users",
+                        LocalizationProvider.getMessage("analytics.user.verified.title"),
                         String.valueOf(verifiedUsers),
                         12.1,
-                        "Verification requests rising",
-                        "Verified accounts to date"
+                        LocalizationProvider.getMessage("analytics.user.verified.message"),
+                        LocalizationProvider.getMessage("analytics.user.verified.description")
                 )
         );
     }
