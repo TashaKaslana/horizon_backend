@@ -18,8 +18,9 @@ public class SystemStatusDto {
     private DatabaseStatusDto database;
     private CloudinaryStatusDto cloudinary;
     private Auth0StatusDto auth0;
+    private AblyStatusDto ably;
+    private RedisStatusDto redis;
     // Other services can be added here as needed
-    // private AblyStatusDto ably;
     // private VercelStatusDto vercel;
 
     // Legacy support for Map conversion if needed
@@ -29,6 +30,8 @@ public class SystemStatusDto {
         status.put("database", database);
         status.put("cloudinary", cloudinary);
         status.put("auth0", auth0);
+        status.put("ably", ably);
+        status.put("redis", redis);
         return status;
     }
 }
