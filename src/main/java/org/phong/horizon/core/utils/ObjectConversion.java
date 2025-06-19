@@ -66,4 +66,9 @@ public final class ObjectConversion {
         @JsonIgnore
         abstract Object getSource();
     }
+
+    public static <T> T safeConvert(Object input, Class<T> targetType) {
+        if (targetType.isInstance(input)) return targetType.cast(input);
+        return new ObjectMapper().convertValue(input, targetType);
+    }
 }

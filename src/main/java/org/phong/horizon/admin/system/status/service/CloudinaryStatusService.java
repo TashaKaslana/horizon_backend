@@ -4,7 +4,6 @@ import com.cloudinary.Cloudinary;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.admin.system.status.dto.CloudinaryStatusDto;
 import org.phong.horizon.core.utils.ObjectConversion;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,7 +14,6 @@ import java.util.Map;
 public class CloudinaryStatusService {
     private final Cloudinary cloudinary;
 
-    @Cacheable("cloudinary-usage")
     public CloudinaryStatusDto getStatus() {
         long start = System.nanoTime();
 

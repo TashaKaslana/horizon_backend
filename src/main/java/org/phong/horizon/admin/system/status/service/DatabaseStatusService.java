@@ -2,7 +2,6 @@ package org.phong.horizon.admin.system.status.service;
 
 import jakarta.persistence.EntityManager;
 import org.phong.horizon.admin.system.status.dto.DatabaseStatusDto;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +13,6 @@ public class DatabaseStatusService {
         this.entityManager = entityManager;
     }
 
-    @Cacheable("database-status")
     public DatabaseStatusDto getStatus() {
         try {
             entityManager.createNativeQuery("SELECT 1").getSingleResult();

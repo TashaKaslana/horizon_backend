@@ -3,7 +3,6 @@ package org.phong.horizon.admin.system.status.service;
 import org.phong.horizon.admin.system.status.dto.Auth0StatusDto;
 import org.phong.horizon.core.properties.Auth0Properties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,7 +19,6 @@ public class Auth0StatusService {
         this.props = props;
     }
 
-    @Cacheable("auth0-status")
     public Auth0StatusDto getStatus() {
         String url = props.getDomain() + "/.well-known/openid-configuration";
         long start = System.nanoTime();

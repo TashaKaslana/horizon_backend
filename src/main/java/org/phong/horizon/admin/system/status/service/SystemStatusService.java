@@ -1,14 +1,17 @@
 package org.phong.horizon.admin.system.status.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.phong.horizon.admin.system.maintenance.services.MaintenanceService;
 import org.phong.horizon.admin.system.status.dto.SystemStatusDto;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class SystemStatusService {
 
+    private final ObjectMapper objectMapper;
     private final CloudinaryStatusService cloudinaryStatusService;
     private final Auth0StatusService auth0StatusService;
     private final DatabaseStatusService databaseStatusService;
@@ -16,6 +19,7 @@ public class SystemStatusService {
 //    private final AblyStatusService ablyStatusService;
 //    private final VercelStatusService vercelStatusService;
 
+    @Cacheable(value = "systemStatus", condition = "false")
     public SystemStatusDto getSystemStatus() {
         SystemStatusDto status = new SystemStatusDto();
 
